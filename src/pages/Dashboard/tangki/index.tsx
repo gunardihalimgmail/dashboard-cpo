@@ -441,18 +441,21 @@ class DashboardTangki extends React.Component {
           curve: 'smooth'
         },
         xaxis: {
-          type: 'category',
-          // type: 'datetime',
-          // tickAmount:30,
+          // type: 'category',
+          type: 'datetime',
+          tickAmount:30,
           // categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"],
           // min: new Date("01/01/2014 05:00").getTime(),
           // max: new Date("01/01/2014 19:00").getTime(),
           categories: [],
+
           labels:{
-            formatter:(val:any)=>{
-              return formatDate(new Date(val), 'HH:mm')
-              // return val
-            }
+              rotate: -45,
+              rotateAlways:true,
+              formatter:(val:any)=>{
+                return formatDate(new Date(val), 'HH:mm')
+                // return val
+              }
           //   formatDate(
           //     (new Date(val).getTime() + new Date(val).getTimezoneOffset() * 60000)
           // ,'HH:mm')
@@ -474,8 +477,10 @@ class DashboardTangki extends React.Component {
               // console.log(w.globals);
 
               // return new Date(value)
-              let waktu:any = w.globals.categoryLabels[dataPointIndex];
-                return waktu;
+              return formatDate(new Date(value),'HH:mm')
+
+              // let waktu:any = w.globals.categoryLabels[dataPointIndex];
+                // return waktu;
             }
             // custom: ({series, seriesIndex, dataPointIndex, w}:any) => {
             //     var data = w.globals.initialSeries[seriesIndex].data[dataPointIndex];
@@ -574,7 +579,7 @@ class DashboardTangki extends React.Component {
     chartTinggiJam_OptionsChart:ApexOptions = {
       chart: {
         type: 'area',
-        stacked: false,
+        // stacked: false,
         height: 350,
         toolbar:{
           show:true,
@@ -633,8 +638,8 @@ class DashboardTangki extends React.Component {
         }
       },
       xaxis: {
-        // type: 'datetime',
-        type: 'category',
+        type: 'datetime',
+        // type: 'category',
         tickAmount:30,
         categories:[],
         // categories:['2023-01-01 12:00:00','2023-01-01 13:00:00','2023-01-01 14:00:00'],
@@ -1020,10 +1025,10 @@ class DashboardTangki extends React.Component {
         
         // dapatkan tanggal terakhir dari semua tangki yang ter-update
         this.getDateMax_From_TangkiLast();
-
         // untuk chart per jam
         // sini
         this.getAllData(this.tanggal_max_tangki_last, this.tanggal_max_tangki_last);
+
         
 
         // alert(formatDate(new Date(),'HH:mm'))
@@ -1066,7 +1071,7 @@ class DashboardTangki extends React.Component {
           "date":formatDate(new Date(datebegin),'YYYY-MM-DD'),
           "hourBegin":'00:00',
           "hourLast":'23:59',
-          "minutes":false
+          "minutes":true
         },
       (res:any)=>{
         
