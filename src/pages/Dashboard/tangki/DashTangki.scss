@@ -1,0 +1,146 @@
+::-webkit-scrollbar {
+    background-color: lightgrey;
+    height:5px;
+}
+::-webkit-scrollbar-track {
+    background-color: white;
+}
+::-webkit-scrollbar-thumb {
+    background-color: rgba(128, 128, 128, 0.712);
+}
+
+.dashtangki-contain-wrapper{
+    // background:#f2edf3;
+    // background:aliceblue;
+    height:100vh;
+}
+.dashtangki-subcontain{
+    // border:1px solid red;
+    margin-bottom:30px;
+    padding:30px;
+    height:100vh;
+}
+
+.dashtangki-row-1{
+    position: relative;
+    display: block;
+    top:20px;
+}
+
+.dashtangki-page-title {
+    color:#000;
+    font-size: 1.125rem;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+}
+.bg-gradient-primary {
+    background:linear-gradient(90deg,#da8cff,#9a55ff)
+}
+.bg-gradient-info {
+    background:linear-gradient(90deg,#90caf9,#047edf 99%)
+}
+.bg-gradient-success {
+    background:linear-gradient(90deg,#84d9d2,#07cdae)
+}
+.bg-gradient-warning {
+    // background:linear-gradient(90deg,#f6e384,#ffd500)
+    background:linear-gradient(90deg,#b9dd77,#46ee25)
+}
+
+span.dashtangki-mdi-span {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin-right:10px;
+    width:36px;
+    height:36px;
+    box-shadow: 0 3px 8.3px 0.7px rgb(163 93 255 / 35%);
+    border-radius: 4px;
+}
+
+.bg-gradient-danger{
+    background: linear-gradient(90deg,#ffbf96,#fe7096);
+}
+
+h4.dashtangki-cardbody-ontop{
+    // font-size:20px !important
+    font-weight: 400 !important;
+}
+
+.dashtangki-image-circle {
+    position: absolute;
+    top:0;
+    right:0;
+    height:100%;
+    // color:#f0f8ff
+}
+
+.dashtangki-title{
+    font-weight:100;
+    font-family: fantasy;
+    margin-bottom:0;
+}
+
+.dashtangki-subtitle {
+    color:grey;
+    font-size:12px;
+    font-style: italic;
+    font-weight: 500;
+    top:-5px;
+    position: relative;
+}
+
+.customclass-snap{
+    scroll-snap-type: x mandatory;
+    white-space: nowrap;
+    overflow-x:auto;
+    
+
+    .snap-col {
+        scroll-snap-align: center;
+    }
+}
+
+.dashtangki-subtitle-card {
+    position: relative;
+    margin-top:-7px;
+}
+
+.filter-css-title {
+    font-weight: bold;
+    font-size:20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-right:10px;
+    width:100px;
+}
+
+.select-class{
+    width:200px;
+    margin-right:10px;
+}
+
+// datepicker
+.react-datepicker__input-container {
+    input {
+        box-shadow: 2px 1px 5px 1px lightgrey;
+        border:1px solid darkgrey;
+        padding:5px;
+        border-radius: 5px;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+}
+
+.react-datepicker-wrapper {
+    width:200px !important
+}
+
+.btn-filter-ml{
+    margin-left:5px
+}
+
+.react-timerange-picker__wrapper{
+    box-shadow: 2px 1px 5px 1px lightgrey;
+    padding:3px;
+    border-radius: 5px;
+}

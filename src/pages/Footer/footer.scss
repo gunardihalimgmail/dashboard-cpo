@@ -1,0 +1,33 @@
+.footer-img-wrapper {
+    background-color: white;
+    border-radius: 50%;
+    text-align: center;
+    padding:2px 2px;
+}
+.footer-main {
+    bottom: 0;
+    display: flex;
+    height:60px;
+    justify-content: space-between;
+    background-color: seagreen;
+    padding:10px;
+    color:white;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 15px;
+    padding-right: 20px;
+    padding-left: 20px;
+    align-items: center;
+}
+
+.footer-img {
+    vertical-align: middle;
+    width:20px;
+    height:20px;
+    object-fit: contain;
+}
+.footer-img-flex {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
