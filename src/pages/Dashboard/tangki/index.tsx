@@ -447,7 +447,7 @@ class DashboardTangki extends React.Component {
           // categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"],
           // min: new Date("01/01/2014 05:00").getTime(),
           // max: new Date("01/01/2014 19:00").getTime(),
-          categories: [],
+          // categories: [],
 
           labels:{
               rotate: -45,
@@ -641,7 +641,7 @@ class DashboardTangki extends React.Component {
         type: 'datetime',
         // type: 'category',
         tickAmount:30,
-        categories:[],
+        // categories:[],
         // categories:['2023-01-01 12:00:00','2023-01-01 13:00:00','2023-01-01 14:00:00'],
         // tickAmount: 24,
         // tickPlacement: 'on',
@@ -1056,7 +1056,7 @@ class DashboardTangki extends React.Component {
         }
     }
 
-    async getAllData(datebegin:any, datelast:any){
+    async getAllData(datebegin:any, datelast:any, hourbegin?:any, hourlast?:any){
 
         // GET ALL DATA PER JAM (SUHU, TINGGI)
       // await postApi("https://platform.iotsolution.id:7004/api-v1/getAllData",null,true,'1',(res:any)=>{
@@ -1066,11 +1066,11 @@ class DashboardTangki extends React.Component {
       // "dateLast":formatDate(new Date(datelast),'YYYY-MM-DD')
 
       // LAGI FIXING PAK BAYU getDataHour banyak yg NaN
-      await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
+      await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
         {
           "date":formatDate(new Date(datebegin),'YYYY-MM-DD'),
-          "hourBegin":'00:00',
-          "hourLast":'23:59',
+          "hourBegin": typeof hourbegin == 'undefined' || hourbegin == null ? '00:00' : hourbegin,
+          "hourLast": typeof hourlast == 'undefined' || hourlast == null ? '23:59' : hourlast,
           "minutes":true
         },
       (res:any)=>{
@@ -1252,10 +1252,9 @@ class DashboardTangki extends React.Component {
                   })
 
                   // ... end LOOPING obj_keys_suhu (Object.keys(data_arr))
+
                   // console.log('OBJ temp tank')
                   // console.log(obj_temp_tank)
-
-                  
 
                   // hitung rata-rata tangki "obj_temp_tank"
                   let arr_obj_keys_avg = Object.keys(obj_temp_tank);
@@ -1293,7 +1292,23 @@ class DashboardTangki extends React.Component {
                           idx_arr_perjam_series = findIdx;
                       }
 
-                      data_temp.push(obj_temp_tank?.[tangki_name]?.['avg']);
+                      data_temp.push(
+                          {
+                            x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm'),
+                            y: parseFloat(obj_temp_tank?.[tangki_name]?.['avg']),
+                            x_time: new Date(time_tank).getTime()
+                          }
+                      );
+
+                      // SORTING data_tinggi_temp
+                      if (data_temp.length > 0) {
+
+                        data_temp.sort((a,b)=>{
+                            return a['x_time'] - b['x_time'];
+                        })
+
+                      }
+                      // ... end sorting 
 
                       // store data ke "data_suhu_tangki_perjam_series" untuk nanti di simpan ke setChartSuhuJam
                       if (!tangki_exists){
@@ -1323,7 +1338,26 @@ class DashboardTangki extends React.Component {
                           idx_arr_perjam_series = findTinggiIdx;
                       }
 
-                      data_tinggi_temp.push(obj_temp_tank?.[tangki_name]?.['tinggi_minyak']);
+                      data_tinggi_temp.push(
+                          {
+                            x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm'),
+                            y: parseFloat(obj_temp_tank?.[tangki_name]?.['tinggi_minyak']),
+                            x_time: new Date(time_tank).getTime()
+                          }
+                      );
+                      // SORTING data_tinggi_temp
+                      if (data_tinggi_temp.length > 0) {
+
+                        data_tinggi_temp.sort((a,b)=>{
+                            return a['x_time'] - b['x_time'];
+                        })
+
+                      }
+                      // ... end sorting 
+
+                      // console.log("DATA TINGGI TEMP")
+                      // console.log(data_tinggi_temp)
+
                        // store data ke "data_tinggi_tangki_perjam_series" untuk nanti di simpan ke setChartTinggiJam
                        if (!tangki_exists){
                             this.data_tinggi_tangki_perjam_series.push(
@@ -1343,9 +1377,16 @@ class DashboardTangki extends React.Component {
                   // ... end obj_temp_tank
 
                   // push categories (tanggal tz ke array "data_suhu_tangki_perjam_categories")
-                  this.data_suhu_tangki_perjam_categories.push(time_tank);
-                  this.data_tinggi_tangki_perjam_categories.push(time_tank);
+                  // this.data_suhu_tangki_perjam_categories.push(time_tank);
+                  // this.data_tinggi_tangki_perjam_categories.push(time_tank);
 
+                  // REVISI UNTUK IRREGULAR SERIES ({x:..., y: ....})
+                  this.data_suhu_tangki_perjam_categories.push(new Date(time_tank).getTime());
+                  this.data_tinggi_tangki_perjam_categories.push(
+                        new Date(formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm')).getTime()
+                  );
+
+                  
                   // reverse
                   // let temp_reverse = this.data_suhu_tangki_perjam_categories.reverse();
                   // this.data_suhu_tangki_perjam_categories = [...temp_reverse];
@@ -1368,6 +1409,16 @@ class DashboardTangki extends React.Component {
 
               console.log("DATA SUHU TANGKI PER JAM SERIES")
               console.log(this.data_suhu_tangki_perjam_series)
+              
+              console.log("DATA TINGGI TANGKI PER JAM CATEGORIES")
+              console.log(this.data_tinggi_tangki_perjam_categories)
+
+              let min_tgl:any = null;
+              let max_tgl:any = null;
+              if (this.data_tinggi_tangki_perjam_categories.length > 0){
+                  min_tgl = Math.min.apply(null, this.data_tinggi_tangki_perjam_categories)
+                  max_tgl = Math.max.apply(null, this.data_tinggi_tangki_perjam_categories)
+              }
 
               // SET CHART SUHU JAM
               this.setChartSuhuJam = {
@@ -1377,7 +1428,8 @@ class DashboardTangki extends React.Component {
                     ...this.setChartSuhuJam.options,
                     xaxis:{
                       ...this.setChartSuhuJam.options.xaxis,
-                      categories: JSON.parse(JSON.stringify(this.data_suhu_tangki_perjam_categories))
+                      type:'datetime',
+                      // categories: JSON.parse(JSON.stringify(this.data_suhu_tangki_perjam_categories))
                     },
                     dataLabels:{
                       ...this.setChartSuhuJam.options.dataLabels,
@@ -1394,7 +1446,12 @@ class DashboardTangki extends React.Component {
                     ...this.setChartTinggiJam.options,
                     xaxis:{
                       ...this.setChartTinggiJam.options.xaxis,
-                      categories: JSON.parse(JSON.stringify(this.data_tinggi_tangki_perjam_categories))
+                      min: typeof min_tgl != 'undefined' && min_tgl != null ? new Date(min_tgl).getTime() : 0,
+                      max: typeof max_tgl != 'undefined' && max_tgl != null ? new Date(max_tgl).getTime() : 0
+                      // type: 'datetime',
+                      // min: formatDate(new Date(time_tank),'YYYY-MM-DD'
+                      // // categories untuk type 'category'
+                      // categories: JSON.parse(JSON.stringify(this.data_tinggi_tangki_perjam_categories))
                     },
                     dataLabels:{
                       ...this.setChartTinggiJam.options.dataLabels,
@@ -1425,8 +1482,13 @@ class DashboardTangki extends React.Component {
               // console.log(time_tank)
 
               setTimeout(()=>{
+                console.log("CHART TINGGI JAM")
+                console.log(this.state.chartTinggiJam)
+
                 console.log("set chart suhu jam")
                 console.log(this.data_suhu_tangki_perjam_categories)
+                console.log(min_tgl)
+                console.log(max_tgl)
               },500)
 
               // console.log("array json tangki ALL DATA")
@@ -1739,6 +1801,35 @@ class DashboardTangki extends React.Component {
                   this.getAllData(this.state.dateSelected, this.state.dateSelected)
                 },200)
             }
+            else
+            {
+              if (this.state.show.datepicker && this.state.show.timepicker){
+                if (dateSelected != null && 
+                        timeSelected[0] != null &&
+                        timeSelected[1] != null){
+                    
+                    this.data_suhu_tangki_perjam_series = []
+                    this.data_suhu_tangki_perjam_categories = []
+                    this.data_tinggi_tangki_perjam_categories = []
+                    this.data_tinggi_tangki_perjam_series = []
+
+                    this.setState({
+                      ...this.state,
+                      loader:{
+                        ...this.state.loader,
+                        tinggi_isi_jam: true,
+                        suhu_tangki_jam: true
+                      },
+                    });
+
+                    setTimeout(()=>{
+                      this.getAllData(dateSelected, dateSelected, timeSelected[0], timeSelected[1]);
+                    },200)
+                }
+              }
+            }
+
+
             console.log(dateSelected)
             console.log(timeSelected)
           }

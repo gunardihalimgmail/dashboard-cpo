@@ -5,6 +5,7 @@ export const formatDate = (tanggal:any, format:
                                 "DD MMMM YYYY HH:mm:ss"|
                                 "DD MMM YYYY HH:mm:ss" |
                                 "YYYY-MM-DD" |
+                                "YYYY-MM-DD HH:mm" |
                                 "YYYY-MM-DDTHH:mm:ssZ" |
                                 "YYYY-MM-DDTHH:mm:ss" |
                                 "YYYY-MM-DD HH:mm:ss") => {
@@ -43,6 +44,9 @@ export const formatDate = (tanggal:any, format:
                 break;
             case 'YYYY-MM-DD HH:mm:ss':
                 final_format = year_y + "-" + month_m + "-" + date_d + " " + hour_d + ":" + minutes_d + ":" + seconds_d;
+                break;
+            case 'YYYY-MM-DD HH:mm':
+                final_format = year_y + "-" + month_m + "-" + date_d + " " + hour_d + ":" + minutes_d;
                 break;
             case 'YYYY-MM-DD':
                 final_format = year_y + "-" + month_m + "-" + date_d;
