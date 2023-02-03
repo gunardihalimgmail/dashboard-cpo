@@ -95,7 +95,7 @@ h4.dashtangki-cardbody-ontop{
     scroll-snap-type: x mandatory;
     white-space: nowrap;
     overflow-x:auto;
-    
+    overflow-y:hidden;
 
     .snap-col {
         scroll-snap-align: center;

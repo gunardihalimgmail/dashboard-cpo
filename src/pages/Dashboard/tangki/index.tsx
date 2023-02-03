@@ -42,6 +42,12 @@ import moment from 'moment';
 // import { Form } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 
+import tangki_1_json from '../../../data/volume_tangki/tangki_1.json'
+import tangki_2_json from '../../../data/volume_tangki/tangki_2.json'
+import tangki_3_json from '../../../data/volume_tangki/tangki_3.json'
+import tangki_4_json from '../../../data/volume_tangki/tangki_4.json'
+
+
 // import tesaja from '../../../data/tes.json'
 
 // ReactFC.fcRoot(FusionCharts, PowerCharts, FusionTheme)
@@ -53,6 +59,20 @@ charts(FusionCharts);
 
 
 class DashboardTangki extends React.Component {
+
+  // ARRAY CPO & PKO berdasarkan tanggal berlaku
+    arr_cpo_pko = [
+      {name: 'tangki_1', jenis:'CPO', datebegin:'1970-01-01', datelast:''},
+
+      {name: 'tangki_2', jenis:'PKO', datebegin:'1970-01-01', datelast:''},
+
+      {name: 'tangki_3', jenis:'CPO', datebegin:'1970-01-01', datelast:'2023-01-28'},
+      {name: 'tangki_3', jenis:'PKO', datebegin:'2023-01-28', datelast:''},
+
+      {name: 'tangki_4', jenis:'CPO', datebegin:'1970-01-01', datelast:''},
+    ]
+
+
 
     statusChecked:any = {
       tinggi: false,
@@ -441,12 +461,12 @@ class DashboardTangki extends React.Component {
           curve: 'smooth'
         },
         xaxis: {
-          // type: 'category',
           type: 'datetime',
-          tickAmount:30,
+          // type: 'category',
+          // tickAmount:30,
           // categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"],
-          // min: new Date("01/01/2014 05:00").getTime(),
-          // max: new Date("01/01/2014 19:00").getTime(),
+          // min: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 0, 0).getTime(),
+          // max: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 23, 59).getTime(),
           // categories: [],
 
           labels:{
@@ -627,7 +647,7 @@ class DashboardTangki extends React.Component {
             offsetX: 0,
             formatter: (val:any) => {
               // return (val / 1000000).toFixed(2);
-              return (val);
+              return val + " m";
             },
         },
         axisBorder: {
@@ -640,7 +660,7 @@ class DashboardTangki extends React.Component {
       xaxis: {
         type: 'datetime',
         // type: 'category',
-        tickAmount:30,
+        // tickAmount:0,
         // categories:[],
         // categories:['2023-01-01 12:00:00','2023-01-01 13:00:00','2023-01-01 14:00:00'],
         // tickAmount: 24,
@@ -963,8 +983,8 @@ class DashboardTangki extends React.Component {
         let length_mst_list_tangki:any = this.mst_list_tangki.length;
 
         // hit api yang getAllData
-        // await postApi("https://platform.iotsolution.id:7004/api-v1/getAllData",null,true,(res:any)=>{
         await postApi("https://platform.iotsolution.id:7004/api-v1/getLastData",null,true,'1',null,(res:any)=>{
+        // await postApi("http://192.168.1.120:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
           
           if (res?.['responseCode'] == "200"){
               let res_data:any = res?.['data'];
@@ -988,8 +1008,8 @@ class DashboardTangki extends React.Component {
                       let data_arr:any = (ele?.['data']?.[0]);
 
                       // last tangki 4
-                      console.log("ini element ")
-                      console.log(ele)
+                      // console.log("ini element ")
+                      // console.log(ele)
 
                       for (let mst_list_tangki of this.mst_list_tangki){
                         // sample : update_to_arr_json_tangki_last (
@@ -1016,7 +1036,9 @@ class DashboardTangki extends React.Component {
               
               this.kalkulasi_tinggi_tangki(()=>{
                 this.kalkulasi_suhu_tangki(()=>{
-                  this.kalkulasi_set_others_tangki();
+                  this.kalkulasi_volume_tangki(()=>{
+                    this.kalkulasi_set_others_tangki();
+                  })
                 });
               });
           }
@@ -1066,7 +1088,8 @@ class DashboardTangki extends React.Component {
       // "dateLast":formatDate(new Date(datelast),'YYYY-MM-DD')
 
       // LAGI FIXING PAK BAYU getDataHour banyak yg NaN
-      await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
+      // await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
+      await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
         {
           "date":formatDate(new Date(datebegin),'YYYY-MM-DD'),
           "hourBegin": typeof hourbegin == 'undefined' || hourbegin == null ? '00:00' : hourbegin,
@@ -1381,7 +1404,8 @@ class DashboardTangki extends React.Component {
                   // this.data_tinggi_tangki_perjam_categories.push(time_tank);
 
                   // REVISI UNTUK IRREGULAR SERIES ({x:..., y: ....})
-                  this.data_suhu_tangki_perjam_categories.push(new Date(time_tank).getTime());
+                  this.data_suhu_tangki_perjam_categories.push(
+                        new Date(formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm')).getTime());
                   this.data_tinggi_tangki_perjam_categories.push(
                         new Date(formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm')).getTime()
                   );
@@ -1415,9 +1439,17 @@ class DashboardTangki extends React.Component {
 
               let min_tgl:any = null;
               let max_tgl:any = null;
+
+              let min_suhu_tgl:any = null;
+              let max_suhu_tgl:any = null;
+
               if (this.data_tinggi_tangki_perjam_categories.length > 0){
                   min_tgl = Math.min.apply(null, this.data_tinggi_tangki_perjam_categories)
                   max_tgl = Math.max.apply(null, this.data_tinggi_tangki_perjam_categories)
+              }
+              if (this.data_suhu_tangki_perjam_categories.length > 0){
+                  min_suhu_tgl = Math.min.apply(null, this.data_suhu_tangki_perjam_categories)
+                  max_suhu_tgl = Math.max.apply(null, this.data_suhu_tangki_perjam_categories)
               }
 
               // SET CHART SUHU JAM
@@ -1428,7 +1460,9 @@ class DashboardTangki extends React.Component {
                     ...this.setChartSuhuJam.options,
                     xaxis:{
                       ...this.setChartSuhuJam.options.xaxis,
-                      type:'datetime',
+                      // min: typeof min_suhu_tgl != 'undefined' && min_suhu_tgl != null ? new Date(min_suhu_tgl).getTime() : 0,
+                      // max: typeof max_suhu_tgl != 'undefined' && max_suhu_tgl != null ? new Date(max_suhu_tgl).getTime() : 0
+                      // type:'datetime',
                       // categories: JSON.parse(JSON.stringify(this.data_suhu_tangki_perjam_categories))
                     },
                     dataLabels:{
@@ -1446,8 +1480,8 @@ class DashboardTangki extends React.Component {
                     ...this.setChartTinggiJam.options,
                     xaxis:{
                       ...this.setChartTinggiJam.options.xaxis,
-                      min: typeof min_tgl != 'undefined' && min_tgl != null ? new Date(min_tgl).getTime() : 0,
-                      max: typeof max_tgl != 'undefined' && max_tgl != null ? new Date(max_tgl).getTime() : 0
+                      // min: typeof min_tgl != 'undefined' && min_tgl != null ? new Date(min_tgl).getTime() : 0,
+                      // max: typeof max_tgl != 'undefined' && max_tgl != null ? new Date(max_tgl).getTime() : 0
                       // type: 'datetime',
                       // min: formatDate(new Date(time_tank),'YYYY-MM-DD'
                       // // categories untuk type 'category'
@@ -1549,7 +1583,7 @@ class DashboardTangki extends React.Component {
                         ...temp_updatedState_tinggi['realtime'],
                         [tangki_name]: {
                             ...this.state.realtime[tangki_name],
-                            tinggi: parseFloat(tinggi_minyak)
+                            tinggi: parseFloat(tinggi_minyak),
                         }
                     }
                     
@@ -1608,8 +1642,109 @@ class DashboardTangki extends React.Component {
                 console.log(this.state)
                 callback()
               })
-        }
+
+      }
     }
+          
+    kalkulasi_volume_tangki(callback:any){
+        // console.log("TINGGI MINYAK REAL TIME")
+        let realtime:any = this.state?.['realtime'];
+        console.log("VOLUME TANGKI")
+        console.log(realtime)
+
+        // LOOPING TANGKI NAME (realtime)
+        let temp_update_volume:any = {};
+        
+        temp_update_volume['realtime'] = {
+
+            ...this.state['realtime']
+        }
+
+        Object.keys(realtime).forEach((tangki_name:any)=>{
+
+            let tinggi:any = realtime?.[tangki_name]?.['tinggi'] ?? null;
+            if (tinggi != null){
+                // panggil array json tabel volume tangki yang sesuai
+                let arr_volume:any = this.json_arr_volume_tangki(tangki_name);
+
+                let findItem:any = arr_volume.find(res=>
+                      parseInt(res.tinggi) == (tinggi*100)
+                )
+                if (findItem){
+
+                  // volume_tbl => volume dari tabel
+                  let volume_tbl:any = parseFloat(findItem.volume);
+                  
+                  temp_update_volume['realtime'] = {
+                      ...temp_update_volume['realtime'],
+                      [tangki_name]: {
+                        ...this.state.realtime?.[tangki_name],
+                        volume: volume_tbl
+                      }
+                  }
+
+                }
+            }
+        })
+
+        // end LOOPING TANGKI NAME (realtime)
+
+        // UPDATE DI STATE
+
+
+        setTimeout(()=>{
+
+          this.setState({
+            ...this.state,
+            ...temp_update_volume
+          })
+
+          setTimeout(()=>{
+            console.log("REALTIME STATE (VOLUME)")
+            console.log(this.state.realtime)
+            callback()
+          },100)
+        })
+      }
+
+
+    fungsi(){
+      // this.setState({
+      //   ...this.state,
+      //   realtime:{
+      //       ...this.state.realtime,
+      //       'tangki_1':{
+      //           ...this.state.realtime.tangki_1,
+      //           volume:123456
+      //       },
+      //       'tes':'wefw'
+      //   }
+      // })
+
+      console.log("STATE")
+      console.log(this.state)
+    }
+
+    json_arr_volume_tangki(tangki_name:any){
+        let arr_temp:any = [];
+
+        switch (tangki_name){
+          case 'tangki_1':
+              arr_temp = JSON.parse(JSON.stringify(tangki_1_json));
+              break;
+          case 'tangki_2':
+              arr_temp = JSON.parse(JSON.stringify(tangki_2_json));
+              break;
+          case 'tangki_3':
+              arr_temp = JSON.parse(JSON.stringify(tangki_3_json));
+              break;
+          case 'tangki_4':
+              arr_temp = JSON.parse(JSON.stringify(tangki_4_json));
+              break;
+        }
+
+        return arr_temp;
+    } 
 
     kalkulasi_suhu_tangki(callback:any){
 
@@ -1963,6 +2098,8 @@ class DashboardTangki extends React.Component {
     render(){
         return (
             <div>
+
+              {/* <button onClick={()=>this.fungsi()}> Click </button> */}
               {/* <TimeRange
                   startMoment={this.state.startTime}
                   endMoment={this.state.endTime}
@@ -2036,7 +2173,7 @@ class DashboardTangki extends React.Component {
 
                                                                   <h4 className='text-white'>Tinggi : {this.state.realtime?.[ele.name].tinggi} M</h4>
                                                                   <h4 className='text-white'>Suhu : {this.state.realtime?.[ele.name].suhu} °C</h4>
-                                                                  <h4 className='text-white'>Volume : {this.state.realtime?.[ele.name].volume} kg</h4>
+                                                                  <h4 className='text-white'>Volume : { this.state.realtime?.[ele.name].volume != "-" ? new Number(this.state.realtime?.[ele.name].volume).toLocaleString('en-us') : '-'} kg</h4>
 
                                                               </Card.Body>
                                                           </Card>
@@ -2294,7 +2431,7 @@ class DashboardTangki extends React.Component {
 
                                         <Row className='mt-4'>
                                             <h5 className='dashtangki-title'>Volume Tangki ( kg )</h5>
-                                            <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal_jam})</span></div>
+                                            {/* <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal_jam})</span></div> */}
 
                                             <Col className='d-flex flex-nowrap customclass-snap'>
                                                 {/* <ReactFC {...this.chartConfigs_Suhu}/>
@@ -2305,7 +2442,10 @@ class DashboardTangki extends React.Component {
                                                   this.mst_list_tangki.map((ele,idx)=>{
                                                     return (
                                                       <div className='snap-col' key = {ele.name}>
-                                                        <CylinderFC caption = {ele.title} value={this.state.realtime?.[ele.name]?.['volume']} plottooltext_hover="Volume"/>
+                                                        <CylinderFC caption = {ele.title} 
+                                                                  subcaption2={this.state.realtime?.[ele.name]?.['tanggal_jam']}
+                                                                  subcaption={this.state.realtime?.[ele.name]?.['tanggal']} 
+                                                                  value={this.state.realtime?.[ele.name]?.['volume']} plottooltext_hover="Volume"/>
                                                       </div>
                                                     )
                                                   })

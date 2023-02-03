@@ -3,11 +3,13 @@ import Charts from 'fusioncharts/fusioncharts.charts';
 import Widgets from 'fusioncharts/fusioncharts.widgets';
 import React from 'react'
 import ReactFC from 'react-fusioncharts';
+import { formatDate } from '../../../services/functions';
 
 ReactFC.fcRoot(FusionCharts, Widgets, Charts);
 
 const CylinderFC = ({caption="", value=0, 
-                            plottooltext_hover=""}) => {
+                        plottooltext_hover=""
+                        ,subcaption="", subcaption2=""}) => {
     // chart termometer
     setTimeout(()=>{
         let tspan_trial = document.querySelectorAll("tspan");
@@ -22,6 +24,7 @@ const CylinderFC = ({caption="", value=0,
     let dataSource = {
         chart: {
           caption: `${caption}`,
+          subcaption: formatDate(new Date(subcaption),'DD MMMM YYYY') + '\n' + formatDate(new Date(subcaption2),'HH:mm'),
           // subcaption: "(Real Time)",
           lowerlimit: "0",
           upperlimit: "6000000",
