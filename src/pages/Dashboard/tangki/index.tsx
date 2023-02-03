@@ -46,7 +46,8 @@ import tangki_1_json from '../../../data/volume_tangki/tangki_1.json'
 import tangki_2_json from '../../../data/volume_tangki/tangki_2.json'
 import tangki_3_json from '../../../data/volume_tangki/tangki_3.json'
 import tangki_4_json from '../../../data/volume_tangki/tangki_4.json'
-
+import berat_jenis_cpo_json from '../../../data/volume_tangki/berat_jenis_cpo.json'
+import berat_jenis_pko_json from '../../../data/volume_tangki/berat_jenis_pko.json'
 
 // import tesaja from '../../../data/tes.json'
 
@@ -62,14 +63,14 @@ class DashboardTangki extends React.Component {
 
   // ARRAY CPO & PKO berdasarkan tanggal berlaku
     arr_cpo_pko = [
-      {name: 'tangki_1', jenis:'CPO', datebegin:'1970-01-01', datelast:''},
+      {name: 'tangki_1', jenis:'CPO', datebegin:'1970-01-01 00:00', datelast:''},
 
-      {name: 'tangki_2', jenis:'PKO', datebegin:'1970-01-01', datelast:''},
+      {name: 'tangki_2', jenis:'PKO', datebegin:'1970-01-01 00:00', datelast:''},
 
-      {name: 'tangki_3', jenis:'CPO', datebegin:'1970-01-01', datelast:'2023-01-28'},
-      {name: 'tangki_3', jenis:'PKO', datebegin:'2023-01-28', datelast:''},
+      {name: 'tangki_3', jenis:'CPO', datebegin:'1970-01-01 00:00', datelast:'2023-01-27 23:59'},
+      {name: 'tangki_3', jenis:'PKO', datebegin:'2023-01-28 00:00', datelast:''},
 
-      {name: 'tangki_4', jenis:'CPO', datebegin:'1970-01-01', datelast:''},
+      {name: 'tangki_4', jenis:'CPO', datebegin:'1970-01-01 00:00', datelast:''},
     ]
 
 
@@ -1036,9 +1037,9 @@ class DashboardTangki extends React.Component {
               
               this.kalkulasi_tinggi_tangki(()=>{
                 this.kalkulasi_suhu_tangki(()=>{
-                  this.kalkulasi_volume_tangki(()=>{
-                    this.kalkulasi_set_others_tangki();
-                  })
+                  this.kalkulasi_set_others_tangki(()=>{
+                    this.kalkulasi_volume_tangki(()=>{})
+                  });
                 });
               });
           }
@@ -1670,7 +1671,55 @@ class DashboardTangki extends React.Component {
                 let findItem:any = arr_volume.find(res=>
                       parseInt(res.tinggi) == (tinggi*100)
                 )
+
+                // this.arr_cpo_pko
+                console.log("REAL TIME STATE : ===")
+                console.log(this.state.realtime)
+
+                let tanggal_tangki:any = new Date(this.arr_json_tangki_last[tangki_name]['time']);
+
+                let jenis:any = '';
+
+                let findCpoPko = this.arr_cpo_pko.find(res=>
+                          res.name == tangki_name &&
+                          (
+                            (new Date(res.datebegin) <= tanggal_tangki
+                                && (res.datelast != '' && res.datelast != null && new Date(res.datelast) >= tanggal_tangki)
+                            )
+                            ||
+                            (
+                              (new Date(res.datebegin) <= tanggal_tangki)
+                                && (res.datelast == '' || res.datelast == null)
+                            )
+                          ) 
+                          // && 
+                          // (res.datelast == null || res.datelast == '' || new Date(res.datelast) >= tanggal_tangki)
+                )
+                if (findCpoPko){
+                    jenis = findCpoPko?.['jenis'];
+                    console.log("kalkulasi_volume_tangki findCpoPko");
+                    console.log(findCpoPko)
+                }
+
+                // let arr_beratjenis:any = this.json_arr_berat_jenis_tangki()
+
+
                 if (findItem){
+                  
+                  // dikali dengan berat jenis nya apakah cpo atau pko
+                  if (jenis != '' && jenis != null){
+                      let arr_berat_jenis:any = this.json_arr_berat_jenis_tangki(jenis);
+
+                      let suhu_last:any = this.state.realtime?.[tangki_name]?.['suhu'];
+                      // sini update
+                      let find_berat_jenis:any = arr_berat_jenis.find(res=>parseFloat(res.temperature) == parseFloat(suhu_last));
+                      if (find_berat_jenis){
+                        alert(find_berat_jenis)
+                      }
+                      
+                      // alert(JSON.stringify(arr_berat_jenis))
+                  }
+                  // ... end
 
                   // volume_tbl => volume dari tabel
                   let volume_tbl:any = parseFloat(findItem.volume);
@@ -1723,6 +1772,21 @@ class DashboardTangki extends React.Component {
 
       console.log("STATE")
       console.log(this.state)
+    }
+
+    json_arr_berat_jenis_tangki(jenis:any){
+        let arr_temp:any = [];
+
+        switch (jenis.toLowerCase()){
+          case 'cpo':
+              arr_temp = JSON.parse(JSON.stringify(berat_jenis_cpo_json));
+              break;
+          case 'pko':
+              arr_temp = JSON.parse(JSON.stringify(berat_jenis_pko_json));
+              break;
+        }
+
+        return arr_temp;
     }
 
     json_arr_volume_tangki(tangki_name:any){
@@ -1816,7 +1880,7 @@ class DashboardTangki extends React.Component {
         }
     }
 
-    kalkulasi_set_others_tangki(){
+    kalkulasi_set_others_tangki(callback:any){
       let obj_keys:any = Object.keys(this.arr_json_tangki_last);
 
       let temp_arr:any = [];
@@ -1859,6 +1923,7 @@ class DashboardTangki extends React.Component {
               // console.log(temp_updatedState_suhu)
               console.log("temp_updatedState_tanggal")
               console.log(temp_updatedState_tanggal)
+              callback();
             })
       }
   }
