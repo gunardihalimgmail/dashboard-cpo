@@ -77,7 +77,8 @@ class DashboardTangki extends React.Component {
 
     statusChecked:any = {
       tinggi: false,
-      suhu: false
+      suhu: false,
+      volume: false
     }
     
     options_filter:any = [
@@ -134,6 +135,9 @@ class DashboardTangki extends React.Component {
 
     data_tinggi_tangki_perjam_series:any = [];
     data_tinggi_tangki_perjam_categories:any = [];
+    
+    data_volume_tangki_perjam_series:any = [];
+    data_volume_tangki_perjam_categories:any = [];
 
     // chart 1 (Tinggi isi Tangki)
     setChartTinggi = {
@@ -582,9 +586,36 @@ class DashboardTangki extends React.Component {
         stroke: {
           curve: 'smooth'
         },
+        yaxis: {
+          labels: {
+              style: {
+                  colors: '#8e8da4',
+              },
+              offsetX: 0,
+              formatter: (val:any) => {
+                // return (val / 1000000).toFixed(2);
+                return parseFloat(val?.toFixed(3)) + " kg";
+              },
+          },
+          axisBorder: {
+              show: false,
+          },
+          axisTicks: {
+              show: false
+          }
+        },
         xaxis: {
           type: 'datetime',
-          categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"]
+          labels: {
+              rotate: -45,
+              rotateAlways: true,
+              formatter: (val:any) =>{
+                return formatDate(new Date(val),'HH:mm')
+                  // return (formatDate(new Date(timestamp),'HH:mm'))
+                // return moment(new Date(timestamp)).format("DD MMM YYYY")
+              }
+          }
+          // categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"]
         },
         tooltip: {
           x: {
@@ -648,7 +679,7 @@ class DashboardTangki extends React.Component {
             offsetX: 0,
             formatter: (val:any) => {
               // return (val / 1000000).toFixed(2);
-              return val + " m";
+              return parseFloat(val?.toFixed(3)) + " m";
             },
         },
         axisBorder: {
@@ -684,7 +715,7 @@ class DashboardTangki extends React.Component {
         offsetX: 14
       },
       tooltip: {
-        shared: true
+        shared: true,
       },
       legend: {
         position: 'bottom',
@@ -1147,6 +1178,9 @@ class DashboardTangki extends React.Component {
                   // LOOPING obj_keys_suhu (Object.keys(data_arr))
                   // console.log(data_arr)
 
+                  // UPDATE TINGGI MINYAK
+                  let tinggi_hitung:any = '';
+
                   obj_keys_suhu.forEach((ele_attr:any)=>{
 
                     // UPDATE SUHU TANGKI
@@ -1211,7 +1245,7 @@ class DashboardTangki extends React.Component {
                     }
                     // ... <end SUHU TANGKI>
 
-                    // UPDATE TINGGI MINYAK
+
                     let patt_tinggi = new RegExp(/(Jarak Sensor dengan permukaan Tank [0-9]+)/,'gi')
                     let patt_tinggi_exec = patt_tinggi.exec(ele_attr);
                     if (patt_tinggi_exec != null){
@@ -1232,9 +1266,10 @@ class DashboardTangki extends React.Component {
                             if (patt_tank_exec[0] != null){
                                 let nama_tangki:any = '';
                                 let title_tangki:any = '';
-
+                                
+                                // UPDATE TINGGI MINYAK 
                                 let tinggi_hitung:any = '';
-
+                                
                                 let find_mst_list:any = this.mst_list_tangki.find(ele_list=>ele_list.api.toLowerCase() == data_tank.toLowerCase());
                                 if (find_mst_list){
 
@@ -1244,7 +1279,7 @@ class DashboardTangki extends React.Component {
                                       // cari tinggi minyak
                                       let ruang_kosong:any = (data_arr?.[data_jarak_sensor] / 100) - this.mst_avg_t_segitiga?.[nama_tangki];
 
-                                      tinggi_hitung = (this.mst_t_tangki?.[nama_tangki] - ruang_kosong).toFixed(3);
+                                      tinggi_hitung = this.mst_t_tangki?.[nama_tangki] - ruang_kosong;
                                       // ... end tinggi minyak
 
 
@@ -1271,7 +1306,8 @@ class DashboardTangki extends React.Component {
                     }
                     // sampai sini
 
-                    // LOOPING obj_keys_tinggi (Object.keys(data_arr))
+
+                  // LOOPING obj_keys_tinggi (Object.keys(data_arr))
 
                   })
 
@@ -1293,6 +1329,96 @@ class DashboardTangki extends React.Component {
                       }
                   });
                   // ... <end>
+
+                  
+                  // === UPDATE VOLUME TANGKI MINYAK ===
+                  console.log("Tinggi Hitung (VOLUME)")
+                  console.log(obj_temp_tank)
+
+                  let arr_obj_keys_vol = Object.keys(obj_temp_tank);
+
+                  arr_obj_keys_vol.forEach((tangki_name:any)=>{
+
+                      let tinggi_tmp:any = obj_temp_tank[tangki_name]['tinggi_minyak'];
+                      let avg_tmp:any = parseFloat(obj_temp_tank[tangki_name]['avg']);
+
+                      if (tinggi_tmp != null){
+                          // panggil array json tabel volume tangki yang sesuai
+                          let arr_volume:any = this.json_arr_volume_tangki(tangki_name);
+
+                          let findItem:any = arr_volume.find(res=>
+                                parseInt(res.tinggi) == (tinggi_tmp.toFixed(2) * 100)
+                          )
+
+                          let tanggal_tangki:any = new Date(obj_temp_tank[tangki_name]['tanggal']);
+
+                          let jenis:any = '';
+                          let findCpoPko = this.arr_cpo_pko.find(res=>
+                                    res.name == tangki_name &&
+                                    (
+                                      (new Date(res.datebegin) <= tanggal_tangki
+                                          && (res.datelast != '' && res.datelast != null && new Date(res.datelast) >= tanggal_tangki)
+                                      )
+                                      ||
+                                      (
+                                        (new Date(res.datebegin) <= tanggal_tangki)
+                                          && (res.datelast == '' || res.datelast == null)
+                                      )
+                                    ) 
+                                    // && 
+                                    // (res.datelast == null || res.datelast == '' || new Date(res.datelast) >= tanggal_tangki)
+                          )
+
+                          if (findCpoPko){
+                              jenis = findCpoPko?.['jenis'];
+                              console.log("kalkulasi_volume_tangki findCpoPko");
+                              console.log(findCpoPko)
+                          }
+
+                          if (findItem){
+                  
+                              let volume_tbl:any = 0;
+            
+                              // VOLUME LITER ATAU KG tangki
+                              volume_tbl = parseFloat(findItem.volume);
+                              // dikali dengan berat jenis nya apakah cpo atau pko
+                              if (jenis != '' && jenis != null){
+
+                                  let arr_berat_jenis:any = this.json_arr_berat_jenis_tangki(jenis);
+
+                                  // sini update
+
+                                  let find_berat_jenis:any = arr_berat_jenis.find(res=>
+                                        Math.round(parseFloat(res.temperature)) == Math.round(avg_tmp)
+                                    );
+                                  if (find_berat_jenis){
+                                      volume_tbl = Math.round(volume_tbl * find_berat_jenis?.['berat_jenis']);
+                                  }
+
+                                  obj_temp_tank[tangki_name] = {
+                                      ...obj_temp_tank[tangki_name],
+                                      volume: volume_tbl
+                                  }
+                                  
+                                  // alert(JSON.stringify(arr_berat_jenis))
+                                  // volume_tbl => volume dari tabel
+                                  
+                              }
+
+                            // ... end (dikali dengan berat jenis nya apakah cpo atau pko)
+
+                          }
+
+                      }
+                      
+
+                  })
+
+                  console.log("(VOLUME) OBJ TEMP TANK")
+                  console.log(obj_temp_tank)
+
+                  // ... end <VOLUME TANGKI>
+
                   
                   // taruh hasil rata-rata nya ke data_suhu_tangki_per_jam
                   // looping obj_temp_tank
@@ -1383,7 +1509,7 @@ class DashboardTangki extends React.Component {
                       // console.log(data_tinggi_temp)
 
                        // store data ke "data_tinggi_tangki_perjam_series" untuk nanti di simpan ke setChartTinggiJam
-                       if (!tangki_exists){
+                       if (!tangki_tinggi_exists){
                             this.data_tinggi_tangki_perjam_series.push(
                                 {name:title_tangki, data:[...data_tinggi_temp]}
                             )
@@ -1394,6 +1520,51 @@ class DashboardTangki extends React.Component {
                             }
                         }
                       // ... end <TINGGI TANGKI PER JAM>
+
+                      // VOLUME TANGKI PER JAM
+                      let data_volume_temp:any = [];
+
+                      let tangki_volume_exists:boolean = false
+                      let findVolumeIdx:any = this.data_volume_tangki_perjam_series.findIndex((res:any)=>res.name == obj_temp_tank[tangki_name]?.['title']);
+                      if (findVolumeIdx != -1){
+                          tangki_volume_exists = true;
+                          data_volume_temp = [...this.data_volume_tangki_perjam_series[findVolumeIdx]?.['data']];
+
+                          // posisi index
+                          idx_arr_perjam_series = findVolumeIdx;
+                      }
+
+                      data_volume_temp.push(
+                          {
+                            x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm'),
+                            y: parseFloat(obj_temp_tank?.[tangki_name]?.['volume']),
+                            x_time: new Date(time_tank).getTime()
+                          }
+                      );
+
+                      // SORTING data_tinggi_temp
+                      if (data_volume_temp.length > 0) {
+
+                        data_volume_temp.sort((a,b)=>{
+                            return a['x_time'] - b['x_time'];
+                        })
+
+                      }
+                      // ... end sorting 
+
+                      // store data ke "data_volume_tangki_perjam_series" untuk nanti di simpan ke setChartVolumeJam
+                      if (!tangki_volume_exists){
+                          this.data_volume_tangki_perjam_series.push(
+                              {name:title_tangki, data:[...data_volume_temp]}
+                          )
+                      }else{
+                          this.data_volume_tangki_perjam_series[idx_arr_perjam_series] = {
+                              ...this.data_volume_tangki_perjam_series[idx_arr_perjam_series],
+                              data: [...data_volume_temp]
+                          }
+                      }
+
+                      // ... end VOLUME TANGKI PER JAM
 
                   });
 
@@ -1408,8 +1579,10 @@ class DashboardTangki extends React.Component {
                   this.data_suhu_tangki_perjam_categories.push(
                         new Date(formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm')).getTime());
                   this.data_tinggi_tangki_perjam_categories.push(
-                        new Date(formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm')).getTime()
-                  );
+                        new Date(formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm')).getTime());
+                  this.data_volume_tangki_perjam_categories.push(
+                        new Date(formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm')).getTime());
+                  ;
 
                   
                   // reverse
@@ -1438,6 +1611,9 @@ class DashboardTangki extends React.Component {
               console.log("DATA TINGGI TANGKI PER JAM CATEGORIES")
               console.log(this.data_tinggi_tangki_perjam_categories)
 
+              console.log("DATA VOLUME TANGKI PER JAM CATEGORIES")
+              console.log(this.data_volume_tangki_perjam_categories)
+
               let min_tgl:any = null;
               let max_tgl:any = null;
 
@@ -1451,6 +1627,10 @@ class DashboardTangki extends React.Component {
               if (this.data_suhu_tangki_perjam_categories.length > 0){
                   min_suhu_tgl = Math.min.apply(null, this.data_suhu_tangki_perjam_categories)
                   max_suhu_tgl = Math.max.apply(null, this.data_suhu_tangki_perjam_categories)
+              }
+              if (this.data_volume_tangki_perjam_categories.length > 0){
+                  min_suhu_tgl = Math.min.apply(null, this.data_volume_tangki_perjam_categories)
+                  max_suhu_tgl = Math.max.apply(null, this.data_volume_tangki_perjam_categories)
               }
 
               // SET CHART SUHU JAM
@@ -1495,6 +1675,28 @@ class DashboardTangki extends React.Component {
                 }
               }
 
+              // SET CHART TINGGI JAM
+              this.setChartVolumeJam = {
+                ...this.setChartVolumeJam,
+                series: JSON.parse(JSON.stringify(this.data_volume_tangki_perjam_series)),
+                options:{
+                    ...this.setChartVolumeJam.options,
+                    xaxis:{
+                      ...this.setChartVolumeJam.options.xaxis,
+                      // min: typeof min_tgl != 'undefined' && min_tgl != null ? new Date(min_tgl).getTime() : 0,
+                      // max: typeof max_tgl != 'undefined' && max_tgl != null ? new Date(max_tgl).getTime() : 0
+                      // type: 'datetime',
+                      // min: formatDate(new Date(time_tank),'YYYY-MM-DD'
+                      // // categories untuk type 'category'
+                      // categories: JSON.parse(JSON.stringify(this.data_tinggi_tangki_perjam_categories))
+                    },
+                    dataLabels:{
+                      ...this.setChartVolumeJam.options.dataLabels,
+                      enabled: this.statusChecked?.['volume'] ?? false
+                    }
+                }
+              }
+
               // console.log("setChartSuhuJam")
               // console.log(this.setChartSuhuJam)
 
@@ -1510,7 +1712,8 @@ class DashboardTangki extends React.Component {
                     tanggal_jam: formatDate(new Date(time_first),'DD MMMM YYYY HH:mm:ss')
                 },
                 chartSuhuJam: {...this.setChartSuhuJam},
-                chartTinggiJam: {...this.setChartTinggiJam}
+                chartTinggiJam: {...this.setChartTinggiJam},
+                chartVolumeJam: {...this.setChartVolumeJam},
               })
 
               // console.log("INI ADALAH TIME TANK")
@@ -1706,23 +1909,32 @@ class DashboardTangki extends React.Component {
 
                 if (findItem){
                   
+                  let volume_tbl:any = 0;
+
+                  // VOLUME LITER ATAU KG tangki
+                  volume_tbl = parseFloat(findItem.volume);
+
                   // dikali dengan berat jenis nya apakah cpo atau pko
                   if (jenis != '' && jenis != null){
                       let arr_berat_jenis:any = this.json_arr_berat_jenis_tangki(jenis);
 
                       let suhu_last:any = this.state.realtime?.[tangki_name]?.['suhu'];
+
                       // sini update
-                      let find_berat_jenis:any = arr_berat_jenis.find(res=>parseFloat(res.temperature) == parseFloat(suhu_last));
+
+                      let find_berat_jenis:any = arr_berat_jenis.find(res=>
+                            Math.round(parseFloat(res.temperature)) == Math.round(parseFloat(suhu_last))
+                        );
                       if (find_berat_jenis){
-                        alert(find_berat_jenis)
+                        volume_tbl = Math.round(volume_tbl * find_berat_jenis?.['berat_jenis']);
                       }
                       
                       // alert(JSON.stringify(arr_berat_jenis))
+                      // volume_tbl => volume dari tabel
+                      
                   }
-                  // ... end
+                  // ... end (dikali dengan berat jenis nya apakah cpo atau pko)
 
-                  // volume_tbl => volume dari tabel
-                  let volume_tbl:any = parseFloat(findItem.volume);
                   
                   temp_update_volume['realtime'] = {
                       ...temp_update_volume['realtime'],
