@@ -802,7 +802,8 @@ class DashboardTangki extends React.Component {
             tinggi_isi: true,
             tinggi_isi_jam: false,
             suhu_tangki: true,
-            suhu_tangki_jam: false
+            suhu_tangki_jam: false,
+            volume_tangki_jam: true,
         },
         chartTinggi:{...this.setChartTinggi},
         chartTinggiJam:{...this.setChartTinggiJam},
@@ -1015,8 +1016,8 @@ class DashboardTangki extends React.Component {
         let length_mst_list_tangki:any = this.mst_list_tangki.length;
 
         // hit api yang getAllData
-        await postApi("https://platform.iotsolution.id:7004/api-v1/getLastData",null,true,'1',null,(res:any)=>{
-        // await postApi("http://192.168.1.120:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
+        // await postApi("https://platform.iotsolution.id:7004/api-v1/getLastData",null,true,'1',null,(res:any)=>{
+        await postApi("http://192.168.1.120:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
           
           if (res?.['responseCode'] == "200"){
               let res_data:any = res?.['data'];
@@ -1120,8 +1121,8 @@ class DashboardTangki extends React.Component {
       // "dateLast":formatDate(new Date(datelast),'YYYY-MM-DD')
 
       // LAGI FIXING PAK BAYU getDataHour banyak yg NaN
-      // await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
-      await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
+      await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
+      // await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
         {
           "date":formatDate(new Date(datebegin),'YYYY-MM-DD'),
           "hourBegin": typeof hourbegin == 'undefined' || hourbegin == null ? '00:00' : hourbegin,
@@ -1277,7 +1278,16 @@ class DashboardTangki extends React.Component {
                                       title_tangki = find_mst_list?.['title'] ?? '';
 
                                       // cari tinggi minyak
-                                      let ruang_kosong:any = (data_arr?.[data_jarak_sensor] / 100) - this.mst_avg_t_segitiga?.[nama_tangki];
+                                      let tangki_jarak_sensor:any =  data_arr?.[data_jarak_sensor];
+                    
+                                      if (typeof tangki_jarak_sensor != 'undefined' && tangki_jarak_sensor != null){
+                                          if (typeof tangki_jarak_sensor == 'string'){
+                                            tangki_jarak_sensor = (parseFloat(tangki_jarak_sensor) / 100).toFixed(2);
+                                          }else{tangki_jarak_sensor = 0}
+                                      }else{tangki_jarak_sensor = 0}
+
+                                      // let ruang_kosong:any = (parseFloat(data_arr?.[data_jarak_sensor]) / 100) - this.mst_avg_t_segitiga?.[nama_tangki];
+                                      let ruang_kosong:any = (tangki_jarak_sensor - this.mst_avg_t_segitiga?.[nama_tangki]).toFixed(2);
 
                                       tinggi_hitung = this.mst_t_tangki?.[nama_tangki] - ruang_kosong;
                                       // ... end tinggi minyak
@@ -1347,7 +1357,7 @@ class DashboardTangki extends React.Component {
                           let arr_volume:any = this.json_arr_volume_tangki(tangki_name);
 
                           let findItem:any = arr_volume.find(res=>
-                                parseInt(res.tinggi) == (tinggi_tmp.toFixed(2) * 100)
+                                parseInt(res.tinggi) == Math.round(tinggi_tmp.toFixed(2) * 100)
                           )
 
                           let tanggal_tangki:any = new Date(obj_temp_tank[tangki_name]['tanggal']);
@@ -1391,9 +1401,18 @@ class DashboardTangki extends React.Component {
                                   let find_berat_jenis:any = arr_berat_jenis.find(res=>
                                         Math.round(parseFloat(res.temperature)) == Math.round(avg_tmp)
                                     );
+
+                                  if (tangki_name == "tangki_3"){
+                                    console.error("tinggi tmp tangki_3 : " + tinggi_tmp)
+                                    console.error("tanggal jam tmp tangki_3 : " + formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm:ss'))
+                                    console.error("volume tbl tangki_3 : " + volume_tbl)
+                                    console.error("berat jenis tangki_3 : " + find_berat_jenis?.['berat_jenis'])
+                                  }
                                   if (find_berat_jenis){
+                                    
                                       volume_tbl = Math.round(volume_tbl * find_berat_jenis?.['berat_jenis']);
                                   }
+
 
                                   obj_temp_tank[tangki_name] = {
                                       ...obj_temp_tank[tangki_name],
@@ -1408,6 +1427,12 @@ class DashboardTangki extends React.Component {
                             // ... end (dikali dengan berat jenis nya apakah cpo atau pko)
 
                           }
+                          // else{
+                          //     console.error("NAN VOLUME TABLE")
+                          //     console.log(tangki_name)
+                          //     console.log(tinggi_tmp.toFixed(2) * 100)
+                          //     console.log(Math.round(tinggi_tmp.toFixed(2) * 100))
+                          // }
 
                       }
                       
@@ -1705,7 +1730,8 @@ class DashboardTangki extends React.Component {
                 loader:{
                   ...this.state.loader,
                   suhu_tangki_jam: false,
-                  tinggi_isi_jam: false
+                  tinggi_isi_jam: false,
+                  volume_tangki_jam: false
                 },
                 waktu:{
                     tanggal: formatDate(new Date(time_first),'DD MMMM YYYY'),
@@ -1742,6 +1768,8 @@ class DashboardTangki extends React.Component {
 
         let arr_tangki_name:any = [];
         let arr_tangki_tinggi:any = [];
+
+        let arr_tangki_temp:any = [];
 
         if (obj_keys.length > 0){
 
@@ -1810,6 +1838,31 @@ class DashboardTangki extends React.Component {
 
             })
 
+            arr_tangki_name.forEach((ele, idx)=>{
+                let patt = new RegExp(/([0-9]+)/,'gi');
+                let match:any = patt.exec(ele[0]);
+                let angka_temp:any = 0;
+                if (match){
+                  angka_temp = match[0];
+                }
+
+                arr_tangki_temp.push(
+                  {x: ele, y: arr_tangki_tinggi[idx], 
+                    tangki_num: parseFloat(angka_temp)}
+                ) 
+                
+            })
+
+            // sort
+            if (arr_tangki_temp){
+              arr_tangki_temp.sort((a,b)=>{
+                return a['tangki_num'] - b['tangki_num']
+              })
+            }
+            // ... end sort
+
+              // alert(JSON.stringify(arr_tangki_temp))
+
               this.setState({
                 ...this.state,
                 loader:{
@@ -1822,12 +1875,13 @@ class DashboardTangki extends React.Component {
                         ...this.state.chartTinggi.options,
                         xaxis:{
                           ...this.state.chartTinggi.options.xaxis,
-                          categories: [...arr_tangki_name]    // ["Tangki 1","Tangki 2","Tangki 3","Tangki 4"]
+                          // categories: [...arr_tangki_name]    // ["Tangki 1","Tangki 2","Tangki 3","Tangki 4"]
                         }
                     },
                     series: [
                       {
-                        data:[...arr_tangki_tinggi],  // [4.55, 8.81, ...]
+                        // data:[...arr_tangki_tinggi],  // [4.55, 8.81, ...]
+                        data:[...arr_tangki_temp], 
                         name: "Tinggi Isi Tangki"}
                     ]
                 },
@@ -1842,7 +1896,7 @@ class DashboardTangki extends React.Component {
               })
 
               setTimeout(()=>{
-                console.log("ini adalah state")
+                console.log("ini adalah state (KALKULASI TINGGI TANGKI)")
                 console.log(this.state)
                 callback()
               })
@@ -2199,13 +2253,16 @@ class DashboardTangki extends React.Component {
                 this.data_suhu_tangki_perjam_categories = []
                 this.data_tinggi_tangki_perjam_categories = []
                 this.data_tinggi_tangki_perjam_series = []
+                this.data_volume_tangki_perjam_categories = []
+                this.data_volume_tangki_perjam_series = []
 
                 this.setState({
                   ...this.state,
                   loader:{
                     ...this.state.loader,
                     tinggi_isi_jam: true,
-                    suhu_tangki_jam: true
+                    suhu_tangki_jam: true,
+                    volume_tangki_jam: true
                   },
                 });
 
@@ -2230,7 +2287,8 @@ class DashboardTangki extends React.Component {
                       loader:{
                         ...this.state.loader,
                         tinggi_isi_jam: true,
-                        suhu_tangki_jam: true
+                        suhu_tangki_jam: true,
+                        volume_tangki_jam: true
                       },
                     });
 
@@ -2252,13 +2310,16 @@ class DashboardTangki extends React.Component {
         this.data_suhu_tangki_perjam_categories = []
         this.data_tinggi_tangki_perjam_categories = []
         this.data_tinggi_tangki_perjam_series = []
+        this.data_volume_tangki_perjam_categories = []
+        this.data_volume_tangki_perjam_series = []
 
         this.setState({
           ...this.state,
           loader:{
             ...this.state.loader,
             tinggi_isi_jam: true,
-            suhu_tangki_jam: true
+            suhu_tangki_jam: true,
+            volume_tangki_jam: true
           },
           // chartTinggiJam: {
           //   ...this.state.chartTinggiJam,
@@ -2910,8 +2971,33 @@ class DashboardTangki extends React.Component {
                                             <h5 className='dashtangki-title'>Volume Tangki ( kg / jam )</h5>
                                             <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
                                             <Col> 
-                                                <div id="chart">
-                                                    <ReactApexChart options={this.state.chartVolumeJam.options} series={this.state.chartVolumeJam.series} type="area" height={350} />
+                                                <div id="chart" className='d-flex justify-content-center'>
+
+                                                    <ThreeCircles
+                                                          height="100"
+                                                          width="100"
+                                                          color="#4fa94d"
+                                                          wrapperStyle={{}}
+                                                          wrapperClass=""
+                                                          visible={this.state.loader.volume_tangki_jam}
+                                                          ariaLabel="three-circles-rotating"
+                                                          outerCircleColor=""
+                                                          innerCircleColor=""
+                                                          middleCircleColor=""
+                                                    />
+
+                                                    { 
+                                                        !this.state.loader.volume_tangki_jam &&
+                                                        <div className='w-100'>
+                                                            <ReactApexChart 
+                                                                  options={this.state.chartVolumeJam.options} 
+                                                                  series={this.state.chartVolumeJam.series} 
+                                                                  type="area" 
+                                                                  height={350} />
+                                                        </div>
+                                                    }
+
+                                                    {/* <ReactApexChart options={this.state.chartVolumeJam.options} series={this.state.chartVolumeJam.series} type="area" height={350} /> */}
                                                 </div>
                                             </Col>
                                         </Row>
