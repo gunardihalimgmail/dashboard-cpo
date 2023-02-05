@@ -1,6 +1,7 @@
 import { errorMonitor } from "stream";
 
 export const formatDate = (tanggal:any, format: 
+                                "HH:mm:ss"|
                                 "HH:mm"|"DD MMMM YYYY"|
                                 "DD MMMM YYYY HH:mm:ss"|
                                 "DD MMM YYYY HH:mm:ss" |
@@ -22,6 +23,9 @@ export const formatDate = (tanggal:any, format:
         let seconds_d:any = ("0" + tanggal.getSeconds()).slice(-2);
 
         switch(format){
+            case 'HH:mm:ss':
+                final_format = hour_d + ":" + minutes_d + ":" + seconds_d;
+                break;
             case 'HH:mm':
                 final_format = hour_d + ":" + minutes_d;
                 break;

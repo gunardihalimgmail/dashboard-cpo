@@ -58,6 +58,162 @@ ReactFC.fcRoot(FusionCharts, Widgets, charts);
 
 charts(FusionCharts);
 
+// column 3d
+const dataSource = {
+  chart: {
+    // caption: "Countries with Highest Deforestation Rate",
+    // subcaption: "For the year 2017",
+    // yaxisname: "Deforested Area{br}(in Hectares)",
+    thmFillColor: "#ff0000",
+    decimals: "9",
+    theme: "fusion"
+  },
+  data: [
+    {
+      label: "Brazil",
+      value: "1466000"
+    },
+    {
+      label: "Indonesia",
+      value: "1147800"
+    },
+    {
+      label: "Russian Federation",
+      value: "532200"
+    },
+    {
+      label: "Mexico",
+      value: "395000"
+    },
+    {
+      label: "Papua New Guinea",
+      value: "250200"
+    },
+    {
+      label: "Peru",
+      value: "224600"
+    },
+    {
+      label: "U.S.A",
+      value: "215200"
+    },
+    {
+      label: "Bolivia",
+      value: "135200"
+    },
+    {
+      label: "Sudan",
+      value: "117807"
+    },
+    {
+      label: "Nigeria",
+      value: "82000"
+    },
+
+    {
+      label: "U.S.A",
+      value: "215200"
+    },
+    {
+      label: "Bolivia",
+      value: "135200"
+    },
+    {
+      label: "Sudan",
+      value: "117807"
+    },
+    {
+      label: "Nigeria",
+      value: "82000"
+    },
+
+    {
+      label: "U.S.A",
+      value: "215200"
+    },
+    {
+      label: "Bolivia",
+      value: "135200"
+    },
+    {
+      label: "Sudan",
+      value: "117807"
+    },
+    {
+      label: "Nigeria",
+      value: "82000"
+    },
+
+    {
+      label: "U.S.A",
+      value: "215200"
+    },
+    {
+      label: "Bolivia",
+      value: "135200"
+    },
+    {
+      label: "Sudan",
+      value: "117807"
+    },
+    {
+      label: "Nigeria",
+      value: "82000"
+    },
+
+    {
+      label: "U.S.A",
+      value: "215200"
+    },
+    {
+      label: "Bolivia",
+      value: "135200"
+    },
+    {
+      label: "Sudan",
+      value: "117807"
+    },
+    {
+      label: "Nigeria",
+      value: "82000"
+    },
+
+    {
+      label: "U.S.A",
+      value: "215200"
+    },
+    {
+      label: "Bolivia",
+      value: "135200"
+    },
+    {
+      label: "Sudan",
+      value: "117807"
+    },
+    {
+      label: "Nigeria",
+      value: "82000"
+    },
+
+    {
+      label: "U.S.A",
+      value: "215200"
+    },
+    {
+      label: "Bolivia",
+      value: "135200"
+    },
+    {
+      label: "Sudan",
+      value: "117807"
+    },
+    {
+      label: "Nigeria",
+      value: "82000"
+    }
+  ]
+};
+// ... <end> column 3d
 
 class DashboardTangki extends React.Component {
 
@@ -76,6 +232,7 @@ class DashboardTangki extends React.Component {
 
 
     statusChecked:any = {
+      jarak_sensor: false,
       tinggi: false,
       suhu: false,
       volume: false
@@ -130,6 +287,9 @@ class DashboardTangki extends React.Component {
     // [
     //    {name:'Tangki 1', data:[31, 40, 28, 51]}
     // ]
+    data_jaraksensor_tangki_perjam_series:any = [];
+    data_jaraksensor_tangki_perjam_categories:any = [];
+    
     data_suhu_tangki_perjam_series:any = [];
     data_suhu_tangki_perjam_categories:any = [];
 
@@ -166,6 +326,7 @@ class DashboardTangki extends React.Component {
           ],
           plotOptions: {
             bar: {
+              columnWidth:'90%',
               borderRadius: 10,
               horizontal:false,
               distributed: false, // multicolor
@@ -275,6 +436,19 @@ class DashboardTangki extends React.Component {
             style: {
               color: '#444'
             }
+          },
+          fill: {
+            type: 'gradient',
+            gradient: {
+              shade: 'light',
+              type: "horizontal",
+              shadeIntensity: 0.25,
+              gradientToColors: undefined,
+              inverseColors: true,
+              opacityFrom: 0.85,
+              opacityTo: 0.85,
+              stops: [50, 80, 100]
+            },
           }
         },
     // ... end 
@@ -652,7 +826,7 @@ class DashboardTangki extends React.Component {
       dataLabels: {
         enabled: false,
         formatter:(val:any)=>{
-          return val + " m"
+          return !isNaN(val) ? (val.toFixed(3) + " m") : ''
         }
         // style: {
         //   colors: ['#F44336', '#E91E63', '#9C27B0']
@@ -722,6 +896,124 @@ class DashboardTangki extends React.Component {
         horizontalAlign: 'center',
         offsetX: 0
       },
+    }
+
+    chartJarakSensorJam_OptionsChart:ApexOptions = {
+      chart: {
+        type: 'area',
+        // stacked: false,
+        height: 350,
+        toolbar:{
+          show:true,
+          tools:{
+            download:false,
+          //   zoomin:true,
+          //   pan:true,
+          //   reset:true,
+          //   selection:true,
+          //   zoom:true,
+          //   zoomout:true
+          }
+        },
+        zoom: {
+          enabled: false
+        },
+      },
+      dataLabels: {
+        enabled: false,
+        formatter:(val:any)=>{
+          return !isNaN(val) ? (val.toFixed(3) + " m") : ''
+        }
+        // style: {
+        //   colors: ['#F44336', '#E91E63', '#9C27B0']
+        // }
+      },
+      markers: {
+        size: 0,
+      },
+      fill: {
+        type: 'gradient',
+        gradient: {
+            shadeIntensity: 1,
+            inverseColors: false,
+            opacityFrom: 0.45,
+            opacityTo: 0.05,
+            stops: [50, 100, 100, 100]
+          },
+      },
+      yaxis: {
+        labels: {
+            style: {
+                colors: '#8e8da4',
+            },
+            offsetX: 0,
+            formatter: (val:any) => {
+              // return (val / 1000000).toFixed(2);
+              return parseFloat(val?.toFixed(3)) + " m";
+            },
+        },
+        axisBorder: {
+            show: false,
+        },
+        axisTicks: {
+            show: false
+        }
+      },
+      xaxis: {
+        type: 'datetime',
+        // type: 'category',
+        // tickAmount:0,
+        // categories:[],
+        // categories:['2023-01-01 12:00:00','2023-01-01 13:00:00','2023-01-01 14:00:00'],
+        // tickAmount: 24,
+        // tickPlacement: 'on',
+        // min: new Date("01/01/2014 05:00").getTime(),
+        // max: new Date("01/01/2014 19:00").getTime(),
+        labels: {
+            rotate: -45,
+            rotateAlways: true,
+            formatter: (val:any) =>{
+              return formatDate(new Date(val),'HH:mm:ss')
+                // return (formatDate(new Date(timestamp),'HH:mm'))
+              // return moment(new Date(timestamp)).format("DD MMM YYYY")
+            }
+        }
+      },
+      title: {
+        // text: 'Irregular Data in Time Series',
+        align: 'left',
+        offsetX: 14
+      },
+      tooltip: {
+        shared: true,
+      },
+      legend: {
+        position: 'bottom',
+        horizontalAlign: 'center',
+        offsetX: 0
+      },
+    }
+
+    setChartJarakSensorJam = {
+
+      series: [
+        // {
+        //   name: 'Tangki 1',
+        //   data: [{ x: '12/01/2013 06:00', y: 54 }, { x: '01/01/2014 14:00', y: 60 } , { x: '01/01/2014 19:00', y: 70 }]
+        // }, {
+        //   name: 'Tangki 2',
+        //   data: [{ x: '01/01/2014 07:00', y: 30 }, { x: '01/01/2014 15:00', y: 40 } , { x: '01/01/2014 19:00', y: 45 }]
+        // }
+        // , {
+        //   name: 'Tangki 3',
+        //   data: [{ x: '01/01/2014 06:00', y: 15 }, { x: '01/01/2014 14:00', y: 25 } , { x: '01/01/2014 19:00', y: 40 }]
+        // }
+        // , {
+        //   name: 'Tangki 4',
+        //   data: [{ x: '01/01/2014 06:00', y: 20 }, { x: '01/01/2014 14:00', y: 35 } , { x: '01/01/2014 19:00', y: 45 }]
+        // }
+      ],
+      options: {...this.chartJarakSensorJam_OptionsChart}
     }
 
     // Tinggi Isi Tangki (Jam) 
@@ -799,12 +1091,14 @@ class DashboardTangki extends React.Component {
         },
 
         loader:{
+            jarak_sensor_jam: true,
             tinggi_isi: true,
             tinggi_isi_jam: false,
             suhu_tangki: true,
             suhu_tangki_jam: false,
             volume_tangki_jam: true,
         },
+        chartJarakSensorJam:{...this.setChartJarakSensorJam},
         chartTinggi:{...this.setChartTinggi},
         chartTinggiJam:{...this.setChartTinggiJam},
         chartSuhuJam:{...this.setChartSuhuJam},
@@ -979,7 +1273,7 @@ class DashboardTangki extends React.Component {
     update_to_arr_json_tangki_last(data_arr:any, ele:any, tangki_name:any, tangki_api:any){
 
         let findTank = Object.keys(data_arr).findIndex(res=>
-          res.toLowerCase().indexOf(tangki_api) != -1
+          res.toLowerCase().indexOf(tangki_api) !== -1
         );
 
         if (findTank != -1){
@@ -1016,8 +1310,8 @@ class DashboardTangki extends React.Component {
         let length_mst_list_tangki:any = this.mst_list_tangki.length;
 
         // hit api yang getAllData
-        // await postApi("https://platform.iotsolution.id:7004/api-v1/getLastData",null,true,'1',null,(res:any)=>{
-        await postApi("http://192.168.1.120:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
+        await postApi("https://platform.iotsolution.id:7004/api-v1/getLastData",null,true,'1',null,(res:any)=>{
+        // await postApi("http://192.168.1.120:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
           
           if (res?.['responseCode'] == "200"){
               let res_data:any = res?.['data'];
@@ -1121,8 +1415,8 @@ class DashboardTangki extends React.Component {
       // "dateLast":formatDate(new Date(datelast),'YYYY-MM-DD')
 
       // LAGI FIXING PAK BAYU getDataHour banyak yg NaN
-      await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
-      // await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
+      // await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
+      await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
         {
           "date":formatDate(new Date(datebegin),'YYYY-MM-DD'),
           "hourBegin": typeof hourbegin == 'undefined' || hourbegin == null ? '00:00' : hourbegin,
@@ -1283,13 +1577,16 @@ class DashboardTangki extends React.Component {
                                       if (typeof tangki_jarak_sensor != 'undefined' && tangki_jarak_sensor != null){
                                           if (typeof tangki_jarak_sensor == 'string'){
                                             tangki_jarak_sensor = (parseFloat(tangki_jarak_sensor) / 100).toFixed(2);
-                                          }else{tangki_jarak_sensor = 0}
+                                          }else{
+                                            tangki_jarak_sensor = (tangki_jarak_sensor / 100).toFixed(2);
+                                          }
                                       }else{tangki_jarak_sensor = 0}
 
                                       // let ruang_kosong:any = (parseFloat(data_arr?.[data_jarak_sensor]) / 100) - this.mst_avg_t_segitiga?.[nama_tangki];
                                       let ruang_kosong:any = (tangki_jarak_sensor - this.mst_avg_t_segitiga?.[nama_tangki]).toFixed(2);
-
+                                      
                                       tinggi_hitung = this.mst_t_tangki?.[nama_tangki] - ruang_kosong;
+
                                       // ... end tinggi minyak
 
 
@@ -1303,6 +1600,7 @@ class DashboardTangki extends React.Component {
                                           // tanggal_tz: new Date(time_tank).getTime() + new Date(time_tank).getTimezoneOffset() * 60000,
                                           // tanggal_tz: new Date(time_tank),
                                           data_jarak_sensor: data_arr?.[data_jarak_sensor],
+                                          data_jarak_sensor_m: tangki_jarak_sensor,   // satuan meter
                                           tinggi_minyak: tinggi_hitung
                                           // tinggi_minyak: data
                                           // data_jarak_sensor: obj_temp_tank[nama_tangki]?.['data_jarak_sensor'] == null ?
@@ -1320,6 +1618,8 @@ class DashboardTangki extends React.Component {
                   // LOOPING obj_keys_tinggi (Object.keys(data_arr))
 
                   })
+
+
 
                   // ... end LOOPING obj_keys_suhu (Object.keys(data_arr))
 
@@ -1499,8 +1799,9 @@ class DashboardTangki extends React.Component {
                       // ... end <SUHU TANGKI PER JAM>
 
 
-
                       // TINGGI TANGKI PER JAM
+                      idx_arr_perjam_series = -1
+                      
                       let data_tinggi_temp:any = [];
 
                       let tangki_tinggi_exists:boolean = false
@@ -1528,6 +1829,7 @@ class DashboardTangki extends React.Component {
                         })
 
                       }
+
                       // ... end sorting 
 
                       // console.log("DATA TINGGI TEMP")
@@ -1546,7 +1848,57 @@ class DashboardTangki extends React.Component {
                         }
                       // ... end <TINGGI TANGKI PER JAM>
 
+                      
+                      // JARAK SENSOR TANGKI
+
+                      idx_arr_perjam_series = -1
+                      let data_jarak_sensor_temp:any = [];
+
+                      let tangki_jarak_sensor_exists:boolean = false
+                      let findJarakSensorIdx:any = this.data_jaraksensor_tangki_perjam_series.findIndex((res:any)=>res.name == obj_temp_tank[tangki_name]?.['title']);
+                      if (findJarakSensorIdx != -1){
+                          tangki_jarak_sensor_exists = true;
+                          data_jarak_sensor_temp = [...this.data_jaraksensor_tangki_perjam_series[findJarakSensorIdx]?.['data']];
+
+                          // posisi index
+                          idx_arr_perjam_series = findJarakSensorIdx;
+                      }
+                      data_jarak_sensor_temp.push(
+                          {
+                            x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm'),
+                            y: parseFloat(obj_temp_tank?.[tangki_name]?.['data_jarak_sensor_m']),
+                            x_time: new Date(time_tank).getTime()
+                          }
+                      );
+                       // SORTING data_tinggi_temp
+                       if (data_jarak_sensor_temp.length > 0) {
+
+                        data_jarak_sensor_temp.sort((a,b)=>{
+                            return a['x_time'] - b['x_time'];
+                        })
+                      }
+                      // store data ke "data_jaraksensor_tangki_perjam_series" untuk nanti di simpan ke setChartJarakSensorJam
+                        if (!tangki_tinggi_exists){
+                          this.data_jaraksensor_tangki_perjam_series.push(
+                              {name:title_tangki, data:[...data_jarak_sensor_temp]}
+                          )
+                      }else{
+                          this.data_jaraksensor_tangki_perjam_series[idx_arr_perjam_series] = {
+                              ...this.data_jaraksensor_tangki_perjam_series[idx_arr_perjam_series],
+                              data: [...data_jarak_sensor_temp]
+                          }
+                      }
+
+                      // ... end sorting 
+
+
+
+                      // ...end <JARAK SENSOR TANGKI PER JAM>
+                      
+
                       // VOLUME TANGKI PER JAM
+
+                      idx_arr_perjam_series = -1
                       let data_volume_temp:any = [];
 
                       let tangki_volume_exists:boolean = false
@@ -1678,6 +2030,29 @@ class DashboardTangki extends React.Component {
                 }
               }
 
+
+              // SET CHART TINGGI JAM
+              this.setChartJarakSensorJam = {
+                ...this.setChartJarakSensorJam,
+                series: JSON.parse(JSON.stringify(this.data_jaraksensor_tangki_perjam_series)),
+                options:{
+                    ...this.setChartJarakSensorJam.options,
+                    xaxis:{
+                      ...this.setChartJarakSensorJam.options.xaxis,
+                      // min: typeof min_tgl != 'undefined' && min_tgl != null ? new Date(min_tgl).getTime() : 0,
+                      // max: typeof max_tgl != 'undefined' && max_tgl != null ? new Date(max_tgl).getTime() : 0
+                      // type: 'datetime',
+                      // min: formatDate(new Date(time_tank),'YYYY-MM-DD'
+                      // // categories untuk type 'category'
+                      // categories: JSON.parse(JSON.stringify(this.data_tinggi_tangki_perjam_categories))
+                    },
+                    dataLabels:{
+                      ...this.setChartJarakSensorJam.options.dataLabels,
+                      enabled: this.statusChecked?.['jarak_sensor'] ?? false
+                    }
+                }
+              }
+
               // SET CHART TINGGI JAM
               this.setChartTinggiJam = {
                 ...this.setChartTinggiJam,
@@ -1729,6 +2104,7 @@ class DashboardTangki extends React.Component {
                 ...this.state,
                 loader:{
                   ...this.state.loader,
+                  jarak_sensor_jam: false,
                   suhu_tangki_jam: false,
                   tinggi_isi_jam: false,
                   volume_tangki_jam: false
@@ -1737,6 +2113,7 @@ class DashboardTangki extends React.Component {
                     tanggal: formatDate(new Date(time_first),'DD MMMM YYYY'),
                     tanggal_jam: formatDate(new Date(time_first),'DD MMMM YYYY HH:mm:ss')
                 },
+                chartJarakSensorJam: {...this.setChartJarakSensorJam},
                 chartSuhuJam: {...this.setChartSuhuJam},
                 chartTinggiJam: {...this.setChartTinggiJam},
                 chartVolumeJam: {...this.setChartVolumeJam},
@@ -1829,9 +2206,10 @@ class DashboardTangki extends React.Component {
                           [find_tangki_title['title'], tanggal, jam]
                           // find_tangki_title['title']
                       );
-                    }
 
+                    }
                     arr_tangki_tinggi.push(parseFloat(tinggi_minyak));
+
                     // ... <end>
                   
                 }
@@ -2249,6 +2627,8 @@ class DashboardTangki extends React.Component {
           {
             if (this.state.show.datepicker && !this.state.show.timepicker){
 
+                this.data_jaraksensor_tangki_perjam_series = []
+                this.data_jaraksensor_tangki_perjam_categories = []
                 this.data_suhu_tangki_perjam_series = []
                 this.data_suhu_tangki_perjam_categories = []
                 this.data_tinggi_tangki_perjam_categories = []
@@ -2260,6 +2640,7 @@ class DashboardTangki extends React.Component {
                   ...this.state,
                   loader:{
                     ...this.state.loader,
+                    jarak_sensor_jam: true,
                     tinggi_isi_jam: true,
                     suhu_tangki_jam: true,
                     volume_tangki_jam: true
@@ -2277,15 +2658,20 @@ class DashboardTangki extends React.Component {
                         timeSelected[0] != null &&
                         timeSelected[1] != null){
                     
+                    this.data_jaraksensor_tangki_perjam_series = []
+                    this.data_jaraksensor_tangki_perjam_categories = []
                     this.data_suhu_tangki_perjam_series = []
                     this.data_suhu_tangki_perjam_categories = []
                     this.data_tinggi_tangki_perjam_categories = []
                     this.data_tinggi_tangki_perjam_series = []
+                    this.data_volume_tangki_perjam_categories = []
+                    this.data_volume_tangki_perjam_series = []
 
                     this.setState({
                       ...this.state,
                       loader:{
                         ...this.state.loader,
+                        jarak_sensor_jam: true,
                         tinggi_isi_jam: true,
                         suhu_tangki_jam: true,
                         volume_tangki_jam: true
@@ -2368,7 +2754,7 @@ class DashboardTangki extends React.Component {
     alert(JSON.stringify(e))
   }
 
-  checkChartJam(val:any, type:'tinggi'|'suhu_jam'){
+  checkChartJam(val:any, type:'jarak_sensor'|'tinggi'|'suhu_jam'){
     
     // console.log(val.target.checked)
     // if (val.target.checked){
@@ -2402,7 +2788,7 @@ class DashboardTangki extends React.Component {
                   dataLabels:{
                     ...this.state.chartTinggiJam.options.dataLabels,
                     formatter:(val:any)=>{
-                      return val + " m"
+                      return !isNaN(val) ? val.toFixed(3) + " m" : ''
                     },
                     enabled: val.target.checked
                   }
@@ -2424,6 +2810,26 @@ class DashboardTangki extends React.Component {
                   },
                   dataLabels:{
                     ...this.state.chartSuhuJam.options.dataLabels,
+                    enabled: val.target.checked
+                  }
+                }
+            }
+          })
+      }
+      else if(type == 'jarak_sensor'){
+          this.statusChecked['jarak_sensor'] = val.target.checked
+
+          this.setState({
+            ...this.state,
+            chartJarakSensorJam: {
+                ...this.state.chartJarakSensorJam,
+                options:{
+                  ...this.state.chartJarakSensorJam.options,
+                  xaxis:{
+                    ...this.state.chartJarakSensorJam.options.xaxis,
+                  },
+                  dataLabels:{
+                    ...this.state.chartJarakSensorJam.options.dataLabels,
                     enabled: val.target.checked
                   }
                 }
@@ -2654,6 +3060,16 @@ class DashboardTangki extends React.Component {
                                             {/* <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal_jam})</span></div> */}
                                             <Col>
                                                 <div id="chart" className='d-flex justify-content-center align-items-center'>
+
+                                                    {/* <ReactFC
+                                                        type="column3d"
+                                                        width="100%"
+                                                        height="30%"
+                                                        dataFormat="JSON"
+                                                        dataSource={dataSource}
+                                                    /> */}
+
+
                                                     {/* <Audio
                                                       height="150"
                                                       width="150"
@@ -2730,8 +3146,6 @@ class DashboardTangki extends React.Component {
                                                 <ReactFC {...this.chartConfigs_Suhu}/>
                                                 <ReactFC {...this.chartConfigs_Suhu}/>
                                                 <ReactFC {...this.chartConfigs_Suhu}/> */}
-
-
                                                
                                                 {
                                                    !this.state.loader.suhu_tangki && 
@@ -2858,6 +3272,65 @@ class DashboardTangki extends React.Component {
 
                                             {/* <h5 className='dashtangki-title'>Tinggi Isi Tangki ( m / jam )</h5> */}
                                             {/* <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div> */}
+                                        </Row>
+
+                                        <Row className='mt-2'>
+                                            <hr></hr>
+                                            <div className='d-flex justify-content-between'>
+                                                <div>
+                                                    <h5 className='dashtangki-title'>Jarak Sensor ( m / jam )</h5>
+                                                    <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
+                                                </div>
+                                                <div>
+                                                        {/* <Form.Check
+                                                          inline
+                                                          label="1"
+                                                          name="group1"
+                                                          type='checkbox'
+                                                          id={`inline-${'1'}-1`}
+                                                        /> */}
+                                                        <Form.Check type={'checkbox'} inline>
+                                                            <Form.Check.Input type={'checkbox'} onChange={(val)=>{this.checkChartJam(val,'jarak_sensor')}}/>
+                                                            <Form.Check.Label>{`Show Data Label`}</Form.Check.Label>
+                                                            {/* <Form.Control.Feedback type="valid">
+                                                              You did it! 
+                                                            </Form.Control.Feedback> */}
+                                                        </Form.Check>
+                                                </div>
+
+
+                                            </div>
+
+                                            <Col> 
+                                                <div id="chart" className='d-flex justify-content-center align-items-center'>
+
+                                                   <ThreeCircles
+                                                        height="100"
+                                                        width="100"
+                                                        color="#4fa94d"
+                                                        wrapperStyle={{}}
+                                                        wrapperClass=""
+                                                        visible={this.state.loader.jarak_sensor_jam}
+                                                        ariaLabel="three-circles-rotating"
+                                                        outerCircleColor=""
+                                                        innerCircleColor=""
+                                                        middleCircleColor=""
+                                                    />
+
+                                                    { 
+                                                        !this.state.loader.jarak_sensor_jam &&
+                                                        <div className='w-100'>
+                                                            <ReactApexChart 
+                                                                  options={this.state.chartJarakSensorJam.options} 
+                                                                  series={this.state.chartJarakSensorJam.series} 
+                                                                  type="area" 
+                                                                  height={350} />
+                                                        </div>
+                                                    }
+
+                                                    
+                                                </div>
+                                            </Col>
                                         </Row>
 
                                         <Row className='mt-2'>
