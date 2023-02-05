@@ -2692,6 +2692,8 @@ class DashboardTangki extends React.Component {
       }
       else{
         // reset yang perjam
+        this.data_jaraksensor_tangki_perjam_series = []
+        this.data_jaraksensor_tangki_perjam_categories = []
         this.data_suhu_tangki_perjam_series = []
         this.data_suhu_tangki_perjam_categories = []
         this.data_tinggi_tangki_perjam_categories = []
@@ -2703,6 +2705,7 @@ class DashboardTangki extends React.Component {
           ...this.state,
           loader:{
             ...this.state.loader,
+            jarak_sensor_jam: true,
             tinggi_isi_jam: true,
             suhu_tangki_jam: true,
             volume_tangki_jam: true
