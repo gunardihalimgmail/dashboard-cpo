@@ -1589,6 +1589,9 @@ class DashboardTangki extends React.Component {
                           }
                       }
 
+                      console.error("!!!! OBJ TEMP TANK DATA VOLUME TANGKI PER JAM SERIES !!!!")
+                      console.log(this.data_volume_tangki_perjam_series)
+
                       // ... end VOLUME TANGKI PER JAM
 
                   });
@@ -1753,6 +1756,10 @@ class DashboardTangki extends React.Component {
                 console.log(this.data_suhu_tangki_perjam_categories)
                 console.log(min_tgl)
                 console.log(max_tgl)
+
+
+                console.error("===DATA VOLUME TANGKI PER JAM SERIES===")
+                console.error(this.data_volume_tangki_perjam_series)
               },500)
 
               // console.log("array json tangki ALL DATA")
