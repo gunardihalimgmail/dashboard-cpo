@@ -2185,7 +2185,9 @@ class DashboardTangki extends React.Component {
                     if (typeof tangki_jarak_sensor != 'undefined' && tangki_jarak_sensor != null){
                         if (typeof tangki_jarak_sensor == 'string'){
                           tangki_jarak_sensor = (parseFloat(tangki_jarak_sensor) / 100).toFixed(2);
-                        }else{tangki_jarak_sensor = 0}
+                        }else{
+                          tangki_jarak_sensor = (tangki_jarak_sensor / 100).toFixed(2);
+                        }
                     }else{tangki_jarak_sensor = 0}
 
                     let ruang_kosong_tangki:any = (tangki_jarak_sensor - mst_avg_t_segitiga_temp).toFixed(2);
