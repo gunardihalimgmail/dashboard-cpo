@@ -2766,7 +2766,7 @@ class DashboardTangki extends React.Component {
     alert(JSON.stringify(e))
   }
 
-  checkChartJam(val:any, type:'jarak_sensor'|'tinggi'|'suhu_jam'){
+  checkChartJam(val:any, type:'jarak_sensor'|'tinggi'|'suhu_jam'|'volume_jam'){
     
     // console.log(val.target.checked)
     // if (val.target.checked){
@@ -2842,6 +2842,26 @@ class DashboardTangki extends React.Component {
                   },
                   dataLabels:{
                     ...this.state.chartJarakSensorJam.options.dataLabels,
+                    enabled: val.target.checked
+                  }
+                }
+            }
+          })
+      }
+      else if(type == 'volume_jam'){
+          this.statusChecked['volume'] = val.target.checked
+
+          this.setState({
+            ...this.state,
+            chartVolumeJam: {
+                ...this.state.chartVolumeJam,
+                options:{
+                  ...this.state.chartVolumeJam.options,
+                  xaxis:{
+                    ...this.state.chartVolumeJam.options.xaxis,
+                  },
+                  dataLabels:{
+                    ...this.state.chartVolumeJam.options.dataLabels,
                     enabled: val.target.checked
                   }
                 }
@@ -3453,8 +3473,22 @@ class DashboardTangki extends React.Component {
                                         </Row>
 
                                         <Row className='mt-3'>
-                                            <h5 className='dashtangki-title'>Volume Tangki ( kg / jam )</h5>
-                                            <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
+                                            <hr></hr>
+                                            <div className='d-flex justify-content-between'>
+                                                <div>
+                                                    <h5 className='dashtangki-title'>Volume Tangki ( kg / jam )</h5>
+                                                    <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
+                                                </div>
+                                                <div>
+                                                    <Form.Check type={'checkbox'} inline>
+                                                        <Form.Check.Input type={'checkbox'} onChange={(val)=>{this.checkChartJam(val,'volume_jam')}}/>
+                                                        <Form.Check.Label>{`Show Data Label`}</Form.Check.Label>
+                                                        {/* <Form.Control.Feedback type="valid">
+                                                          You did it! 
+                                                        </Form.Control.Feedback> */}
+                                                    </Form.Check>
+                                                </div>
+                                            </div>
                                             <Col> 
                                                 <div id="chart" className='d-flex justify-content-center'>
 
