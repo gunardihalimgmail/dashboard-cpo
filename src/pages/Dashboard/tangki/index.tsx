@@ -172,9 +172,9 @@ class DashboardTangki extends React.Component {
       // konstanta tinggi segitiga di atas tinggi tangki
     mst_avg_t_segitiga:any = {
       'tangki_1':0.49629,
-      'tangki_2':0.71348,
-      'tangki_3':0.54700,
-      'tangki_4':0.47460,
+      'tangki_2':0.70074,   // 0.71348  (prev)
+      'tangki_3':0.48733,   // 0.54700  (prev)
+      'tangki_4':0.47229,   // 0.47460  (prev)
     }
     // ... end
 
