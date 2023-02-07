@@ -14,6 +14,14 @@ import "react-datepicker/dist/react-datepicker.css";
 import "@wojtekmaj/react-timerange-picker/dist/TimeRangePicker.css"
 import "react-clock/dist/Clock.css"
 
+// import 'react-notifications/lib/notifications.css';
+// import { ToastProvider } from 'rc-toastr';
+
+// toastr
+// import "rc-toastr/dist/index.css" // import the css file
+import 'react-toastify/dist/ReactToastify.css';
+
+
 // Redux (penyimpanan data global)
 // const createStores = createStore;
 

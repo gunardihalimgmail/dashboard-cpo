@@ -29,7 +29,7 @@ import ReactApexChart from 'react-apexcharts';
 import ThermometerFC from '../thermometer';
 import CylinderFC from '../cylinder';
 
-import { formatDate, postApi } from '../../../services/functions';
+import { formatDate, notify, postApi } from '../../../services/functions';
 import { ApexOptions } from 'apexcharts';
 
 import { Audio, Dna, ThreeCircles } from  'react-loader-spinner'
@@ -48,7 +48,7 @@ import tangki_3_json from '../../../data/volume_tangki/tangki_3.json'
 import tangki_4_json from '../../../data/volume_tangki/tangki_4.json'
 import berat_jenis_cpo_json from '../../../data/volume_tangki/berat_jenis_cpo.json'
 import berat_jenis_pko_json from '../../../data/volume_tangki/berat_jenis_pko.json'
-
+import { toast, ToastContainer } from 'react-toastify';
 // import tesaja from '../../../data/tes.json'
 
 // ReactFC.fcRoot(FusionCharts, PowerCharts, FusionTheme)
@@ -59,6 +59,7 @@ ReactFC.fcRoot(FusionCharts, Widgets, charts);
 charts(FusionCharts);
 
 // column 3d
+
 const dataSource = {
   chart: {
     // caption: "Countries with Highest Deforestation Rate",
@@ -110,110 +111,11 @@ const dataSource = {
       value: "82000"
     },
 
-    {
-      label: "U.S.A",
-      value: "215200"
-    },
-    {
-      label: "Bolivia",
-      value: "135200"
-    },
-    {
-      label: "Sudan",
-      value: "117807"
-    },
-    {
-      label: "Nigeria",
-      value: "82000"
-    },
-
-    {
-      label: "U.S.A",
-      value: "215200"
-    },
-    {
-      label: "Bolivia",
-      value: "135200"
-    },
-    {
-      label: "Sudan",
-      value: "117807"
-    },
-    {
-      label: "Nigeria",
-      value: "82000"
-    },
-
-    {
-      label: "U.S.A",
-      value: "215200"
-    },
-    {
-      label: "Bolivia",
-      value: "135200"
-    },
-    {
-      label: "Sudan",
-      value: "117807"
-    },
-    {
-      label: "Nigeria",
-      value: "82000"
-    },
-
-    {
-      label: "U.S.A",
-      value: "215200"
-    },
-    {
-      label: "Bolivia",
-      value: "135200"
-    },
-    {
-      label: "Sudan",
-      value: "117807"
-    },
-    {
-      label: "Nigeria",
-      value: "82000"
-    },
-
-    {
-      label: "U.S.A",
-      value: "215200"
-    },
-    {
-      label: "Bolivia",
-      value: "135200"
-    },
-    {
-      label: "Sudan",
-      value: "117807"
-    },
-    {
-      label: "Nigeria",
-      value: "82000"
-    },
-
-    {
-      label: "U.S.A",
-      value: "215200"
-    },
-    {
-      label: "Bolivia",
-      value: "135200"
-    },
-    {
-      label: "Sudan",
-      value: "117807"
-    },
-    {
-      label: "Nigeria",
-      value: "82000"
-    }
   ]
 };
 // ... <end> column 3d
+
+;
 
 class DashboardTangki extends React.Component {
 
@@ -2632,6 +2534,30 @@ class DashboardTangki extends React.Component {
       let timeSelected:any = this.state.timeSelected;
       
       if (this.state.show.datepicker || this.state.show.timepicker){
+
+          if (this.state.show.datepicker && dateSelected == null){
+              notify("error","Tanggal harus di isi !");
+              return
+          }
+
+          if (this.state.show.timepicker && (timeSelected[0] == null
+                || timeSelected[1] == null)
+              )
+          {
+              notify("error","Waktu harus di isi !");
+              return
+          }
+          if (this.state.show.timepicker){
+              let firstDate:any = formatDate(new Date(),'YYYY-MM-DD') + ' ' + timeSelected[0];
+              let secondDate:any = formatDate(new Date(),'YYYY-MM-DD') + ' ' + timeSelected[1];
+              if (firstDate > secondDate){
+                notify("error","Waktu Kedua harus lebih besar dari Waktu Pertama !")
+                return
+              }
+          }
+
+
+
           if (dateSelected != null || timeSelected != null)
           {
             if (this.state.show.datepicker && !this.state.show.timepicker){
@@ -2868,13 +2794,33 @@ class DashboardTangki extends React.Component {
             }
           })
       }
+    
     // }
   }
+
 
     render(){
         return (
             <div>
-              
+
+              <ToastContainer 
+                draggable
+                pauseOnHover
+              />
+
+              {/* <ToastContainer 
+                  position="top-right"
+                  autoClose={5000}
+                  hideProgressBar={false}
+                  newestOnTop={false}
+                  closeOnClick
+                  rtl={false}
+                  pauseOnFocusLoss
+                  draggable
+                  pauseOnHover
+                  theme="colored"
+              /> */}
+
               {/* <button onClick={()=>this.fungsi()}> Click </button> */}
               {/* <TimeRange
                   startMoment={this.state.startTime}

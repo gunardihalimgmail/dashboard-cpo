@@ -1,3 +1,4 @@
+import { toast } from "react-toastify";
 import { errorMonitor } from "stream";
 
 export const formatDate = (tanggal:any, format: 
@@ -104,3 +105,55 @@ export const postApi = async (url?:any, param?:any, isAwait?:boolean, token_code
   }
   return
 }
+
+export const notify = (type:'info'|'error'|'success'|'warning', msg?:any) => {
+  // React-toastify
+  const obj_toastify:any = {
+    position: toast.POSITION.TOP_CENTER,
+    theme:"colored",
+    autoClose: 1000,
+    hideProgressBar: false,
+    newestOnTop:true,
+    rtl:false,
+    // closeOnClick:true,
+    // pauseOnFocusLoss:true,
+    // draggable:true,
+    // pauseOnHover:true
+  }
+  switch(type){
+    case 'info':
+      toast.info(msg, {...obj_toastify});
+      break;
+    case 'error':
+      toast.error(msg, {...obj_toastify});
+      break;
+    case 'success':
+      toast.success(msg, {...obj_toastify});
+      break;
+    case 'warning':
+      toast.warning(msg, {...obj_toastify});
+      break;
+  }
+
+  // const NotificationManager = window.ReactNotifications.NotificationManager;
+
+  // return () => {
+  //   switch (type) {
+  //     case 'info':
+  //       alert("halo")
+  //       // NotificationManager.info('Info message');
+  //       break;
+  //     case 'success':
+  //       // NotificationManager.success('Success message', 'Title here');
+  //       break;
+  //     case 'warning':
+  //       // NotificationManager.warning('Warning message', 'Close after 3000ms', 3000);
+  //       break;
+  //     case 'error':
+  //       // NotificationManager.error('Error message', 'Click me!', 5000, () => {
+  //       //   alert('callback');
+  //       // });
+  //       break;
+  //   }
+  // };
+};
