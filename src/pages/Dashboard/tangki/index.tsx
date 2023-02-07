@@ -1594,6 +1594,10 @@ class DashboardTangki extends React.Component {
                               // VOLUME LITER ATAU KG tangki
                               volume_tbl = parseFloat(findItem.volume);
                               // dikali dengan berat jenis nya apakah cpo atau pko
+
+                              let faktor_koreksi_temp:any;
+                              let volume_prev:any = volume_tbl;
+
                               if (jenis != '' && jenis != null){
 
                                   let arr_berat_jenis:any = this.json_arr_berat_jenis_tangki(jenis);
@@ -1611,13 +1615,20 @@ class DashboardTangki extends React.Component {
                                     console.error("berat jenis tangki_3 : " + find_berat_jenis?.['berat_jenis'])
                                   }
                                   if (find_berat_jenis){
-                                    
                                       volume_tbl = Math.round(volume_tbl * find_berat_jenis?.['berat_jenis']);
+                                      volume_prev = volume_tbl;   // just info volume sebelumnya
                                   }
 
+                                  // faktor koreksi
+                                  faktor_koreksi_temp = this.faktor_koreksi(volume_tbl, parseFloat(avg_tmp));
+                                  if (faktor_koreksi_temp != null){
+                                      volume_tbl *= faktor_koreksi_temp.toFixed(2);
+                                  }
 
                                   obj_temp_tank[tangki_name] = {
                                       ...obj_temp_tank[tangki_name],
+                                      volume_prev,
+                                      faktor_koreksi: faktor_koreksi_temp,
                                       volume: volume_tbl
                                   }
                                   
@@ -2215,12 +2226,13 @@ class DashboardTangki extends React.Component {
                 let arr_volume:any = this.json_arr_volume_tangki(tangki_name);
 
                 let findItem:any = arr_volume.find(res=>
-                      parseInt(res.tinggi) == (tinggi*100)
+                      parseInt(res.tinggi) == Math.round(tinggi.toFixed(2) * 100)
                 )
 
                 // this.arr_cpo_pko
                 console.log("REAL TIME STATE : ===")
                 console.log(this.state.realtime)
+                
 
                 let tanggal_tangki:any = new Date(this.arr_json_tangki_last[tangki_name]['time']);
 
@@ -2258,6 +2270,10 @@ class DashboardTangki extends React.Component {
                   volume_tbl = parseFloat(findItem.volume);
 
                   // dikali dengan berat jenis nya apakah cpo atau pko
+
+                  let faktor_koreksi_temp:any;
+                  let volume_prev:any = volume_tbl;
+
                   if (jenis != '' && jenis != null){
                       let arr_berat_jenis:any = this.json_arr_berat_jenis_tangki(jenis);
 
@@ -2270,6 +2286,16 @@ class DashboardTangki extends React.Component {
                         );
                       if (find_berat_jenis){
                         volume_tbl = Math.round(volume_tbl * find_berat_jenis?.['berat_jenis']);
+
+                        volume_prev = volume_tbl;   // just info volume sebelumnya
+                      }
+
+
+                      // faktor koreksi
+
+                      faktor_koreksi_temp = this.faktor_koreksi(volume_tbl, parseFloat(suhu_last));
+                      if (faktor_koreksi_temp != null){
+                          volume_tbl *= faktor_koreksi_temp.toFixed(2);
                       }
                       
                       // alert(JSON.stringify(arr_berat_jenis))
@@ -2283,6 +2309,8 @@ class DashboardTangki extends React.Component {
                       ...temp_update_volume['realtime'],
                       [tangki_name]: {
                         ...this.state.realtime?.[tangki_name],
+                        volume_prev,
+                        faktor_koreksi: faktor_koreksi_temp,
                         volume: volume_tbl
                       }
                   }
@@ -2310,6 +2338,28 @@ class DashboardTangki extends React.Component {
           },100)
         })
       }
+
+
+    faktor_koreksi(volume:any, suhu:any){
+        if (volume == null || suhu == null ||
+            typeof volume == 'undefined' ||
+            typeof suhu == 'undefined'){
+            return null
+        }
+
+
+        if (typeof volume == 'number' && 
+            typeof suhu == 'number'){
+
+            let lambda:any = 0.0000348;
+            let hitung_koreksi:any;
+            hitung_koreksi = 1 + (lambda * (suhu - 36));
+
+            return hitung_koreksi;
+        }
+
+        return null
+    }
 
 
     fungsi(){
