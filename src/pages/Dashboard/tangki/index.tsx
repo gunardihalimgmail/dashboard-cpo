@@ -23,7 +23,7 @@ import Badge from 'react-bootstrap/Badge';
 import Col from 'react-bootstrap/esm/Col';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/esm/Row';
-import { SVG_Circle } from '../../../assets'
+import { No_Found, SVG_Circle } from '../../../assets'
 import ReactApexChart from 'react-apexcharts';
 
 import ThermometerFC from '../thermometer';
@@ -481,7 +481,8 @@ class DashboardTangki extends React.Component {
     }
 
     setChartSuhuJam = {
-      
+
+      statusFound: false,
       series: [
         // {
         //   name: 'Tangki 1',
@@ -575,7 +576,6 @@ class DashboardTangki extends React.Component {
               // console.log(series)
               // console.log(seriesIndex)
               // console.log(dataPointIndex)
-              // console.log(w.globals);
 
               // return new Date(value)
               return formatDate(new Date(value),'HH:mm')
@@ -608,7 +608,8 @@ class DashboardTangki extends React.Component {
 
     // Volume Tangki (Jam)
     setChartVolumeJam = {
-      
+
+      statusFound: false,
       series: [
         // {
         // name: 'Tangki 1',
@@ -898,6 +899,7 @@ class DashboardTangki extends React.Component {
 
     setChartJarakSensorJam = {
 
+      statusFound: false,
       series: [
         // {
         //   name: 'Tangki 1',
@@ -921,6 +923,7 @@ class DashboardTangki extends React.Component {
     // Tinggi Isi Tangki (Jam) 
     setChartTinggiJam = {
 
+      statusFound: false,
       series: [
         // {
         //   name:'Tangki 1',
@@ -995,9 +998,9 @@ class DashboardTangki extends React.Component {
         loader:{
             jarak_sensor_jam: true,
             tinggi_isi: true,
-            tinggi_isi_jam: false,
+            tinggi_isi_jam: true,
             suhu_tangki: true,
-            suhu_tangki_jam: false,
+            suhu_tangki_jam: true,
             volume_tangki_jam: true,
         },
         chartJarakSensorJam:{...this.setChartJarakSensorJam},
@@ -1329,6 +1332,45 @@ class DashboardTangki extends React.Component {
         
         console.log("post api await per jam")
         console.log(res)
+
+        if (res?.['responseCode'] == "404"){
+            notify("error", res?.['responseDesc']);
+            this.setChartJarakSensorJam = {
+              ...this.setChartJarakSensorJam,
+              statusFound: false
+            }
+
+            this.setChartTinggiJam = {
+              ...this.setChartTinggiJam,
+              statusFound: false
+            }
+
+            this.setChartSuhuJam = {
+              ...this.setChartSuhuJam,
+              statusFound: false
+            }
+            this.setChartVolumeJam = {
+              ...this.setChartVolumeJam,
+              statusFound: false
+            }
+
+            this.setState({
+              ...this.state,
+              loader:{
+                ...this.state.loader,
+                jarak_sensor_jam: false,
+                tinggi_isi_jam: false,
+                suhu_tangki_jam: false,
+                volume_tangki_jam: false
+              },
+              chartJarakSensorJam: {...this.setChartJarakSensorJam},
+              chartTinggiJam: {...this.setChartTinggiJam},
+              chartSuhuJam:{...this.setChartSuhuJam},
+              chartVolumeJam:{...this.setChartVolumeJam}
+            })
+            
+            return
+        }
 
         if (res?.['responseCode'] == "200"){
 
@@ -1929,6 +1971,7 @@ class DashboardTangki extends React.Component {
               // SET CHART SUHU JAM
               this.setChartSuhuJam = {
                 ...this.setChartSuhuJam,
+                statusFound: true,
                 series: JSON.parse(JSON.stringify(this.data_suhu_tangki_perjam_series)),
                 options:{
                     ...this.setChartSuhuJam.options,
@@ -1950,6 +1993,7 @@ class DashboardTangki extends React.Component {
               // SET CHART TINGGI JAM
               this.setChartJarakSensorJam = {
                 ...this.setChartJarakSensorJam,
+                statusFound: true,
                 series: JSON.parse(JSON.stringify(this.data_jaraksensor_tangki_perjam_series)),
                 options:{
                     ...this.setChartJarakSensorJam.options,
@@ -1972,6 +2016,7 @@ class DashboardTangki extends React.Component {
               // SET CHART TINGGI JAM
               this.setChartTinggiJam = {
                 ...this.setChartTinggiJam,
+                statusFound: true,
                 series: JSON.parse(JSON.stringify(this.data_tinggi_tangki_perjam_series)),
                 options:{
                     ...this.setChartTinggiJam.options,
@@ -1994,6 +2039,7 @@ class DashboardTangki extends React.Component {
               // SET CHART TINGGI JAM
               this.setChartVolumeJam = {
                 ...this.setChartVolumeJam,
+                statusFound: true,
                 series: JSON.parse(JSON.stringify(this.data_volume_tangki_perjam_series)),
                 options:{
                     ...this.setChartVolumeJam.options,
@@ -3345,14 +3391,24 @@ class DashboardTangki extends React.Component {
                                                         middleCircleColor=""
                                                     />
 
-                                                    { 
+                                                    {
                                                         !this.state.loader.jarak_sensor_jam &&
+                                                        this.state.chartJarakSensorJam.statusFound &&
                                                         <div className='w-100'>
                                                             <ReactApexChart 
                                                                   options={this.state.chartJarakSensorJam.options} 
                                                                   series={this.state.chartJarakSensorJam.series} 
                                                                   type="area" 
                                                                   height={350} />
+                                                        </div>
+                                                    }
+
+                                                    {
+                                                        !this.state.loader.jarak_sensor_jam &&
+                                                        !this.state.chartJarakSensorJam.statusFound &&
+                                                        <div className='d-flex flex-column justify-content-center align-items-center'>
+                                                            <img src = {No_Found} className="nofound-class" />
+                                                            <div className='nofound-label'> No Data Found </div>
                                                         </div>
                                                     }
 
@@ -3406,12 +3462,22 @@ class DashboardTangki extends React.Component {
 
                                                     { 
                                                         !this.state.loader.tinggi_isi_jam &&
+                                                        this.state.chartJarakSensorJam.statusFound &&
                                                         <div className='w-100'>
                                                             <ReactApexChart 
                                                                   options={this.state.chartTinggiJam.options} 
                                                                   series={this.state.chartTinggiJam.series} 
                                                                   type="area" 
                                                                   height={350} />
+                                                        </div>
+                                                    }
+
+                                                    {
+                                                        !this.state.loader.tinggi_isi_jam &&
+                                                        !this.state.chartJarakSensorJam.statusFound &&
+                                                        <div className='d-flex flex-column justify-content-center align-items-center'>
+                                                            <img src = {No_Found} className="nofound-class" />
+                                                            <div className='nofound-label'> No Data Found </div>
                                                         </div>
                                                     }
 
@@ -3456,11 +3522,21 @@ class DashboardTangki extends React.Component {
 
                                                     { 
                                                         !this.state.loader.suhu_tangki_jam &&
+                                                        this.state.chartSuhuJam.statusFound &&
                                                         <div className='w-100'>
                                                             <ReactApexChart options={this.state.chartSuhuJam.options} 
                                                                   series={this.state.chartSuhuJam.series} 
                                                                   type="area" 
                                                                   height={350} />
+                                                        </div>
+                                                    }
+
+                                                    {
+                                                        !this.state.loader.suhu_tangki_jam &&
+                                                        !this.state.chartSuhuJam.statusFound &&
+                                                        <div className='d-flex flex-column justify-content-center align-items-center'>
+                                                            <img src = {No_Found} className="nofound-class" />
+                                                            <div className='nofound-label'> No Data Found </div>
                                                         </div>
                                                     }
 
@@ -3503,12 +3579,22 @@ class DashboardTangki extends React.Component {
 
                                                     { 
                                                         !this.state.loader.volume_tangki_jam &&
+                                                        this.state.chartVolumeJam.statusFound &&
                                                         <div className='w-100'>
                                                             <ReactApexChart 
                                                                   options={this.state.chartVolumeJam.options} 
                                                                   series={this.state.chartVolumeJam.series} 
                                                                   type="area" 
                                                                   height={350} />
+                                                        </div>
+                                                    }
+
+                                                    {
+                                                        !this.state.loader.volume_tangki_jam &&
+                                                        !this.state.chartVolumeJam.statusFound &&
+                                                        <div className='d-flex flex-column justify-content-center align-items-center'>
+                                                            <img src = {No_Found} className="nofound-class" />
+                                                            <div className='nofound-label'> No Data Found </div>
                                                         </div>
                                                     }
 
