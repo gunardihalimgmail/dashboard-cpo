@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Route, Routes } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
@@ -9,8 +9,28 @@ import { Route_custom } from '../config';
 import { actionCreators, State } from '../state';
 import './App.css';
 import Login from './login';
+import useUpdateLogger from './customHook/useUpdateLogger';
+import useLocalStorage from './customHook/useLocalStorage';
+import usePrevPage from './customHook/usePrevPage';
 
 function App() {
+  
+    // useEffect(
+    //   () => {
+    //     const t = setTimeout(
+    //       () => {
+    //         console.log('HELLO USE UPDATE LOGGER => useEffect ');
+    //       },
+    //       0
+    //     );
+
+    //     return () => {
+    //       clearTimeout(t);
+    //     }
+    //   },
+    //   [],
+    // );
+
 
   // CONTOH REDUX
   // const dispatch = useDispatch();
@@ -18,6 +38,9 @@ function App() {
   // const { depositMoney, withdrawMoney, bankrupt } = bindActionCreators(actionCreators, dispatch)
   // const amount = useSelector((state: State)=> state.bank)
   // ... <end redux>
+
+  // === CUSTOM HOOK ===
+  // const [val, setVal] = useLocalStorage("kunci",'');
 
   return (
       
@@ -29,6 +52,22 @@ function App() {
       // </div>
 
       <Route_custom />
+
+      // === CUSTOM HOOK ===
+      // <div>
+      //   {val} <br />
+
+      //   <input 
+      //     type = "text"
+      //     value={val}
+      //     onChange={e=>{
+      //         setVal(e.target.value)
+      //     }}
+      //     />
+      // </div>
+
+
+        
 
       // begin === contoh home react 
 

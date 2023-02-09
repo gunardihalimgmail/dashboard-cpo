@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
+import ReactToPrint from 'react-to-print'
 
 // import FusionCharts from 'fusioncharts';
 // import Charts from 'fusioncharts/fusioncharts.charts';
@@ -23,7 +24,7 @@ import Badge from 'react-bootstrap/Badge';
 import Col from 'react-bootstrap/esm/Col';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/esm/Row';
-import { No_Found, SVG_Circle } from '../../../assets'
+import { Img_Facebook, No_Found, SVG_Circle } from '../../../assets'
 import ReactApexChart from 'react-apexcharts';
 
 import ThermometerFC from '../thermometer';
@@ -117,7 +118,19 @@ const dataSource = {
 
 ;
 
+class PanggilToast extends React.Component {
+  render(){
+    return (
+      <div style={{color:'red'}}>
+        <div>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Reprehenderit dignissimos soluta sapiente consectetur ad temporibus. Necessitatibus, eius minus placeat fuga sed enim aliquid molestias totam consectetur aut? Itaque perferendis quia ratione consectetur explicabo! Eum dolorum molestiae, animi, soluta quo temporibus accusantium magnam itaque consequuntur autem, minima quasi optio esse. Sunt nihil ex, sit tenetur, quasi nobis hic officiis earum reprehenderit animi harum, quos cumque unde incidunt eaque corporis provident ipsum ea quisquam natus laborum. Ut hic expedita sequi! Deserunt, dolorum aperiam! Maiores, est molestias neque nisi ipsa, consequuntur necessitatibus maxime numquam ut inventore quis similique dolorem repellat minima. Placeat, expedita. </div>
+      </div>
+    )
+  }
+}
+
 class DashboardTangki extends React.Component {
+
+    componentRef:any;
 
   // ARRAY CPO & PKO berdasarkan tanggal berlaku
     arr_cpo_pko = [
@@ -126,12 +139,11 @@ class DashboardTangki extends React.Component {
       {name: 'tangki_2', jenis:'PKO', datebegin:'1970-01-01 00:00', datelast:''},
 
       {name: 'tangki_3', jenis:'CPO', datebegin:'1970-01-01 00:00', datelast:'2023-01-27 23:59'},
-      {name: 'tangki_3', jenis:'PKO', datebegin:'2023-01-28 00:00', datelast:''},
+      {name: 'tangki_3', jenis:'PKO', datebegin:'2023-01-28 00:00', datelast:'2023-02-03 23:59'},
+      {name: 'tangki_3', jenis:'CPO', datebegin:'2023-02-04 00:00', datelast:''},
 
       {name: 'tangki_4', jenis:'CPO', datebegin:'1970-01-01 00:00', datelast:''},
     ]
-
-
 
     statusChecked:any = {
       jarak_sensor: false,
@@ -571,6 +583,7 @@ class DashboardTangki extends React.Component {
         tooltip: {
           enabled:true,
           x: {
+            show:true,
             format: 'dd MMM yy (HH:mm)',
             formatter: (value:any, { series, seriesIndex, dataPointIndex, w }:any)=> {
               // console.log(series)
@@ -578,7 +591,7 @@ class DashboardTangki extends React.Component {
               // console.log(dataPointIndex)
 
               // return new Date(value)
-              return formatDate(new Date(value),'HH:mm')
+              return formatDate(new Date(value),'HH:mm:ss')
 
               // let waktu:any = w.globals.categoryLabels[dataPointIndex];
                 // return waktu;
@@ -1055,6 +1068,7 @@ class DashboardTangki extends React.Component {
   
     constructor(props:any){
         super(props)
+
         // this.buttonPlus = this.buttonPlus.bind(this);
 
         // start chart
@@ -1724,7 +1738,7 @@ class DashboardTangki extends React.Component {
 
                       data_temp.push(
                           {
-                            x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm'),
+                            x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm:ss'),
                             y: parseFloat(obj_temp_tank?.[tangki_name]?.['avg']),
                             x_time: new Date(time_tank).getTime()
                           }
@@ -2895,9 +2909,21 @@ class DashboardTangki extends React.Component {
   }
 
 
-    render(){
-        return (
+  render(){
+      
+
+      return (
             <div>
+               
+
+                {/* <PanggilToast ref={(response)=>(this.componentRef = response)} /> */}
+
+                {/* <ReactToPrint
+                  trigger={()=>{
+                    return <a href="#">Print this out !</a>;
+                  }}
+                  content={()=>this.componentRef}
+                /> */}
 
               <ToastContainer 
                 draggable
@@ -3341,6 +3367,22 @@ class DashboardTangki extends React.Component {
                                                       <button className='btn btn-sm btn-primary' onClick={()=>this.clickFilter()}>Filter</button>
                                                     </div>
 
+                                                    <div className='w-100 d-flex justify-content-end'>
+                                                      
+                                                        <ReactToPrint
+                                                            content={() => this.componentRef}
+                                                            // concept create watermark
+                                                            //   const PrintElem = document.createElement('div');
+                                                            //   const header = 
+                                                            //     `<img src="${Img_Facebook}" alt="" class="watermark"/>` + 
+                                                            //     `<div class="page-footer">I'm The Footer</div>`;
+                                                            //   PrintElem.innerHTML = header;
+                                                            //   return PrintElem;
+                                                            // }}
+                                                            trigger={() => <button className="btn btn-sm btn-success">Print to PDF!</button>}
+                                                        />
+                                                    </div>
+
                                                 </div>
                                             </Col>
 
@@ -3348,260 +3390,265 @@ class DashboardTangki extends React.Component {
                                             {/* <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div> */}
                                         </Row>
 
-                                        <Row className='mt-2'>
-                                            <hr></hr>
-                                            <div className='d-flex justify-content-between'>
-                                                <div>
-                                                    <h5 className='dashtangki-title'>Jarak Sensor ( m / jam )</h5>
-                                                    <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
+                                        <div 
+                                              ref={(response)=>this.componentRef=response}>
+
+                                            <Row className='mt-2'>
+                                                <hr></hr>
+                                                <div className='d-flex justify-content-between'>
+                                                    <div>
+                                                        <h5 className='dashtangki-title'>Jarak Sensor ( m / jam )</h5>
+                                                        <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
+                                                    </div>
+                                                    <div>
+                                                            {/* <Form.Check
+                                                              inline
+                                                              label="1"
+                                                              name="group1"
+                                                              type='checkbox'
+                                                              id={`inline-${'1'}-1`}
+                                                            /> */}
+                                                            <Form.Check type={'checkbox'} inline>
+                                                                <Form.Check.Input type={'checkbox'} onChange={(val)=>{this.checkChartJam(val,'jarak_sensor')}}/>
+                                                                <Form.Check.Label>{`Show Data Label`}</Form.Check.Label>
+                                                                {/* <Form.Control.Feedback type="valid">
+                                                                  You did it! 
+                                                                </Form.Control.Feedback> */}
+                                                            </Form.Check>
+                                                    </div>
+
+
                                                 </div>
-                                                <div>
-                                                        {/* <Form.Check
-                                                          inline
-                                                          label="1"
-                                                          name="group1"
-                                                          type='checkbox'
-                                                          id={`inline-${'1'}-1`}
-                                                        /> */}
+
+                                                <Col> 
+                                                    <div id="chart" className='d-flex justify-content-center align-items-center'>
+
+                                                      <ThreeCircles
+                                                            height="100"
+                                                            width="100"
+                                                            color="#4fa94d"
+                                                            wrapperStyle={{}}
+                                                            wrapperClass=""
+                                                            visible={this.state.loader.jarak_sensor_jam}
+                                                            ariaLabel="three-circles-rotating"
+                                                            outerCircleColor=""
+                                                            innerCircleColor=""
+                                                            middleCircleColor=""
+                                                        />
+
+                                                        {
+                                                            !this.state.loader.jarak_sensor_jam &&
+                                                            this.state.chartJarakSensorJam.statusFound &&
+
+                                                            <div className='w-100'>
+                                                                <ReactApexChart 
+                                                                      options={this.state.chartJarakSensorJam.options} 
+                                                                      series={this.state.chartJarakSensorJam.series} 
+                                                                      type="area" 
+                                                                      height={350} />
+                                                            </div>
+                                                        }
+
+                                                        {
+                                                            !this.state.loader.jarak_sensor_jam &&
+                                                            !this.state.chartJarakSensorJam.statusFound &&
+                                                            <div className='d-flex flex-column justify-content-center align-items-center'>
+                                                                <img src = {No_Found} className="nofound-class" />
+                                                                <div className='nofound-label'> No Data Found </div>
+                                                            </div>
+                                                        }
+
+                                                        
+                                                    </div>
+                                                </Col>
+                                            </Row>
+
+                                            <Row className='mt-2'>
+                                                <hr></hr>
+                                                <div className='d-flex justify-content-between'>
+                                                    <div>
+                                                        <h5 className='dashtangki-title'>Tinggi Isi Tangki ( m / jam )</h5>
+                                                        <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
+                                                    </div>
+                                                    <div>
+                                                            {/* <Form.Check
+                                                              inline
+                                                              label="1"
+                                                              name="group1"
+                                                              type='checkbox'
+                                                              id={`inline-${'1'}-1`}
+                                                            /> */}
+                                                            <Form.Check type={'checkbox'} inline>
+                                                                <Form.Check.Input type={'checkbox'} onChange={(val)=>{this.checkChartJam(val,'tinggi')}}/>
+                                                                <Form.Check.Label>{`Show Data Label`}</Form.Check.Label>
+                                                                {/* <Form.Control.Feedback type="valid">
+                                                                  You did it! 
+                                                                </Form.Control.Feedback> */}
+                                                            </Form.Check>
+                                                    </div>
+
+
+                                                </div>
+
+                                                <Col> 
+                                                    <div id="chart" className='d-flex justify-content-center align-items-center'>
+
+                                                      <ThreeCircles
+                                                            height="100"
+                                                            width="100"
+                                                            color="#4fa94d"
+                                                            wrapperStyle={{}}
+                                                            wrapperClass=""
+                                                            visible={this.state.loader.tinggi_isi_jam}
+                                                            ariaLabel="three-circles-rotating"
+                                                            outerCircleColor=""
+                                                            innerCircleColor=""
+                                                            middleCircleColor=""
+                                                        />
+
+                                                        { 
+                                                            !this.state.loader.tinggi_isi_jam &&
+                                                            this.state.chartJarakSensorJam.statusFound &&
+                                                            <div className='w-100'>
+                                                                <ReactApexChart 
+                                                                      options={this.state.chartTinggiJam.options} 
+                                                                      series={this.state.chartTinggiJam.series} 
+                                                                      type="area" 
+                                                                      height={350} />
+                                                            </div>
+                                                        }
+
+                                                        {
+                                                            !this.state.loader.tinggi_isi_jam &&
+                                                            !this.state.chartJarakSensorJam.statusFound &&
+                                                            <div className='d-flex flex-column justify-content-center align-items-center'>
+                                                                <img src = {No_Found} className="nofound-class" />
+                                                                <div className='nofound-label'> No Data Found </div>
+                                                            </div>
+                                                        }
+
+                                                        
+                                                    </div>
+                                                </Col>
+                                            </Row>
+
+                                            <Row className='mt-3'>
+                                                <hr></hr>
+                                                <div className='d-flex justify-content-between'>
+                                                    <div>
+                                                        <h5 className='dashtangki-title'>Suhu Tangki ( °C / jam )</h5>
+                                                        <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
+                                                    </div>
+                                                    <div>
                                                         <Form.Check type={'checkbox'} inline>
-                                                            <Form.Check.Input type={'checkbox'} onChange={(val)=>{this.checkChartJam(val,'jarak_sensor')}}/>
+                                                            <Form.Check.Input type={'checkbox'} onChange={(val)=>{this.checkChartJam(val,'suhu_jam')}}/>
                                                             <Form.Check.Label>{`Show Data Label`}</Form.Check.Label>
                                                             {/* <Form.Control.Feedback type="valid">
                                                               You did it! 
                                                             </Form.Control.Feedback> */}
                                                         </Form.Check>
+                                                    </div>
                                                 </div>
 
+                                                <Col> 
+                                                    <div id="chart" className='d-flex justify-content-center'>
 
-                                            </div>
+                                                        <ThreeCircles
+                                                            height="100"
+                                                            width="100"
+                                                            color="#4fa94d"
+                                                            wrapperStyle={{}}
+                                                            wrapperClass=""
+                                                            visible={this.state.loader.suhu_tangki_jam}
+                                                            ariaLabel="three-circles-rotating"
+                                                            outerCircleColor=""
+                                                            innerCircleColor=""
+                                                            middleCircleColor=""
+                                                        />
 
-                                            <Col> 
-                                                <div id="chart" className='d-flex justify-content-center align-items-center'>
+                                                        { 
+                                                            !this.state.loader.suhu_tangki_jam &&
+                                                            this.state.chartSuhuJam.statusFound &&
+                                                            <div className='w-100'>
+                                                                <ReactApexChart options={this.state.chartSuhuJam.options} 
+                                                                      series={this.state.chartSuhuJam.series} 
+                                                                      type="area" 
+                                                                      height={350} />
+                                                            </div>
+                                                        }
 
-                                                   <ThreeCircles
-                                                        height="100"
-                                                        width="100"
-                                                        color="#4fa94d"
-                                                        wrapperStyle={{}}
-                                                        wrapperClass=""
-                                                        visible={this.state.loader.jarak_sensor_jam}
-                                                        ariaLabel="three-circles-rotating"
-                                                        outerCircleColor=""
-                                                        innerCircleColor=""
-                                                        middleCircleColor=""
-                                                    />
+                                                        {
+                                                            !this.state.loader.suhu_tangki_jam &&
+                                                            !this.state.chartSuhuJam.statusFound &&
+                                                            <div className='d-flex flex-column justify-content-center align-items-center'>
+                                                                <img src = {No_Found} className="nofound-class" />
+                                                                <div className='nofound-label'> No Data Found </div>
+                                                            </div>
+                                                        }
 
-                                                    {
-                                                        !this.state.loader.jarak_sensor_jam &&
-                                                        this.state.chartJarakSensorJam.statusFound &&
-                                                        <div className='w-100'>
-                                                            <ReactApexChart 
-                                                                  options={this.state.chartJarakSensorJam.options} 
-                                                                  series={this.state.chartJarakSensorJam.series} 
-                                                                  type="area" 
-                                                                  height={350} />
-                                                        </div>
-                                                    }
+                                                    </div>
+                                                </Col>
+                                            </Row>
 
-                                                    {
-                                                        !this.state.loader.jarak_sensor_jam &&
-                                                        !this.state.chartJarakSensorJam.statusFound &&
-                                                        <div className='d-flex flex-column justify-content-center align-items-center'>
-                                                            <img src = {No_Found} className="nofound-class" />
-                                                            <div className='nofound-label'> No Data Found </div>
-                                                        </div>
-                                                    }
-
-                                                    
-                                                </div>
-                                            </Col>
-                                        </Row>
-
-                                        <Row className='mt-2'>
-                                            <hr></hr>
-                                            <div className='d-flex justify-content-between'>
-                                                <div>
-                                                    <h5 className='dashtangki-title'>Tinggi Isi Tangki ( m / jam )</h5>
-                                                    <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
-                                                </div>
-                                                <div>
-                                                        {/* <Form.Check
-                                                          inline
-                                                          label="1"
-                                                          name="group1"
-                                                          type='checkbox'
-                                                          id={`inline-${'1'}-1`}
-                                                        /> */}
+                                            <Row className='mt-3'>
+                                                <hr></hr>
+                                                <div className='d-flex justify-content-between'>
+                                                    <div>
+                                                        <h5 className='dashtangki-title'>Volume Tangki ( kg / jam )</h5>
+                                                        <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
+                                                    </div>
+                                                    <div>
                                                         <Form.Check type={'checkbox'} inline>
-                                                            <Form.Check.Input type={'checkbox'} onChange={(val)=>{this.checkChartJam(val,'tinggi')}}/>
+                                                            <Form.Check.Input type={'checkbox'} onChange={(val)=>{this.checkChartJam(val,'volume_jam')}}/>
                                                             <Form.Check.Label>{`Show Data Label`}</Form.Check.Label>
                                                             {/* <Form.Control.Feedback type="valid">
                                                               You did it! 
                                                             </Form.Control.Feedback> */}
                                                         </Form.Check>
+                                                    </div>
                                                 </div>
+                                                <Col> 
+                                                    <div id="chart" className='d-flex justify-content-center'>
 
+                                                        <ThreeCircles
+                                                              height="100"
+                                                              width="100"
+                                                              color="#4fa94d"
+                                                              wrapperStyle={{}}
+                                                              wrapperClass=""
+                                                              visible={this.state.loader.volume_tangki_jam}
+                                                              ariaLabel="three-circles-rotating"
+                                                              outerCircleColor=""
+                                                              innerCircleColor=""
+                                                              middleCircleColor=""
+                                                        />
 
-                                            </div>
+                                                        { 
+                                                            !this.state.loader.volume_tangki_jam &&
+                                                            this.state.chartVolumeJam.statusFound &&
+                                                            <div className='w-100'>
+                                                                {/* <ReactApexChart 
+                                                                      options={this.state.chartVolumeJam.options} 
+                                                                      series={this.state.chartVolumeJam.series} 
+                                                                      type="area" 
+                                                                      height={350} /> */}
+                                                            </div>
+                                                        }
 
-                                            <Col> 
-                                                <div id="chart" className='d-flex justify-content-center align-items-center'>
+                                                        {
+                                                            !this.state.loader.volume_tangki_jam &&
+                                                            !this.state.chartVolumeJam.statusFound &&
+                                                            <div className='d-flex flex-column justify-content-center align-items-center'>
+                                                                <img src = {No_Found} className="nofound-class" />
+                                                                <div className='nofound-label'> No Data Found </div>
+                                                            </div>
+                                                        }
 
-                                                   <ThreeCircles
-                                                        height="100"
-                                                        width="100"
-                                                        color="#4fa94d"
-                                                        wrapperStyle={{}}
-                                                        wrapperClass=""
-                                                        visible={this.state.loader.tinggi_isi_jam}
-                                                        ariaLabel="three-circles-rotating"
-                                                        outerCircleColor=""
-                                                        innerCircleColor=""
-                                                        middleCircleColor=""
-                                                    />
-
-                                                    { 
-                                                        !this.state.loader.tinggi_isi_jam &&
-                                                        this.state.chartJarakSensorJam.statusFound &&
-                                                        <div className='w-100'>
-                                                            <ReactApexChart 
-                                                                  options={this.state.chartTinggiJam.options} 
-                                                                  series={this.state.chartTinggiJam.series} 
-                                                                  type="area" 
-                                                                  height={350} />
-                                                        </div>
-                                                    }
-
-                                                    {
-                                                        !this.state.loader.tinggi_isi_jam &&
-                                                        !this.state.chartJarakSensorJam.statusFound &&
-                                                        <div className='d-flex flex-column justify-content-center align-items-center'>
-                                                            <img src = {No_Found} className="nofound-class" />
-                                                            <div className='nofound-label'> No Data Found </div>
-                                                        </div>
-                                                    }
-
-                                                    
-                                                </div>
-                                            </Col>
-                                        </Row>
-
-                                        <Row className='mt-3'>
-                                            <hr></hr>
-                                            <div className='d-flex justify-content-between'>
-                                                <div>
-                                                    <h5 className='dashtangki-title'>Suhu Tangki ( °C / jam )</h5>
-                                                    <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
-                                                </div>
-                                                <div>
-                                                    <Form.Check type={'checkbox'} inline>
-                                                        <Form.Check.Input type={'checkbox'} onChange={(val)=>{this.checkChartJam(val,'suhu_jam')}}/>
-                                                        <Form.Check.Label>{`Show Data Label`}</Form.Check.Label>
-                                                        {/* <Form.Control.Feedback type="valid">
-                                                          You did it! 
-                                                        </Form.Control.Feedback> */}
-                                                    </Form.Check>
-                                                </div>
-                                            </div>
-
-                                            <Col> 
-                                                <div id="chart" className='d-flex justify-content-center'>
-
-                                                    <ThreeCircles
-                                                        height="100"
-                                                        width="100"
-                                                        color="#4fa94d"
-                                                        wrapperStyle={{}}
-                                                        wrapperClass=""
-                                                        visible={this.state.loader.suhu_tangki_jam}
-                                                        ariaLabel="three-circles-rotating"
-                                                        outerCircleColor=""
-                                                        innerCircleColor=""
-                                                        middleCircleColor=""
-                                                    />
-
-                                                    { 
-                                                        !this.state.loader.suhu_tangki_jam &&
-                                                        this.state.chartSuhuJam.statusFound &&
-                                                        <div className='w-100'>
-                                                            <ReactApexChart options={this.state.chartSuhuJam.options} 
-                                                                  series={this.state.chartSuhuJam.series} 
-                                                                  type="area" 
-                                                                  height={350} />
-                                                        </div>
-                                                    }
-
-                                                    {
-                                                        !this.state.loader.suhu_tangki_jam &&
-                                                        !this.state.chartSuhuJam.statusFound &&
-                                                        <div className='d-flex flex-column justify-content-center align-items-center'>
-                                                            <img src = {No_Found} className="nofound-class" />
-                                                            <div className='nofound-label'> No Data Found </div>
-                                                        </div>
-                                                    }
-
-                                                </div>
-                                            </Col>
-                                        </Row>
-
-                                        <Row className='mt-3'>
-                                            <hr></hr>
-                                            <div className='d-flex justify-content-between'>
-                                                <div>
-                                                    <h5 className='dashtangki-title'>Volume Tangki ( kg / jam )</h5>
-                                                    <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
-                                                </div>
-                                                <div>
-                                                    <Form.Check type={'checkbox'} inline>
-                                                        <Form.Check.Input type={'checkbox'} onChange={(val)=>{this.checkChartJam(val,'volume_jam')}}/>
-                                                        <Form.Check.Label>{`Show Data Label`}</Form.Check.Label>
-                                                        {/* <Form.Control.Feedback type="valid">
-                                                          You did it! 
-                                                        </Form.Control.Feedback> */}
-                                                    </Form.Check>
-                                                </div>
-                                            </div>
-                                            <Col> 
-                                                <div id="chart" className='d-flex justify-content-center'>
-
-                                                    <ThreeCircles
-                                                          height="100"
-                                                          width="100"
-                                                          color="#4fa94d"
-                                                          wrapperStyle={{}}
-                                                          wrapperClass=""
-                                                          visible={this.state.loader.volume_tangki_jam}
-                                                          ariaLabel="three-circles-rotating"
-                                                          outerCircleColor=""
-                                                          innerCircleColor=""
-                                                          middleCircleColor=""
-                                                    />
-
-                                                    { 
-                                                        !this.state.loader.volume_tangki_jam &&
-                                                        this.state.chartVolumeJam.statusFound &&
-                                                        <div className='w-100'>
-                                                            <ReactApexChart 
-                                                                  options={this.state.chartVolumeJam.options} 
-                                                                  series={this.state.chartVolumeJam.series} 
-                                                                  type="area" 
-                                                                  height={350} />
-                                                        </div>
-                                                    }
-
-                                                    {
-                                                        !this.state.loader.volume_tangki_jam &&
-                                                        !this.state.chartVolumeJam.statusFound &&
-                                                        <div className='d-flex flex-column justify-content-center align-items-center'>
-                                                            <img src = {No_Found} className="nofound-class" />
-                                                            <div className='nofound-label'> No Data Found </div>
-                                                        </div>
-                                                    }
-
-                                                    {/* <ReactApexChart options={this.state.chartVolumeJam.options} series={this.state.chartVolumeJam.series} type="area" height={350} /> */}
-                                                </div>
-                                            </Col>
-                                        </Row>
+                                                        {/* <ReactApexChart options={this.state.chartVolumeJam.options} series={this.state.chartVolumeJam.series} type="area" height={350} /> */}
+                                                    </div>
+                                                </Col>
+                                            </Row>
+                                        </div>
 
                                     </Col>
                                 </Row>                                
