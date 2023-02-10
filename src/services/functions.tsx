@@ -94,7 +94,16 @@ export const postApi = async (url?:any, param?:any, isAwait?:boolean, token_code
   else
   {
     // alert(isAwait)
-    const response = await fetch(url, requestOptions);
+    const response = await (fetch(url, requestOptions).catch((err)=>{return err}));
+    
+    // jika error maka callback error
+    if (response.toString().indexOf("TypeError") != -1){
+      callback({
+        statusCode:"400",
+        msg:response.toString()
+      })
+    }
+
     const result = await response.json();
     // console.log(result)
     callback(result)

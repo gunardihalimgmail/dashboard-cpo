@@ -118,7 +118,7 @@ const dataSource = {
 
 ;
 
-class PanggilToast extends React.Component {
+class PanggilToast extends React.Component { 
   render(){
     return (
       <div style={{color:'red'}}>
@@ -131,6 +131,8 @@ class PanggilToast extends React.Component {
 class DashboardTangki extends React.Component {
 
     componentRef:any;
+
+    getFirstTangki_Default:any = {};
 
   // ARRAY CPO & PKO berdasarkan tanggal berlaku
     arr_cpo_pko = [
@@ -191,11 +193,12 @@ class DashboardTangki extends React.Component {
     // ... end
 
 
+    // value & label untuk options filter pada suhu tinggi tangki
     mst_list_tangki = [
-      {name:'tangki_1', api:'tank 1', bgColor:'bg-gradient-danger', title:'Tangki 1'},
-      {name:'tangki_2', api:'tank 2', bgColor:'bg-gradient-info', title:'Tangki 2'},
-      {name:'tangki_3', api:'tank 3', bgColor:'bg-gradient-success',title:'Tangki 3'},
-      {name:'tangki_4', api:'tank 4', bgColor:'bg-gradient-warning',title:'Tangki 4'}
+      {name:'tangki_1', api:'tank 1', bgColor:'bg-gradient-danger', title:'Tangki 1', value:'Tangki 1', label: 'Tangki 1'},
+      {name:'tangki_2', api:'tank 2', bgColor:'bg-gradient-info', title:'Tangki 2', value:'Tangki 2', label: 'Tangki 2'},
+      {name:'tangki_3', api:'tank 3', bgColor:'bg-gradient-success',title:'Tangki 3', value:'Tangki 3', label: 'Tangki 3'},
+      {name:'tangki_4', api:'tank 4', bgColor:'bg-gradient-warning',title:'Tangki 4', value:'Tangki 4', label: 'Tangki 4'}
     ]
 
     // [
@@ -526,6 +529,118 @@ class DashboardTangki extends React.Component {
       //       { x: '01/01/2014 15:00', y: 40 } , { x: '01/01/2014 19:00', y: 45 }]
       //   }, {
       //     name: 'PRODUCT C',
+      //     data: [{ x: '01/01/2014 06:00', y: 15 }, { x: '01/01/2014 14:00', y: 25 } , { x: '01/01/2014 19:00', y: 40 }]
+      //   }
+      // ],
+
+      options: {
+        chart: {
+          height: 350,
+          type: 'area',
+          toolbar:{
+            show:true,
+            tools:{
+              download:false,
+            }
+          },
+          zoom:{
+            enabled:false
+          }
+        },
+        
+        dataLabels: {
+          enabled: true,
+          formatter: (val:any) => {
+            return val + "°C";
+          },
+        },
+        stroke: {
+          curve: 'smooth'
+        },
+        xaxis: {
+          type: 'datetime',
+          // type: 'category',
+          // tickAmount:30,
+          // categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"],
+          // min: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 0, 0).getTime(),
+          // max: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 23, 59).getTime(),
+          // categories: [],
+
+          labels:{
+              rotate: -45,
+              rotateAlways:true,
+              formatter:(val:any)=>{
+                return formatDate(new Date(val), 'HH:mm')
+                // return val
+              }
+          //   formatDate(
+          //     (new Date(val).getTime() + new Date(val).getTimezoneOffset() * 60000)
+          // ,'HH:mm')
+          }
+        },
+        yaxis:{
+          labels:{
+            formatter: (val:any)=>{ return parseInt(val) + " °C" }
+          }
+        },
+        tooltip: {
+          enabled:true,
+          x: {
+            show:true,
+            format: 'dd MMM yy (HH:mm)',
+            formatter: (value:any, { series, seriesIndex, dataPointIndex, w }:any)=> {
+              // console.log(series)
+              // console.log(seriesIndex)
+              // console.log(dataPointIndex)
+
+              // return new Date(value)
+              return formatDate(new Date(value),'HH:mm:ss')
+
+              // let waktu:any = w.globals.categoryLabels[dataPointIndex];
+                // return waktu;
+            }
+            // custom: ({series, seriesIndex, dataPointIndex, w}:any) => {
+            //     var data = w.globals.initialSeries[seriesIndex].data[dataPointIndex];
+
+            //     return ''
+            // }
+          },
+          y: {
+            formatter: (value:any, { series, seriesIndex, dataPointIndex, w }:any)=> {
+              // console.log(w.globals);
+              return value + " °C"
+            },
+            title: {
+              formatter: (seriesName:any) => {
+                return seriesName + " : "  // nama series pada tooltip sewaktu di hover
+              }
+            },
+          }
+        },
+      }
+        
+  // ... end 
+    }
+
+    setChartSuhuTinggiJam = {
+
+      statusFound: false,
+      isDisabled: true,
+      suhuTinggiSelected:{},
+      series: [
+      ],
+      // series: [
+      //   {
+      //     name: '1 M',
+      //     data: [{ x: '2014-01-01 05:00', y: 54 }, { x: '01/01/2014 14:00', y: 60 } , { x: '01/01/2014 19:00', y: 70 }]
+      //   }, {
+      //     name: '3 M',
+      //     data: [
+      //       { x: '2014-01-01 07:00', y: 30 }, 
+      //       { x: '2014-01-01 09:00', y: 30 }, 
+      //       { x: '01/01/2014 15:00', y: 40 } , { x: '01/01/2014 19:00', y: 45 }]
+      //   }, {
+      //     name: '5 M',
       //     data: [{ x: '01/01/2014 06:00', y: 15 }, { x: '01/01/2014 14:00', y: 25 } , { x: '01/01/2014 19:00', y: 40 }]
       //   }
       // ],
@@ -1014,12 +1129,14 @@ class DashboardTangki extends React.Component {
             tinggi_isi_jam: true,
             suhu_tangki: true,
             suhu_tangki_jam: true,
+            suhu_tinggi_tangki_jam:true,
             volume_tangki_jam: true,
         },
         chartJarakSensorJam:{...this.setChartJarakSensorJam},
         chartTinggi:{...this.setChartTinggi},
         chartTinggiJam:{...this.setChartTinggiJam},
         chartSuhuJam:{...this.setChartSuhuJam},
+        chartSuhuTinggiJam:{...this.setChartSuhuTinggiJam},
         chartVolumeJam:{...this.setChartVolumeJam}
     };
 
@@ -1065,7 +1182,18 @@ class DashboardTangki extends React.Component {
     //   dataSource: this.dataSource_Suhu
     // };
     
-  
+    // CUSTOM STYLE <SELECT />
+    customStyle_SuhuTinggiTangki = {
+        control: base => ({
+            ...base,
+            height:35,
+            minHeight:35,
+            fontSize:15,
+            paddingTop:0,
+            paddingBottom:0
+        })
+    }
+
     constructor(props:any){
         super(props)
 
@@ -1240,9 +1368,14 @@ class DashboardTangki extends React.Component {
                   // ambil data dengan id devices "BESTAGRO"
                   this.arr_json_alldata = [...
                       res_data.filter((res:any)=>{
+
+                          // const device_patt = new RegExp(/BESTAGRO_[0-9]+_NEW/,'gi')
+                          // penamaan device baru => BESTAGRO_001_NEW
+                          
                           if (typeof res?.['id_device'] != 'undefined' &&
                               res?.['id_device'] != null && 
-                              res?.['id_device'].indexOf("BESTAGRO") != -1)
+                              res?.['id_device'].toString().toUpperCase().indexOf("BESTAGRO") != -1)
+                              // device_patt.test(res?.['id_device']))
                           {
                               return true
                           }
@@ -1288,14 +1421,34 @@ class DashboardTangki extends React.Component {
                 });
               });
           }
+          else if (res?.['statusCode'] == '400'){
+            notify('error',res?.['msg'])
+          }
         })
 
         
         // dapatkan tanggal terakhir dari semua tangki yang ter-update
         this.getDateMax_From_TangkiLast();
         // untuk chart per jam
+        
         // sini
-        this.getAllData(this.tanggal_max_tangki_last, this.tanggal_max_tangki_last);
+        let getFirstTangkiList = this.mst_list_tangki.length > 0 ? {...this.mst_list_tangki[0]} : {}
+        this.getFirstTangki_Default = {...getFirstTangkiList}
+
+        this.setState({
+          ...this.state,
+          chartSuhuTinggiJam: {
+                ...this.state.chartSuhuTinggiJam,
+                suhuTinggiSelected: {...getFirstTangkiList}
+          }
+        })
+
+        // alert(JSON.stringify(this.state.chartSuhuTinggiJam.suhuTinggiSelected))
+        // alert(JSON.stringify(this.getFirstTangki_Default))
+
+        setTimeout(()=>{
+          this.getAllData(this.tanggal_max_tangki_last, this.tanggal_max_tangki_last);
+        },100)
 
         
 
@@ -2281,10 +2434,9 @@ class DashboardTangki extends React.Component {
         Object.keys(realtime).forEach((tangki_name:any)=>{
 
             let tinggi:any = realtime?.[tangki_name]?.['tinggi'] ?? null;
-            if (tinggi != null){
+            if (tinggi != null && tinggi != "-" && tinggi != ""){
                 // panggil array json tabel volume tangki yang sesuai
                 let arr_volume:any = this.json_arr_volume_tangki(tangki_name);
-
                 let findItem:any = arr_volume.find(res=>
                       parseInt(res.tinggi) == Math.round(tinggi.toFixed(2) * 100)
                 )
@@ -2593,6 +2745,36 @@ class DashboardTangki extends React.Component {
       }
   }
 
+
+  onChangeSelectSuhuTinggiFilter(e:any, action:any){
+
+    if (action != 'clear'){
+
+      let getFirstTangkiList:any = this.mst_list_tangki.length > 0 ? 
+            {...this.mst_list_tangki.filter(res=>res.value == e.value)[0]} 
+            : {}
+
+      this.getFirstTangki_Default = {...getFirstTangkiList}
+      
+      this.setState({
+        ...this.state,
+        chartSuhuTinggiJam: {
+              ...this.state.chartSuhuTinggiJam,
+              suhuTinggiSelected: {...getFirstTangkiList}
+        }
+      })
+    }
+    else
+    {
+        this.setState({
+          ...this.state,
+          chartSuhuTinggiJam: {
+                ...this.state.chartSuhuTinggiJam,
+                suhuTinggiSelected: {}
+          }
+        })
+    }
+  }
 
   onChangeSelectFilter(e:any, action:any){
     if (action == 'clear'){
@@ -3327,13 +3509,17 @@ class DashboardTangki extends React.Component {
                                         <Row className='mt-5'>
                                             {/* <hr></hr> */}
                                             <Col> 
-                                                <div className='d-flex justify-content-start align-items-center'> 
-                                                    <div className='filter-css-title'>Filter : </div>
-                                                    <Select options={this.options_filter} 
-                                                        className="select-class"
-                                                        tabSelectsValue={false} isClearable={true}
-                                                        onChange={(e, {action})=>this.onChangeSelectFilter(e, action)}
-                                                    />
+                                                <div className='d-flex justify-content-start align-items-start'> 
+
+                                                    <div className='d-flex justify-content-center filter-css-titles'>
+                                                        <div className='filter-css-title'>Filter :</div>
+                                                        <Select options={this.options_filter} 
+                                                            className="select-class"
+                                                            // defaultValue={this.options_filter.filter(({value})=> value == 'time')} // set default value
+                                                            tabSelectsValue={false} isClearable={true}
+                                                            onChange={(e, {action})=>this.onChangeSelectFilter(e, action)}
+                                                        />
+                                                    </div>
 
                                                     {
                                                       this.state.show.datepicker && 
@@ -3359,7 +3545,8 @@ class DashboardTangki extends React.Component {
                                                           minutePlaceholder="mm"
                                                           hourPlaceholder="hh"
                                                           required={true}
-                                                          onChange={(e)=>{this.onChangeTimePicker(e)}} value={this.state.timeSelected}
+                                                          onChange={(e)=>{this.onChangeTimePicker(e)}} 
+                                                          value={this.state.timeSelected}
                                                           onBlur={(e)=>{this.onBlurTimePicker(e)}}/>
                                                     }
 
@@ -3367,7 +3554,7 @@ class DashboardTangki extends React.Component {
                                                       <button className='btn btn-sm btn-primary' onClick={()=>this.clickFilter()}>Filter</button>
                                                     </div>
 
-                                                    <div className='w-100 d-flex justify-content-end'>
+                                                    <div className='w-100 d-flex justify-content-end align-items-center'>
                                                       
                                                         <ReactToPrint
                                                             content={() => this.componentRef}
@@ -3552,6 +3739,82 @@ class DashboardTangki extends React.Component {
 
                                                 <Col> 
                                                     <div id="chart" className='d-flex justify-content-center'>
+
+                                                        <ThreeCircles
+                                                            height="100"
+                                                            width="100"
+                                                            color="#4fa94d"
+                                                            wrapperStyle={{}}
+                                                            wrapperClass=""
+                                                            visible={this.state.loader.suhu_tangki_jam}
+                                                            ariaLabel="three-circles-rotating"
+                                                            outerCircleColor=""
+                                                            innerCircleColor=""
+                                                            middleCircleColor=""
+                                                        />
+
+                                                        { 
+                                                            !this.state.loader.suhu_tangki_jam &&
+                                                            this.state.chartSuhuJam.statusFound &&
+                                                            <div className='w-100'>
+                                                                <ReactApexChart options={this.state.chartSuhuJam.options} 
+                                                                      series={this.state.chartSuhuJam.series} 
+                                                                      type="area" 
+                                                                      height={350} />
+                                                            </div>
+                                                        }
+
+                                                        {
+                                                            !this.state.loader.suhu_tangki_jam &&
+                                                            !this.state.chartSuhuJam.statusFound &&
+                                                            <div className='d-flex flex-column justify-content-center align-items-center'>
+                                                                <img src = {No_Found} className="nofound-class" />
+                                                                <div className='nofound-label'> No Data Found </div>
+                                                            </div>
+                                                        }
+
+                                                    </div>
+                                                </Col>
+                                            </Row>
+
+                                            {/* SUHU TANGKI ( KETINGGIAN )*/}
+                                            <Row className='mt-3'>
+                                                <hr></hr>
+                                                <div className='d-flex justify-content-between'>
+                                                    <div>
+
+                                                        <h5 className='dashtangki-title'>Suhu Tinggi Tangki ( °C / jam )</h5>
+                                                        <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
+
+                                                        {/* FILTER TANGKI */}
+                                                        <div className='d-flex justify-content-start align-items-center'>
+                                                            <div className='filter-subcap-css-title'>Filter : </div>
+                                                            <Select options={this.mst_list_tangki} 
+                                                                className="select-class"
+                                                                isDisabled={this.state.chartSuhuTinggiJam.isDisabled}
+                                                                // styles={this.customStyle_SuhuTinggiTangki}
+                                                                // defaultValue={this.state.chartSuhuTinggiJam.suhuTinggiSelected} // set default value
+                                                                // value={{"name":"tangki_1","api":"tank 1","bgColor":"bg-gradient-danger","title":"Tangki 1","value":"Tangki 1","label":"Tangki 1"}} // set default value
+                                                                value={this.state.chartSuhuTinggiJam.suhuTinggiSelected} // set default value
+                                                                tabSelectsValue={false} isClearable={true}
+                                                                onChange={(e, {action})=>this.onChangeSelectSuhuTinggiFilter(e, action)}
+                                                            />
+                                                        </div>
+
+                                                    </div>
+                                                    <div>
+                                                        <Form.Check type={'checkbox'} inline>
+                                                            <Form.Check.Input type={'checkbox'} onChange={(val)=>{this.checkChartJam(val,'suhu_jam')}}/>
+                                                            <Form.Check.Label>{`Show Data Label`}</Form.Check.Label>
+                                                            {/* <Form.Control.Feedback type="valid">
+                                                              You did it! 
+                                                            </Form.Control.Feedback> */}
+                                                        </Form.Check>
+                                                    </div>
+                                                </div>
+
+                                                <Col> 
+                                                    <div id="chart" className='d-flex justify-content-center mt-3'>
 
                                                         <ThreeCircles
                                                             height="100"

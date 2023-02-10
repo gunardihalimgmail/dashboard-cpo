@@ -112,12 +112,21 @@ h4.dashtangki-cardbody-ontop{
     font-size:20px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin-right:10px;
-    width:100px;
+    width:80px;
+}
+
+.filter-subcap-css-title {
+    font-weight: 700;
+    font-size:15px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-right:0;
+    width:60px;
 }
 
 .select-class{
-    width:200px;
+    width:300px;
     margin-right:10px;
+    
 }
 
 // datepicker
@@ -132,7 +141,8 @@ h4.dashtangki-cardbody-ontop{
 }
 
 .react-datepicker-wrapper {
-    width:200px !important
+    width:200px !important;
+    margin-right: 10px;
 }
 
 .btn-filter-ml{
