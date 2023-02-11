@@ -151,6 +151,7 @@ class DashboardTangki extends React.Component {
       jarak_sensor: false,
       tinggi: false,
       suhu: false,
+      suhu_tinggi: false,
       volume: false
     }
     
@@ -1362,8 +1363,8 @@ class DashboardTangki extends React.Component {
         let length_mst_list_tangki:any = this.mst_list_tangki.length;
 
         // hit api yang getAllData
-        // await postApi("https://platform.iotsolution.id:7004/api-v1/getLastData",null,true,'1',null,(res:any)=>{
-        await postApi("http://192.168.1.120:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
+        await postApi("https://platform.iotsolution.id:7004/api-v1/getLastData",null,true,'1',null,(res:any)=>{
+        // await postApi("http://192.168.1.120:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
           
           if (res?.['responseCode'] == "200"){
               let res_data:any = res?.['data'];
@@ -1434,6 +1435,12 @@ class DashboardTangki extends React.Component {
                           }
                         })
 
+                        this.getDateMax_From_TangkiLast();
+
+                        setTimeout(()=>{
+                          this.getAllData(this.tanggal_max_tangki_last, this.tanggal_max_tangki_last);
+                        },100)
+
                     })
                   });
                 });
@@ -1446,7 +1453,7 @@ class DashboardTangki extends React.Component {
 
         
         // dapatkan tanggal terakhir dari semua tangki yang ter-update
-        this.getDateMax_From_TangkiLast();
+        // this.getDateMax_From_TangkiLast();
         // untuk chart per jam
         
         // sini
@@ -1455,9 +1462,9 @@ class DashboardTangki extends React.Component {
         // alert(JSON.stringify(this.state.chartSuhuTinggiJam.suhuTinggiSelected))
         // alert(JSON.stringify(this.getFirstTangki_Default))
 
-        setTimeout(()=>{
-          this.getAllData(this.tanggal_max_tangki_last, this.tanggal_max_tangki_last);
-        },100)
+        // setTimeout(()=>{
+        //   this.getAllData(this.tanggal_max_tangki_last, this.tanggal_max_tangki_last);
+        // },100)
 
         
 
@@ -1486,6 +1493,94 @@ class DashboardTangki extends React.Component {
         }
     }
 
+    updateSuhuTinggiTangki_PerJam(nama_tangki:any, patt_exec:any, time_tank:any, data_arr:any, data_temperature:any){
+
+      let patt_tinggi_tangki:any = new RegExp(/tinggi [0-9]+.?M/,'gi')
+      // patt_exec['input'] = "Temperature Tank 1 BA tinggi 7 M"
+      let result_tinggi_tangki:any = patt_tinggi_tangki.exec(patt_exec['input']);
+      if (typeof result_tinggi_tangki?.[0] != 'undefined' &&
+            result_tinggi_tangki?.[0] != '')
+      {
+          let patt_final_tinggi:any = new RegExp(/[0-9]+.?M/,'gi')
+          let result_final_tinggi:any = patt_final_tinggi.exec(result_tinggi_tangki?.[0]);
+          let tanggal_format:any;
+          tanggal_format = formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm:ss');
+
+          if (typeof result_final_tinggi?.[0] != 'undefined' && result_final_tinggi?.[0] != null){
+
+            // isi suhu tinggi tangki ke dalam obj_suhu_tinggi_tangki_perjam_series
+
+            // result_final_tinggi[0] => 1 M, 3 M, 5 M, 7 M, 10 M
+
+            let obj_keys_suhutinggi:any = Object.keys(this.obj_suhu_tinggi_tangki_perjam_series);
+            let obj_keys_suhutinggi_cek:any = this.obj_suhu_tinggi_tangki_perjam_series?.[nama_tangki];
+
+            if (typeof obj_keys_suhutinggi_cek == 'undefined' ||
+                  obj_keys_suhutinggi_cek == null)
+            {
+                // JIKA DATA TIDAK ADA 
+                console.error("DATA TEMPERATURE TANK")
+                console.log(data_temperature)   // Temperature Tank 2 BA tinggi 3 M
+                console.log(result_tinggi_tangki)   // json {0, input}
+
+                console.log(data_arr?.[data_temperature])   // 43.31
+                console.log(tanggal_format)   // 2023-02-08 09:00:57
+                console.log(result_final_tinggi[0])   // 5 M
+
+                this.obj_suhu_tinggi_tangki_perjam_series[nama_tangki] = [
+                  {
+                    name: result_final_tinggi[0],
+                    data: [
+                      {
+                        x: tanggal_format,
+                        y: data_arr?.[data_temperature],
+                        x_time: new Date(tanggal_format).getTime()
+                      }
+                    ]
+                  }
+                ]
+
+                // console.log(this.obj_suhu_tinggi_tangki_perjam_series)
+            }
+            else
+            {
+                // JIKA DATA TANGKI SUDAH ADA SEBELUMNYA, MAKA TINGGAL DI PUSH
+                // cari yang misal '1 M' == '1 M'
+                let findIdx:any = this.obj_suhu_tinggi_tangki_perjam_series[nama_tangki].findIndex(res=>res.name == result_final_tinggi[0]);
+                if (findIdx == -1){
+                    // jika tidak ada, maka di push semua name dan data
+                    this.obj_suhu_tinggi_tangki_perjam_series[nama_tangki].push(
+                      {
+                          name: result_final_tinggi[0], // 1 M
+                          data: [
+                            {
+                              x: tanggal_format,
+                              y: data_arr?.[data_temperature],
+                              x_time: new Date(tanggal_format).getTime()
+                            }
+                          ]
+                      }
+                    )
+                }
+                else{
+                  // jika exists, maka di push data saja
+                  this.obj_suhu_tinggi_tangki_perjam_series[nama_tangki][findIdx]['data'].push(
+                      {
+                        x: tanggal_format,
+                        y: data_arr?.[data_temperature],
+                        x_time: new Date(tanggal_format).getTime()
+                      }
+                  )
+                }
+
+                // console.log(this.obj_suhu_tinggi_tangki_perjam_series)
+
+              }
+
+          }
+      }
+    }
+
     async getAllData(datebegin:any, datelast:any, hourbegin?:any, hourlast?:any){
 
         // GET ALL DATA PER JAM (SUHU, TINGGI)
@@ -1496,8 +1591,8 @@ class DashboardTangki extends React.Component {
       // "dateLast":formatDate(new Date(datelast),'YYYY-MM-DD')
 
       // LAGI FIXING PAK BAYU getDataHour banyak yg NaN
-      await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
-      // await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
+      // await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
+      await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
         {
           "date":formatDate(new Date(datebegin),'YYYY-MM-DD'),
           // // === BALIKKIN LAGI ===
@@ -1661,98 +1756,7 @@ class DashboardTangki extends React.Component {
                                   // AMBIL label tinggi (etc: 1 M, 3 M, 5 M, 7 M, 10 M)
 
                                   // UPDATE SUHU TINGGI TANGKI
-
-                                  let patt_tinggi_tangki:any = new RegExp(/tinggi [0-9]+.?M/,'gi')
-                                  // patt_exec['input'] = "Temperature Tank 1 BA tinggi 7 M"
-                                  let result_tinggi_tangki:any = patt_tinggi_tangki.exec(patt_exec['input']);
-                                  if (typeof result_tinggi_tangki?.[0] != 'undefined' &&
-                                        result_tinggi_tangki?.[0] != '')
-                                  {
-                                      let patt_final_tinggi:any = new RegExp(/[0-9]+.?M/,'gi')
-                                      let result_final_tinggi:any = patt_final_tinggi.exec(result_tinggi_tangki?.[0]);
-                                      let tanggal_format:any;
-                                      tanggal_format = formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm:ss');
-
-                                      if (typeof result_final_tinggi?.[0] != 'undefined' && result_final_tinggi?.[0] != null){
-
-                                        // isi suhu tinggi tangki ke dalam obj_suhu_tinggi_tangki_perjam_series
-
-                                        // result_final_tinggi[0] => 1 M, 3 M, 5 M, 7 M, 10 M
-
-                                        let obj_keys_suhutinggi:any = Object.keys(this.obj_suhu_tinggi_tangki_perjam_series);
-                                        let obj_keys_suhutinggi_cek:any = this.obj_suhu_tinggi_tangki_perjam_series?.[nama_tangki];
-
-                                        if (typeof obj_keys_suhutinggi_cek == 'undefined' ||
-                                              obj_keys_suhutinggi_cek == null)
-                                        {
-                                            // JIKA DATA TIDAK ADA 
-                                            console.error("DATA TEMPERATURE TANK")
-                                            console.log(data_temperature)   // Temperature Tank 2 BA tinggi 3 M
-                                            console.log(result_tinggi_tangki)   // json {0, input}
-    
-                                            console.log(data_arr?.[data_temperature])   // 43.31
-                                            console.log(tanggal_format)   // 2023-02-08 09:00:57
-                                            console.log(result_final_tinggi[0])   // 5 M
-
-                                            this.obj_suhu_tinggi_tangki_perjam_series[nama_tangki] = [
-                                              {
-                                                name: result_final_tinggi[0],
-                                                data: [
-                                                  {
-                                                    x: tanggal_format,
-                                                    y: data_arr?.[data_temperature],
-                                                    x_time: new Date(tanggal_format).getTime()
-                                                  }
-                                                ]
-                                              }
-                                            ]
-
-                                            console.log(this.obj_suhu_tinggi_tangki_perjam_series)
-                                        }
-                                        else
-                                        {
-                                            // JIKA DATA TANGKI SUDAH ADA SEBELUMNYA, MAKA TINGGAL DI PUSH
-                                            // cari yang misal '1 M' == '1 M'
-                                            let findIdx:any = this.obj_suhu_tinggi_tangki_perjam_series[nama_tangki].findIndex(res=>res.name == result_final_tinggi[0]);
-                                            if (findIdx == -1){
-                                                // jika tidak ada, maka di push semua name dan data
-                                                this.obj_suhu_tinggi_tangki_perjam_series[nama_tangki].push(
-                                                  {
-                                                      name: result_final_tinggi[0], // 1 M
-                                                      data: [
-                                                        {
-                                                          x: tanggal_format,
-                                                          y: data_arr?.[data_temperature],
-                                                          x_time: new Date(tanggal_format).getTime()
-                                                        }
-                                                      ]
-                                                  }
-                                                )
-                                            }
-                                            else{
-                                              // jika exists, maka di push data saja
-                                              this.obj_suhu_tinggi_tangki_perjam_series[nama_tangki][findIdx]['data'].push(
-                                                  {
-                                                    x: tanggal_format,
-                                                    y: data_arr?.[data_temperature],
-                                                    x_time: new Date(tanggal_format).getTime()
-                                                  }
-                                              )
-                                            }
-
-                                            console.log(this.obj_suhu_tinggi_tangki_perjam_series)
-
-                                            // ['data'].push(
-                                            //     {
-                                            //       x: tanggal_format,
-                                            //       y: data_arr?.[data_temperature],
-                                            //       x_time: new Date(tanggal_format).getTime()
-                                            //     }
-                                            // )
-                                          }
-
-                                      }
-                                  }
+                                  this.updateSuhuTinggiTangki_PerJam(nama_tangki, patt_exec, time_tank, data_arr, data_temperature);
                                   // ... end UPDATE SUHU TINGGI TANGKI
                                   
 
@@ -2357,10 +2361,14 @@ class DashboardTangki extends React.Component {
 
               // // === BALIKKIN LAGI (JARAK SENSOR) ===
 
+
               // SET SUHU TINGGI 
               let suhu_tinggi_tangki_name_selected:any = this.state.chartSuhuTinggiJam.suhuTinggiSelected.name;
               let arr_final_suhutinggi_tangki_selected:any = [];
-              arr_final_suhutinggi_tangki_selected = [...this.obj_suhu_tinggi_tangki_perjam_series[suhu_tinggi_tangki_name_selected]];
+              
+              if (typeof suhu_tinggi_tangki_name_selected != 'undefined'){
+                arr_final_suhutinggi_tangki_selected = [...this.obj_suhu_tinggi_tangki_perjam_series[suhu_tinggi_tangki_name_selected]];
+              }
 
               // alert(JSON.stringify(arr_final_suhutinggi_tangki_selected))
 
@@ -2370,15 +2378,27 @@ class DashboardTangki extends React.Component {
                       ...this.state.loader,
                       suhu_tinggi_tangki_jam: false,
                   },
+                  waktu:{
+                    tanggal: formatDate(new Date(time_first),'DD MMMM YYYY'),
+                    tanggal_jam: formatDate(new Date(time_first),'DD MMMM YYYY HH:mm:ss')
+                  },
                   chartSuhuTinggiJam: {
                     ...this.state.chartSuhuTinggiJam,
                     statusFound: true,
+                    isDisabled: false,
                     suhuTinggiSelected:{
                       ...this.state.chartSuhuTinggiJam.suhuTinggiSelected
                     },
                     series:[
                       ...arr_final_suhutinggi_tangki_selected
-                    ]
+                    ],
+                    options:{
+                        ...this.state.chartSuhuTinggiJam.options,
+                        dataLabels:{
+                            ...this.state.chartSuhuTinggiJam.options.dataLabels,
+                            enabled: this.statusChecked?.['suhu_tinggi'] ?? false
+                        }
+                    }
                   }
               })  
               // this.setState({
@@ -2402,10 +2422,12 @@ class DashboardTangki extends React.Component {
               // })
               // ... END BALIKKIN
 
+              console.log(this.obj_suhu_tinggi_tangki_perjam_series)
+
               // console.log("INI ADALAH TIME TANK")
               // console.log(time_tank)
 
-              setTimeout(()=>{
+              // setTimeout(()=>{
                 // console.log("CHART TINGGI JAM")
                 // console.log(this.state.chartTinggiJam)
 
@@ -2417,7 +2439,7 @@ class DashboardTangki extends React.Component {
 
                 // console.error("===DATA VOLUME TANGKI PER JAM SERIES===")
                 // console.error(this.data_volume_tangki_perjam_series)
-              },500)
+              // },500)
 
               // console.log("array json tangki ALL DATA")
               // console.log(this.arr_json_alldata)
@@ -2910,13 +2932,28 @@ class DashboardTangki extends React.Component {
 
       this.getFirstTangki_Default = {...getFirstTangkiList}
       
+      let arr_final_suhutinggi_tangki_selected:any = [];
+      let obj_selected:any = this.obj_suhu_tinggi_tangki_perjam_series?.[this.getFirstTangki_Default.name];
+      if (typeof obj_selected == 'undefined' || obj_selected == null)
+      {
+          notify('error', e.value + ' tidak ada !')
+          return
+      }
+
+
+      arr_final_suhutinggi_tangki_selected = [...this.obj_suhu_tinggi_tangki_perjam_series[this.getFirstTangki_Default.name]];
+
       this.setState({
         ...this.state,
         chartSuhuTinggiJam: {
               ...this.state.chartSuhuTinggiJam,
+              series:[
+                  ...arr_final_suhutinggi_tangki_selected
+              ],
               suhuTinggiSelected: {...getFirstTangkiList}
         }
       })
+
     }
     else
     {
@@ -2924,6 +2961,7 @@ class DashboardTangki extends React.Component {
           ...this.state,
           chartSuhuTinggiJam: {
                 ...this.state.chartSuhuTinggiJam,
+                series:[],
                 suhuTinggiSelected: {}
           }
         })
@@ -3017,6 +3055,8 @@ class DashboardTangki extends React.Component {
                 this.data_volume_tangki_perjam_categories = []
                 this.data_volume_tangki_perjam_series = []
 
+                this.obj_suhu_tinggi_tangki_perjam_series = {};
+
                 this.setState({
                   ...this.state,
                   loader:{
@@ -3024,6 +3064,7 @@ class DashboardTangki extends React.Component {
                     jarak_sensor_jam: true,
                     tinggi_isi_jam: true,
                     suhu_tangki_jam: true,
+                    suhu_tinggi_tangki_jam: true,
                     volume_tangki_jam: true
                   },
                 });
@@ -3048,6 +3089,8 @@ class DashboardTangki extends React.Component {
                     this.data_volume_tangki_perjam_categories = []
                     this.data_volume_tangki_perjam_series = []
 
+                    this.obj_suhu_tinggi_tangki_perjam_series = {};
+
                     this.setState({
                       ...this.state,
                       loader:{
@@ -3055,6 +3098,7 @@ class DashboardTangki extends React.Component {
                         jarak_sensor_jam: true,
                         tinggi_isi_jam: true,
                         suhu_tangki_jam: true,
+                        suhu_tinggi_tangki_jam: true,
                         volume_tangki_jam: true
                       },
                     });
@@ -3082,6 +3126,8 @@ class DashboardTangki extends React.Component {
         this.data_volume_tangki_perjam_categories = []
         this.data_volume_tangki_perjam_series = []
 
+        this.obj_suhu_tinggi_tangki_perjam_series = {};
+
         this.setState({
           ...this.state,
           loader:{
@@ -3089,6 +3135,7 @@ class DashboardTangki extends React.Component {
             jarak_sensor_jam: true,
             tinggi_isi_jam: true,
             suhu_tangki_jam: true,
+            suhu_tinggi_tangki_jam: true,
             volume_tangki_jam: true
           },
           // chartTinggiJam: {
@@ -3138,7 +3185,7 @@ class DashboardTangki extends React.Component {
     alert(JSON.stringify(e))
   }
 
-  checkChartJam(val:any, type:'jarak_sensor'|'tinggi'|'suhu_jam'|'volume_jam'){
+  checkChartJam(val:any, type:'jarak_sensor'|'tinggi'|'suhu_jam'|'volume_jam'|'suhu_tinggi_jam'){
     
     // console.log(val.target.checked)
     // if (val.target.checked){
@@ -3194,6 +3241,26 @@ class DashboardTangki extends React.Component {
                   },
                   dataLabels:{
                     ...this.state.chartSuhuJam.options.dataLabels,
+                    enabled: val.target.checked
+                  }
+                }
+            }
+          })
+      }
+      else if(type == 'suhu_tinggi_jam'){
+          this.statusChecked['suhu_tinggi'] = val.target.checked
+
+          this.setState({
+            ...this.state,
+            chartSuhuTinggiJam: {
+                ...this.state.chartSuhuTinggiJam,
+                options:{
+                  ...this.state.chartSuhuTinggiJam.options,
+                  xaxis:{
+                    ...this.state.chartSuhuTinggiJam.options.xaxis,
+                  },
+                  dataLabels:{
+                    ...this.state.chartSuhuTinggiJam.options.dataLabels,
                     enabled: val.target.checked
                   }
                 }
@@ -3958,7 +4025,7 @@ class DashboardTangki extends React.Component {
                                                     </div>
                                                     <div>
                                                         <Form.Check type={'checkbox'} inline>
-                                                            <Form.Check.Input type={'checkbox'} onChange={(val)=>{this.checkChartJam(val,'suhu_jam')}}/>
+                                                            <Form.Check.Input type={'checkbox'} onChange={(val)=>{this.checkChartJam(val,'suhu_tinggi_jam')}}/>
                                                             <Form.Check.Label>{`Show Data Label`}</Form.Check.Label>
                                                             {/* <Form.Control.Feedback type="valid">
                                                               You did it! 
