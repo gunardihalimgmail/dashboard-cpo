@@ -1776,78 +1776,78 @@ class DashboardTangki extends React.Component {
                     // ... <end SUHU TANGKI>
 
 
-                    // // === BALIKKIN LAGI (JARAK SENSOR) ===
-                    // let patt_tinggi = new RegExp(/(Jarak Sensor dengan permukaan Tank [0-9]+)/,'gi')
-                    // let patt_tinggi_exec = patt_tinggi.exec(ele_attr);
-                    // if (patt_tinggi_exec != null){
+                    // === BALIKKIN LAGI (JARAK SENSOR) ===
+                    let patt_tinggi = new RegExp(/(Jarak Sensor dengan permukaan Tank [0-9]+)/,'gi')
+                    let patt_tinggi_exec = patt_tinggi.exec(ele_attr);
+                    if (patt_tinggi_exec != null){
 
-                    //     let data_jarak_sensor:any = patt_tinggi_exec['input'];
+                        let data_jarak_sensor:any = patt_tinggi_exec['input'];
 
-                    //     let patt_tank = new RegExp(/(Tank [0-9]+)/,'gi')
-                    //     let patt_tank_exec = patt_tank.exec(patt_tinggi_exec[0])
-                    //     // console.log("PATT TANK EXEC")
-                    //     // console.log(patt_tank_exec)
+                        let patt_tank = new RegExp(/(Tank [0-9]+)/,'gi')
+                        let patt_tank_exec = patt_tank.exec(patt_tinggi_exec[0])
+                        // console.log("PATT TANK EXEC")
+                        // console.log(patt_tank_exec)
 
-                    //     if (patt_tank_exec != null){
-                    //         // console.log("regexp")
-                    //         // console.log(patt_tank_exec[0])
-                    //         // patt_tank_exec[0] => Tank 1, Tank 2, dst...
-                    //         let data_tank:any = patt_tank_exec[0];
+                        if (patt_tank_exec != null){
+                            // console.log("regexp")
+                            // console.log(patt_tank_exec[0])
+                            // patt_tank_exec[0] => Tank 1, Tank 2, dst...
+                            let data_tank:any = patt_tank_exec[0];
 
-                    //         if (patt_tank_exec[0] != null){
-                    //             let nama_tangki:any = '';
-                    //             let title_tangki:any = '';
+                            if (patt_tank_exec[0] != null){
+                                let nama_tangki:any = '';
+                                let title_tangki:any = '';
                                 
-                    //             // UPDATE TINGGI MINYAK 
-                    //             let tinggi_hitung:any = '';
+                                // UPDATE TINGGI MINYAK 
+                                let tinggi_hitung:any = '';
                                 
-                    //             let find_mst_list:any = this.mst_list_tangki.find(ele_list=>ele_list.api.toLowerCase() == data_tank.toLowerCase());
-                    //             if (find_mst_list){
+                                let find_mst_list:any = this.mst_list_tangki.find(ele_list=>ele_list.api.toLowerCase() == data_tank.toLowerCase());
+                                if (find_mst_list){
 
-                    //                   nama_tangki = find_mst_list?.['name'] ?? '';
-                    //                   title_tangki = find_mst_list?.['title'] ?? '';
+                                      nama_tangki = find_mst_list?.['name'] ?? '';
+                                      title_tangki = find_mst_list?.['title'] ?? '';
 
-                    //                   // cari tinggi minyak
-                    //                   let tangki_jarak_sensor:any =  data_arr?.[data_jarak_sensor];
+                                      // cari tinggi minyak
+                                      let tangki_jarak_sensor:any =  data_arr?.[data_jarak_sensor];
                     
-                    //                   if (typeof tangki_jarak_sensor != 'undefined' && tangki_jarak_sensor != null){
-                    //                       if (typeof tangki_jarak_sensor == 'string'){
-                    //                         tangki_jarak_sensor = (parseFloat(tangki_jarak_sensor) / 100).toFixed(2);
-                    //                       }else{
-                    //                         tangki_jarak_sensor = (tangki_jarak_sensor / 100).toFixed(2);
-                    //                       }
-                    //                   }else{tangki_jarak_sensor = 0}
+                                      if (typeof tangki_jarak_sensor != 'undefined' && tangki_jarak_sensor != null){
+                                          if (typeof tangki_jarak_sensor == 'string'){
+                                            tangki_jarak_sensor = (parseFloat(tangki_jarak_sensor) / 100).toFixed(2);
+                                          }else{
+                                            tangki_jarak_sensor = (tangki_jarak_sensor / 100).toFixed(2);
+                                          }
+                                      }else{tangki_jarak_sensor = 0}
 
-                    //                   // let ruang_kosong:any = (parseFloat(data_arr?.[data_jarak_sensor]) / 100) - this.mst_avg_t_segitiga?.[nama_tangki];
-                    //                   let ruang_kosong:any = (tangki_jarak_sensor - this.mst_avg_t_segitiga?.[nama_tangki]).toFixed(2);
+                                      // let ruang_kosong:any = (parseFloat(data_arr?.[data_jarak_sensor]) / 100) - this.mst_avg_t_segitiga?.[nama_tangki];
+                                      let ruang_kosong:any = (tangki_jarak_sensor - this.mst_avg_t_segitiga?.[nama_tangki]).toFixed(2);
                                       
-                    //                   tinggi_hitung = this.mst_t_tangki?.[nama_tangki] - ruang_kosong;
+                                      tinggi_hitung = this.mst_t_tangki?.[nama_tangki] - ruang_kosong;
 
-                    //                   // ... end tinggi minyak
+                                      // ... end tinggi minyak
 
 
-                    //                   obj_temp_tank[nama_tangki] = {
-                    //                       ...obj_temp_tank[nama_tangki],
-                    //                       title: title_tangki,
-                    //                       tanggal: time_tank,
-                    //                       tanggal_tz: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm:ss'),
-                    //                       // tanggal_tz: formatDate(new Date(time_tank),'YYYY-MM-DDTHH:mm:ss'),
-                    //                       // tanggal_tz: formatDate(new Date(time_tank),'YYYY-MM-DDTHH:mm:ss'),
-                    //                       // tanggal_tz: new Date(time_tank).getTime() + new Date(time_tank).getTimezoneOffset() * 60000,
-                    //                       // tanggal_tz: new Date(time_tank),
-                    //                       data_jarak_sensor: data_arr?.[data_jarak_sensor],
-                    //                       data_jarak_sensor_m: tangki_jarak_sensor,   // satuan meter
-                    //                       tinggi_minyak: tinggi_hitung
-                    //                       // tinggi_minyak: data
-                    //                       // data_jarak_sensor: obj_temp_tank[nama_tangki]?.['data_jarak_sensor'] == null ?
-                    //                       //       [data_arr?.[data_jarak_sensor]]
-                    //                       //       : [...obj_temp_tank[nama_tangki]?.['data_jarak_sensor'], data_arr?.[data_jarak_sensor]]
-                    //                 }
-                    //             }
-                    //         }
+                                      obj_temp_tank[nama_tangki] = {
+                                          ...obj_temp_tank[nama_tangki],
+                                          title: title_tangki,
+                                          tanggal: time_tank,
+                                          tanggal_tz: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm:ss'),
+                                          // tanggal_tz: formatDate(new Date(time_tank),'YYYY-MM-DDTHH:mm:ss'),
+                                          // tanggal_tz: formatDate(new Date(time_tank),'YYYY-MM-DDTHH:mm:ss'),
+                                          // tanggal_tz: new Date(time_tank).getTime() + new Date(time_tank).getTimezoneOffset() * 60000,
+                                          // tanggal_tz: new Date(time_tank),
+                                          data_jarak_sensor: data_arr?.[data_jarak_sensor],
+                                          data_jarak_sensor_m: tangki_jarak_sensor,   // satuan meter
+                                          tinggi_minyak: tinggi_hitung
+                                          // tinggi_minyak: data
+                                          // data_jarak_sensor: obj_temp_tank[nama_tangki]?.['data_jarak_sensor'] == null ?
+                                          //       [data_arr?.[data_jarak_sensor]]
+                                          //       : [...obj_temp_tank[nama_tangki]?.['data_jarak_sensor'], data_arr?.[data_jarak_sensor]]
+                                    }
+                                }
+                            }
 
-                    //     }
-                    // }
+                        }
+                    }
                     
 
                   // LOOPING obj_keys_tinggi (Object.keys(data_arr))
@@ -1857,18 +1857,18 @@ class DashboardTangki extends React.Component {
                   // ... end LOOPING obj_keys_suhu (Object.keys(data_arr))
 
                   // hitung rata-rata tangki "obj_temp_tank"
-                  // // === BALIKKIN LAGI (JARAK SENSOR) ===
-                  // let arr_obj_keys_avg = Object.keys(obj_temp_tank);
-                  // arr_obj_keys_avg.forEach((ele_tank_name:any) => {
-                  //     let total:any = obj_temp_tank[ele_tank_name]['data'].reduce((tmp:any, val:any)=>{
-                  //         return tmp + parseFloat(val);
-                  //     },0)
-                  //     let avg_tank:any = (total / obj_temp_tank[ele_tank_name]['data'].length).toFixed(3);
-                  //     obj_temp_tank[ele_tank_name] = {
-                  //         ...obj_temp_tank[ele_tank_name],
-                  //         avg: avg_tank
-                  //     }
-                  // });
+                  // === BALIKKIN LAGI (JARAK SENSOR) ===
+                  let arr_obj_keys_avg = Object.keys(obj_temp_tank);
+                  arr_obj_keys_avg.forEach((ele_tank_name:any) => {
+                      let total:any = obj_temp_tank[ele_tank_name]['data'].reduce((tmp:any, val:any)=>{
+                          return tmp + parseFloat(val);
+                      },0)
+                      let avg_tank:any = (total / obj_temp_tank[ele_tank_name]['data'].length).toFixed(3);
+                      obj_temp_tank[ele_tank_name] = {
+                          ...obj_temp_tank[ele_tank_name],
+                          avg: avg_tank
+                      }
+                  });
                   // ... <end>
 
                   
@@ -1877,112 +1877,112 @@ class DashboardTangki extends React.Component {
                   // console.log(obj_temp_tank)
 
                   
-                  // // === BALIKKIN LAGI (JARAK SENSOR) ===
-                  // let arr_obj_keys_vol = Object.keys(obj_temp_tank);
+                  // === BALIKKIN LAGI (JARAK SENSOR) ===
+                  let arr_obj_keys_vol = Object.keys(obj_temp_tank);
 
-                  // arr_obj_keys_vol.forEach((tangki_name:any)=>{
+                  arr_obj_keys_vol.forEach((tangki_name:any)=>{
 
-                  //     let tinggi_tmp:any = obj_temp_tank[tangki_name]['tinggi_minyak'];
-                  //     let avg_tmp:any = parseFloat(obj_temp_tank[tangki_name]['avg']);
+                      let tinggi_tmp:any = obj_temp_tank[tangki_name]['tinggi_minyak'];
+                      let avg_tmp:any = parseFloat(obj_temp_tank[tangki_name]['avg']);
 
-                  //     if (tinggi_tmp != null){
-                  //         // panggil array json tabel volume tangki yang sesuai
-                  //         let arr_volume:any = this.json_arr_volume_tangki(tangki_name);
+                      if (tinggi_tmp != null){
+                          // panggil array json tabel volume tangki yang sesuai
+                          let arr_volume:any = this.json_arr_volume_tangki(tangki_name);
 
-                  //         let findItem:any = arr_volume.find(res=>
-                  //               parseInt(res.tinggi) == Math.round(tinggi_tmp.toFixed(2) * 100)
-                  //         )
+                          let findItem:any = arr_volume.find(res=>
+                                parseInt(res.tinggi) == Math.round(tinggi_tmp.toFixed(2) * 100)
+                          )
 
-                  //         let tanggal_tangki:any = new Date(obj_temp_tank[tangki_name]['tanggal']);
+                          let tanggal_tangki:any = new Date(obj_temp_tank[tangki_name]['tanggal']);
 
-                  //         let jenis:any = '';
-                  //         let findCpoPko = this.arr_cpo_pko.find(res=>
-                  //                   res.name == tangki_name &&
-                  //                   (
-                  //                     (new Date(res.datebegin) <= tanggal_tangki
-                  //                         && (res.datelast != '' && res.datelast != null && new Date(res.datelast) >= tanggal_tangki)
-                  //                     )
-                  //                     ||
-                  //                     (
-                  //                       (new Date(res.datebegin) <= tanggal_tangki)
-                  //                         && (res.datelast == '' || res.datelast == null)
-                  //                     )
-                  //                   ) 
-                  //                   // && 
-                  //                   // (res.datelast == null || res.datelast == '' || new Date(res.datelast) >= tanggal_tangki)
-                  //         )
+                          let jenis:any = '';
+                          let findCpoPko = this.arr_cpo_pko.find(res=>
+                                    res.name == tangki_name &&
+                                    (
+                                      (new Date(res.datebegin) <= tanggal_tangki
+                                          && (res.datelast != '' && res.datelast != null && new Date(res.datelast) >= tanggal_tangki)
+                                      )
+                                      ||
+                                      (
+                                        (new Date(res.datebegin) <= tanggal_tangki)
+                                          && (res.datelast == '' || res.datelast == null)
+                                      )
+                                    ) 
+                                    // && 
+                                    // (res.datelast == null || res.datelast == '' || new Date(res.datelast) >= tanggal_tangki)
+                          )
 
-                  //         if (findCpoPko){
-                  //             jenis = findCpoPko?.['jenis'];
-                  //             // console.log("kalkulasi_volume_tangki findCpoPko");
-                  //             // console.log(findCpoPko)
-                  //         }
+                          if (findCpoPko){
+                              jenis = findCpoPko?.['jenis'];
+                              // console.log("kalkulasi_volume_tangki findCpoPko");
+                              // console.log(findCpoPko)
+                          }
 
-                  //         if (findItem){
+                          if (findItem){
                   
-                  //             let volume_tbl:any = 0;
+                              let volume_tbl:any = 0;
             
-                  //             // VOLUME LITER ATAU KG tangki
-                  //             volume_tbl = parseFloat(findItem.volume);
-                  //             // dikali dengan berat jenis nya apakah cpo atau pko
+                              // VOLUME LITER ATAU KG tangki
+                              volume_tbl = parseFloat(findItem.volume);
+                              // dikali dengan berat jenis nya apakah cpo atau pko
 
-                  //             let faktor_koreksi_temp:any;
-                  //             let volume_prev:any = volume_tbl;
+                              let faktor_koreksi_temp:any;
+                              let volume_prev:any = volume_tbl;
 
-                  //             if (jenis != '' && jenis != null){
+                              if (jenis != '' && jenis != null){
 
-                  //                 let arr_berat_jenis:any = this.json_arr_berat_jenis_tangki(jenis);
+                                  let arr_berat_jenis:any = this.json_arr_berat_jenis_tangki(jenis);
 
-                  //                 // sini update
+                                  // sini update
 
-                  //                 let find_berat_jenis:any = arr_berat_jenis.find(res=>
-                  //                       Math.round(parseFloat(res.temperature)) == Math.round(avg_tmp)
-                  //                   );
+                                  let find_berat_jenis:any = arr_berat_jenis.find(res=>
+                                        Math.round(parseFloat(res.temperature)) == Math.round(avg_tmp)
+                                    );
 
-                  //                 // if (tangki_name == "tangki_3"){
-                  //                   // console.error("tinggi tmp tangki_3 : " + tinggi_tmp)
-                  //                   // console.error("tanggal jam tmp tangki_3 : " + formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm:ss'))
-                  //                   // console.error("volume tbl tangki_3 : " + volume_tbl)
-                  //                   // console.error("berat jenis tangki_3 : " + find_berat_jenis?.['berat_jenis'])
-                  //                 // }
+                                  // if (tangki_name == "tangki_3"){
+                                    // console.error("tinggi tmp tangki_3 : " + tinggi_tmp)
+                                    // console.error("tanggal jam tmp tangki_3 : " + formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm:ss'))
+                                    // console.error("volume tbl tangki_3 : " + volume_tbl)
+                                    // console.error("berat jenis tangki_3 : " + find_berat_jenis?.['berat_jenis'])
+                                  // }
 
-                  //                 if (find_berat_jenis){
-                  //                     volume_tbl = Math.round(volume_tbl * find_berat_jenis?.['berat_jenis']);
-                  //                     volume_prev = volume_tbl;   // just info volume sebelumnya
-                  //                 }
+                                  if (find_berat_jenis){
+                                      volume_tbl = Math.round(volume_tbl * find_berat_jenis?.['berat_jenis']);
+                                      volume_prev = volume_tbl;   // just info volume sebelumnya
+                                  }
 
-                  //                 // faktor koreksi
-                  //                 faktor_koreksi_temp = this.faktor_koreksi(volume_tbl, parseFloat(avg_tmp));
-                  //                 if (faktor_koreksi_temp != null){
-                  //                     volume_tbl *= faktor_koreksi_temp.toFixed(2);
-                  //                 }
+                                  // faktor koreksi
+                                  faktor_koreksi_temp = this.faktor_koreksi(volume_tbl, parseFloat(avg_tmp));
+                                  if (faktor_koreksi_temp != null){
+                                      volume_tbl *= faktor_koreksi_temp.toFixed(2);
+                                  }
 
-                  //                 obj_temp_tank[tangki_name] = {
-                  //                     ...obj_temp_tank[tangki_name],
-                  //                     volume_prev,
-                  //                     faktor_koreksi: faktor_koreksi_temp,
-                  //                     volume: volume_tbl
-                  //                 }
+                                  obj_temp_tank[tangki_name] = {
+                                      ...obj_temp_tank[tangki_name],
+                                      volume_prev,
+                                      faktor_koreksi: faktor_koreksi_temp,
+                                      volume: volume_tbl
+                                  }
                                   
-                  //                 // alert(JSON.stringify(arr_berat_jenis))
-                  //                 // volume_tbl => volume dari tabel
+                                  // alert(JSON.stringify(arr_berat_jenis))
+                                  // volume_tbl => volume dari tabel
                                   
-                  //             }
+                              }
 
-                  //           // ... end (dikali dengan berat jenis nya apakah cpo atau pko)
+                            // ... end (dikali dengan berat jenis nya apakah cpo atau pko)
 
-                  //         }
-                  //         // else{
-                  //         //     console.error("NAN VOLUME TABLE")
-                  //         //     console.log(tangki_name)
-                  //         //     console.log(tinggi_tmp.toFixed(2) * 100)
-                  //         //     console.log(Math.round(tinggi_tmp.toFixed(2) * 100))
-                  //         // }
+                          }
+                          // else{
+                          //     console.error("NAN VOLUME TABLE")
+                          //     console.log(tangki_name)
+                          //     console.log(tinggi_tmp.toFixed(2) * 100)
+                          //     console.log(Math.round(tinggi_tmp.toFixed(2) * 100))
+                          // }
 
-                  //     }
+                      }
                       
 
-                  // })
+                  })
                   // ... end BALIKKIN
 
                   // ... end <VOLUME TANGKI>
@@ -1991,207 +1991,207 @@ class DashboardTangki extends React.Component {
                   // taruh hasil rata-rata nya ke data_suhu_tangki_per_jam
                   // looping obj_temp_tank
 
-                  // // === BALIKKIN LAGI (JARAK SENSOR) ===
-                  // let obj_keys_obj_temp_tank:any = Object.keys(obj_temp_tank);
-                  // obj_keys_obj_temp_tank.forEach((tangki_name:any) => {
+                  // === BALIKKIN LAGI (JARAK SENSOR) ===
+                  let obj_keys_obj_temp_tank:any = Object.keys(obj_temp_tank);
+                  obj_keys_obj_temp_tank.forEach((tangki_name:any) => {
 
-                  //   // START LOOPING
-                  //     let data_temp:any = [];
+                    // START LOOPING
+                      let data_temp:any = [];
 
-                  //     let title_tangki:any = obj_temp_tank[tangki_name]['title'];
-                  //     let tangki_exists:boolean = false;
-                  //     let idx_arr_perjam_series:any = -1;
+                      let title_tangki:any = obj_temp_tank[tangki_name]['title'];
+                      let tangki_exists:boolean = false;
+                      let idx_arr_perjam_series:any = -1;
 
-                  //     // SUHU TANGKI PER JAM
-                  //     let findIdx:any = this.data_suhu_tangki_perjam_series.findIndex((res:any)=>res.name == obj_temp_tank[tangki_name]?.['title']);
-                  //     if (findIdx != -1){
-                  //         tangki_exists = true;
-                  //         data_temp = [...this.data_suhu_tangki_perjam_series[findIdx]?.['data']];
+                      // SUHU TANGKI PER JAM
+                      let findIdx:any = this.data_suhu_tangki_perjam_series.findIndex((res:any)=>res.name == obj_temp_tank[tangki_name]?.['title']);
+                      if (findIdx != -1){
+                          tangki_exists = true;
+                          data_temp = [...this.data_suhu_tangki_perjam_series[findIdx]?.['data']];
 
-                  //         // posisi index
-                  //         idx_arr_perjam_series = findIdx;
-                  //     }
+                          // posisi index
+                          idx_arr_perjam_series = findIdx;
+                      }
 
-                  //     data_temp.push(
-                  //         {
-                  //           x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm:ss'),
-                  //           y: parseFloat(obj_temp_tank?.[tangki_name]?.['avg']),
-                  //           x_time: new Date(time_tank).getTime()
-                  //         }
-                  //     );
+                      data_temp.push(
+                          {
+                            x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm:ss'),
+                            y: parseFloat(obj_temp_tank?.[tangki_name]?.['avg']),
+                            x_time: new Date(time_tank).getTime()
+                          }
+                      );
 
-                  //     // SORTING data_tinggi_temp
-                  //     if (data_temp.length > 0) {
+                      // SORTING data_tinggi_temp
+                      if (data_temp.length > 0) {
 
-                  //       data_temp.sort((a,b)=>{
-                  //           return a['x_time'] - b['x_time'];
-                  //       })
+                        data_temp.sort((a,b)=>{
+                            return a['x_time'] - b['x_time'];
+                        })
 
-                  //     }
-                  //     // ... end sorting 
+                      }
+                      // ... end sorting 
 
-                  //     // store data ke "data_suhu_tangki_perjam_series" untuk nanti di simpan ke setChartSuhuJam
-                  //     if (!tangki_exists){
-                  //       this.data_suhu_tangki_perjam_series.push(
-                  //           {name:title_tangki, data:[...data_temp]}
-                  //       )
-                  //     }else{
-                  //         this.data_suhu_tangki_perjam_series[idx_arr_perjam_series] = {
-                  //             ...this.data_suhu_tangki_perjam_series[idx_arr_perjam_series],
-                  //             data: [...data_temp]
-                  //         }
-                  //     }
-                  //     // ... end <SUHU TANGKI PER JAM>
+                      // store data ke "data_suhu_tangki_perjam_series" untuk nanti di simpan ke setChartSuhuJam
+                      if (!tangki_exists){
+                        this.data_suhu_tangki_perjam_series.push(
+                            {name:title_tangki, data:[...data_temp]}
+                        )
+                      }else{
+                          this.data_suhu_tangki_perjam_series[idx_arr_perjam_series] = {
+                              ...this.data_suhu_tangki_perjam_series[idx_arr_perjam_series],
+                              data: [...data_temp]
+                          }
+                      }
+                      // ... end <SUHU TANGKI PER JAM>
 
 
-                  //     // TINGGI TANGKI PER JAM
-                  //     idx_arr_perjam_series = -1
+                      // TINGGI TANGKI PER JAM
+                      idx_arr_perjam_series = -1
                       
-                  //     let data_tinggi_temp:any = [];
+                      let data_tinggi_temp:any = [];
 
-                  //     let tangki_tinggi_exists:boolean = false
-                  //     let findTinggiIdx:any = this.data_tinggi_tangki_perjam_series.findIndex((res:any)=>res.name == obj_temp_tank[tangki_name]?.['title']);
-                  //     if (findTinggiIdx != -1){
-                  //         tangki_tinggi_exists = true;
-                  //         data_tinggi_temp = [...this.data_tinggi_tangki_perjam_series[findIdx]?.['data']];
+                      let tangki_tinggi_exists:boolean = false
+                      let findTinggiIdx:any = this.data_tinggi_tangki_perjam_series.findIndex((res:any)=>res.name == obj_temp_tank[tangki_name]?.['title']);
+                      if (findTinggiIdx != -1){
+                          tangki_tinggi_exists = true;
+                          data_tinggi_temp = [...this.data_tinggi_tangki_perjam_series[findIdx]?.['data']];
 
-                  //         // posisi index
-                  //         idx_arr_perjam_series = findTinggiIdx;
-                  //     }
+                          // posisi index
+                          idx_arr_perjam_series = findTinggiIdx;
+                      }
 
-                  //     data_tinggi_temp.push(
-                  //         {
-                  //           x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm'),
-                  //           y: parseFloat(obj_temp_tank?.[tangki_name]?.['tinggi_minyak']),
-                  //           x_time: new Date(time_tank).getTime()
-                  //         }
-                  //     );
-                  //     // SORTING data_tinggi_temp
-                  //     if (data_tinggi_temp.length > 0) {
+                      data_tinggi_temp.push(
+                          {
+                            x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm'),
+                            y: parseFloat(obj_temp_tank?.[tangki_name]?.['tinggi_minyak']),
+                            x_time: new Date(time_tank).getTime()
+                          }
+                      );
+                      // SORTING data_tinggi_temp
+                      if (data_tinggi_temp.length > 0) {
 
-                  //       data_tinggi_temp.sort((a,b)=>{
-                  //           return a['x_time'] - b['x_time'];
-                  //       })
+                        data_tinggi_temp.sort((a,b)=>{
+                            return a['x_time'] - b['x_time'];
+                        })
 
-                  //     }
+                      }
 
-                  //     // ... end sorting 
+                      // ... end sorting 
 
-                  //     // console.log("DATA TINGGI TEMP")
-                  //     // console.log(data_tinggi_temp)
+                      // console.log("DATA TINGGI TEMP")
+                      // console.log(data_tinggi_temp)
 
-                  //      // store data ke "data_tinggi_tangki_perjam_series" untuk nanti di simpan ke setChartTinggiJam
-                  //      if (!tangki_tinggi_exists){
-                  //           this.data_tinggi_tangki_perjam_series.push(
-                  //               {name:title_tangki, data:[...data_tinggi_temp]}
-                  //           )
-                  //       }else{
-                  //           this.data_tinggi_tangki_perjam_series[idx_arr_perjam_series] = {
-                  //               ...this.data_tinggi_tangki_perjam_series[idx_arr_perjam_series],
-                  //               data: [...data_tinggi_temp]
-                  //           }
-                  //       }
-                  //     // ... end <TINGGI TANGKI PER JAM>
+                       // store data ke "data_tinggi_tangki_perjam_series" untuk nanti di simpan ke setChartTinggiJam
+                       if (!tangki_tinggi_exists){
+                            this.data_tinggi_tangki_perjam_series.push(
+                                {name:title_tangki, data:[...data_tinggi_temp]}
+                            )
+                        }else{
+                            this.data_tinggi_tangki_perjam_series[idx_arr_perjam_series] = {
+                                ...this.data_tinggi_tangki_perjam_series[idx_arr_perjam_series],
+                                data: [...data_tinggi_temp]
+                            }
+                        }
+                      // ... end <TINGGI TANGKI PER JAM>
 
                       
-                  //     // JARAK SENSOR TANGKI
+                      // JARAK SENSOR TANGKI
 
-                  //     idx_arr_perjam_series = -1
-                  //     let data_jarak_sensor_temp:any = [];
+                      idx_arr_perjam_series = -1
+                      let data_jarak_sensor_temp:any = [];
 
-                  //     let tangki_jarak_sensor_exists:boolean = false
-                  //     let findJarakSensorIdx:any = this.data_jaraksensor_tangki_perjam_series.findIndex((res:any)=>res.name == obj_temp_tank[tangki_name]?.['title']);
-                  //     if (findJarakSensorIdx != -1){
-                  //         tangki_jarak_sensor_exists = true;
-                  //         data_jarak_sensor_temp = [...this.data_jaraksensor_tangki_perjam_series[findJarakSensorIdx]?.['data']];
+                      let tangki_jarak_sensor_exists:boolean = false
+                      let findJarakSensorIdx:any = this.data_jaraksensor_tangki_perjam_series.findIndex((res:any)=>res.name == obj_temp_tank[tangki_name]?.['title']);
+                      if (findJarakSensorIdx != -1){
+                          tangki_jarak_sensor_exists = true;
+                          data_jarak_sensor_temp = [...this.data_jaraksensor_tangki_perjam_series[findJarakSensorIdx]?.['data']];
 
-                  //         // posisi index
-                  //         idx_arr_perjam_series = findJarakSensorIdx;
-                  //     }
-                  //     data_jarak_sensor_temp.push(
-                  //         {
-                  //           x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm'),
-                  //           y: parseFloat(obj_temp_tank?.[tangki_name]?.['data_jarak_sensor_m']),
-                  //           x_time: new Date(time_tank).getTime()
-                  //         }
-                  //     );
-                  //      // SORTING data_tinggi_temp
-                  //      if (data_jarak_sensor_temp.length > 0) {
+                          // posisi index
+                          idx_arr_perjam_series = findJarakSensorIdx;
+                      }
+                      data_jarak_sensor_temp.push(
+                          {
+                            x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm'),
+                            y: parseFloat(obj_temp_tank?.[tangki_name]?.['data_jarak_sensor_m']),
+                            x_time: new Date(time_tank).getTime()
+                          }
+                      );
+                       // SORTING data_tinggi_temp
+                       if (data_jarak_sensor_temp.length > 0) {
 
-                  //       data_jarak_sensor_temp.sort((a,b)=>{
-                  //           return a['x_time'] - b['x_time'];
-                  //       })
-                  //     }
-                  //     // store data ke "data_jaraksensor_tangki_perjam_series" untuk nanti di simpan ke setChartJarakSensorJam
-                  //       if (!tangki_tinggi_exists){
-                  //         this.data_jaraksensor_tangki_perjam_series.push(
-                  //             {name:title_tangki, data:[...data_jarak_sensor_temp]}
-                  //         )
-                  //     }else{
-                  //         this.data_jaraksensor_tangki_perjam_series[idx_arr_perjam_series] = {
-                  //             ...this.data_jaraksensor_tangki_perjam_series[idx_arr_perjam_series],
-                  //             data: [...data_jarak_sensor_temp]
-                  //         }
-                  //     }
+                        data_jarak_sensor_temp.sort((a,b)=>{
+                            return a['x_time'] - b['x_time'];
+                        })
+                      }
+                      // store data ke "data_jaraksensor_tangki_perjam_series" untuk nanti di simpan ke setChartJarakSensorJam
+                        if (!tangki_tinggi_exists){
+                          this.data_jaraksensor_tangki_perjam_series.push(
+                              {name:title_tangki, data:[...data_jarak_sensor_temp]}
+                          )
+                      }else{
+                          this.data_jaraksensor_tangki_perjam_series[idx_arr_perjam_series] = {
+                              ...this.data_jaraksensor_tangki_perjam_series[idx_arr_perjam_series],
+                              data: [...data_jarak_sensor_temp]
+                          }
+                      }
 
-                  //     // ... end sorting 
+                      // ... end sorting 
 
 
 
-                  //     // ...end <JARAK SENSOR TANGKI PER JAM>
+                      // ...end <JARAK SENSOR TANGKI PER JAM>
                       
 
-                  //     // VOLUME TANGKI PER JAM
+                      // VOLUME TANGKI PER JAM
 
-                  //     idx_arr_perjam_series = -1
-                  //     let data_volume_temp:any = [];
+                      idx_arr_perjam_series = -1
+                      let data_volume_temp:any = [];
 
-                  //     let tangki_volume_exists:boolean = false
-                  //     let findVolumeIdx:any = this.data_volume_tangki_perjam_series.findIndex((res:any)=>res.name == obj_temp_tank[tangki_name]?.['title']);
-                  //     if (findVolumeIdx != -1){
-                  //         tangki_volume_exists = true;
-                  //         data_volume_temp = [...this.data_volume_tangki_perjam_series[findVolumeIdx]?.['data']];
+                      let tangki_volume_exists:boolean = false
+                      let findVolumeIdx:any = this.data_volume_tangki_perjam_series.findIndex((res:any)=>res.name == obj_temp_tank[tangki_name]?.['title']);
+                      if (findVolumeIdx != -1){
+                          tangki_volume_exists = true;
+                          data_volume_temp = [...this.data_volume_tangki_perjam_series[findVolumeIdx]?.['data']];
 
-                  //         // posisi index
-                  //         idx_arr_perjam_series = findVolumeIdx;
-                  //     }
+                          // posisi index
+                          idx_arr_perjam_series = findVolumeIdx;
+                      }
 
-                  //     data_volume_temp.push(
-                  //         {
-                  //           x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm'),
-                  //           y: parseFloat(obj_temp_tank?.[tangki_name]?.['volume']),
-                  //           x_time: new Date(time_tank).getTime()
-                  //         }
-                  //     );
+                      data_volume_temp.push(
+                          {
+                            x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm'),
+                            y: parseFloat(obj_temp_tank?.[tangki_name]?.['volume']),
+                            x_time: new Date(time_tank).getTime()
+                          }
+                      );
 
-                  //     // SORTING data_tinggi_temp
-                  //     if (data_volume_temp.length > 0) {
+                      // SORTING data_tinggi_temp
+                      if (data_volume_temp.length > 0) {
 
-                  //       data_volume_temp.sort((a,b)=>{
-                  //           return a['x_time'] - b['x_time'];
-                  //       })
+                        data_volume_temp.sort((a,b)=>{
+                            return a['x_time'] - b['x_time'];
+                        })
 
-                  //     }
-                  //     // ... end sorting 
+                      }
+                      // ... end sorting 
 
-                  //     // store data ke "data_volume_tangki_perjam_series" untuk nanti di simpan ke setChartVolumeJam
-                  //     if (!tangki_volume_exists){
-                  //         this.data_volume_tangki_perjam_series.push(
-                  //             {name:title_tangki, data:[...data_volume_temp]}
-                  //         )
-                  //     }else{
-                  //         this.data_volume_tangki_perjam_series[idx_arr_perjam_series] = {
-                  //             ...this.data_volume_tangki_perjam_series[idx_arr_perjam_series],
-                  //             data: [...data_volume_temp]
-                  //         }
-                  //     }
+                      // store data ke "data_volume_tangki_perjam_series" untuk nanti di simpan ke setChartVolumeJam
+                      if (!tangki_volume_exists){
+                          this.data_volume_tangki_perjam_series.push(
+                              {name:title_tangki, data:[...data_volume_temp]}
+                          )
+                      }else{
+                          this.data_volume_tangki_perjam_series[idx_arr_perjam_series] = {
+                              ...this.data_volume_tangki_perjam_series[idx_arr_perjam_series],
+                              data: [...data_volume_temp]
+                          }
+                      }
 
-                  //     // console.error("!!!! OBJ TEMP TANK DATA VOLUME TANGKI PER JAM SERIES !!!!")
-                  //     // console.log(this.data_volume_tangki_perjam_series)
+                      // console.error("!!!! OBJ TEMP TANK DATA VOLUME TANGKI PER JAM SERIES !!!!")
+                      // console.log(this.data_volume_tangki_perjam_series)
 
-                  //     // ... end VOLUME TANGKI PER JAM
+                      // ... end VOLUME TANGKI PER JAM
 
-                  // });
+                  });
                   // ... end BALIKKIN
 
 
@@ -2203,14 +2203,14 @@ class DashboardTangki extends React.Component {
 
                   // REVISI UNTUK IRREGULAR SERIES ({x:..., y: ....})
 
-                  // // === BALIKKIN LAGI (JARAK SENSOR) ===
-                  // this.data_suhu_tangki_perjam_categories.push(
-                  //       new Date(formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm')).getTime());
-                  // this.data_tinggi_tangki_perjam_categories.push(
-                  //       new Date(formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm')).getTime());
-                  // this.data_volume_tangki_perjam_categories.push(
-                  //       new Date(formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm')).getTime());
-                  // ;
+                  // === BALIKKIN LAGI (JARAK SENSOR) ===
+                  this.data_suhu_tangki_perjam_categories.push(
+                        new Date(formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm')).getTime());
+                  this.data_tinggi_tangki_perjam_categories.push(
+                        new Date(formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm')).getTime());
+                  this.data_volume_tangki_perjam_categories.push(
+                        new Date(formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm')).getTime());
+                  ;
                   // ... end BALIKKIN
 
                   
@@ -2264,96 +2264,99 @@ class DashboardTangki extends React.Component {
               //     max_suhu_tgl = Math.max.apply(null, this.data_volume_tangki_perjam_categories)
               // }
 
-              // // === BALIKKIN LAGI (JARAK SENSOR) ===
+              // === BALIKKIN LAGI (JARAK SENSOR) ===
               // SET CHART SUHU JAM
-              // this.setChartSuhuJam = {
-              //   ...this.setChartSuhuJam,
-              //   statusFound: true,
-              //   series: JSON.parse(JSON.stringify(this.data_suhu_tangki_perjam_series)),
-              //   options:{
-              //       ...this.setChartSuhuJam.options,
-              //       xaxis:{
-              //         ...this.setChartSuhuJam.options.xaxis,
-              //         // min: typeof min_suhu_tgl != 'undefined' && min_suhu_tgl != null ? new Date(min_suhu_tgl).getTime() : 0,
-              //         // max: typeof max_suhu_tgl != 'undefined' && max_suhu_tgl != null ? new Date(max_suhu_tgl).getTime() : 0
-              //         // type:'datetime',
-              //         // categories: JSON.parse(JSON.stringify(this.data_suhu_tangki_perjam_categories))
-              //       },
-              //       dataLabels:{
-              //         ...this.setChartSuhuJam.options.dataLabels,
-              //         enabled: this.statusChecked?.['suhu'] ?? false
-              //       }
-              //   }
-              // }
 
-              // // SET CHART TINGGI JAM
-              // this.setChartJarakSensorJam = {
-              //   ...this.setChartJarakSensorJam,
-              //   statusFound: true,
-              //   series: JSON.parse(JSON.stringify(this.data_jaraksensor_tangki_perjam_series)),
-              //   options:{
-              //       ...this.setChartJarakSensorJam.options,
-              //       xaxis:{
-              //         ...this.setChartJarakSensorJam.options.xaxis,
-              //         // min: typeof min_tgl != 'undefined' && min_tgl != null ? new Date(min_tgl).getTime() : 0,
-              //         // max: typeof max_tgl != 'undefined' && max_tgl != null ? new Date(max_tgl).getTime() : 0
-              //         // type: 'datetime',
-              //         // min: formatDate(new Date(time_tank),'YYYY-MM-DD'
-              //         // // categories untuk type 'category'
-              //         // categories: JSON.parse(JSON.stringify(this.data_tinggi_tangki_perjam_categories))
-              //       },
-              //       dataLabels:{
-              //         ...this.setChartJarakSensorJam.options.dataLabels,
-              //         enabled: this.statusChecked?.['jarak_sensor'] ?? false
-              //       }
-              //   }
-              // }
 
-              // // SET CHART TINGGI JAM
-              // this.setChartTinggiJam = {
-              //   ...this.setChartTinggiJam,
-              //   statusFound: true,
-              //   series: JSON.parse(JSON.stringify(this.data_tinggi_tangki_perjam_series)),
-              //   options:{
-              //       ...this.setChartTinggiJam.options,
-              //       xaxis:{
-              //         ...this.setChartTinggiJam.options.xaxis,
-              //         // min: typeof min_tgl != 'undefined' && min_tgl != null ? new Date(min_tgl).getTime() : 0,
-              //         // max: typeof max_tgl != 'undefined' && max_tgl != null ? new Date(max_tgl).getTime() : 0
-              //         // type: 'datetime',
-              //         // min: formatDate(new Date(time_tank),'YYYY-MM-DD'
-              //         // // categories untuk type 'category'
-              //         // categories: JSON.parse(JSON.stringify(this.data_tinggi_tangki_perjam_categories))
-              //       },
-              //       dataLabels:{
-              //         ...this.setChartTinggiJam.options.dataLabels,
-              //         enabled: this.statusChecked?.['tinggi'] ?? false
-              //       }
-              //   }
-              // }
+              this.setChartSuhuJam = {
+                ...this.setChartSuhuJam,
+                statusFound: this.data_suhu_tangki_perjam_series.length > 0 ? true : false,
+                series: JSON.parse(JSON.stringify(this.data_suhu_tangki_perjam_series)),
+                options:{
+                    ...this.setChartSuhuJam.options,
+                    xaxis:{
+                      ...this.setChartSuhuJam.options.xaxis,
+                      // min: typeof min_suhu_tgl != 'undefined' && min_suhu_tgl != null ? new Date(min_suhu_tgl).getTime() : 0,
+                      // max: typeof max_suhu_tgl != 'undefined' && max_suhu_tgl != null ? new Date(max_suhu_tgl).getTime() : 0
+                      // type:'datetime',
+                      // categories: JSON.parse(JSON.stringify(this.data_suhu_tangki_perjam_categories))
+                    },
+                    dataLabels:{
+                      ...this.setChartSuhuJam.options.dataLabels,
+                      enabled: this.statusChecked?.['suhu'] ?? false
+                    }
+                }
+              }
 
-              // // SET CHART TINGGI JAM
-              // this.setChartVolumeJam = {
-              //   ...this.setChartVolumeJam,
-              //   statusFound: true,
-              //   series: JSON.parse(JSON.stringify(this.data_volume_tangki_perjam_series)),
-              //   options:{
-              //       ...this.setChartVolumeJam.options,
-              //       xaxis:{
-              //         ...this.setChartVolumeJam.options.xaxis,
-              //         // min: typeof min_tgl != 'undefined' && min_tgl != null ? new Date(min_tgl).getTime() : 0,
-              //         // max: typeof max_tgl != 'undefined' && max_tgl != null ? new Date(max_tgl).getTime() : 0
-              //         // type: 'datetime',
-              //         // min: formatDate(new Date(time_tank),'YYYY-MM-DD'
-              //         // // categories untuk type 'category'
-              //         // categories: JSON.parse(JSON.stringify(this.data_tinggi_tangki_perjam_categories))
-              //       },
-              //       dataLabels:{
-              //         ...this.setChartVolumeJam.options.dataLabels,
-              //         enabled: this.statusChecked?.['volume'] ?? false
-              //       }
-              //   }
-              // }
+              // SET CHART TINGGI JAM
+              this.setChartJarakSensorJam = {
+                ...this.setChartJarakSensorJam,
+                statusFound: this.data_jaraksensor_tangki_perjam_series.length > 0 ? true : false,
+                series: JSON.parse(JSON.stringify(this.data_jaraksensor_tangki_perjam_series)),
+                options:{
+                    ...this.setChartJarakSensorJam.options,
+                    xaxis:{
+                      ...this.setChartJarakSensorJam.options.xaxis,
+                      // min: typeof min_tgl != 'undefined' && min_tgl != null ? new Date(min_tgl).getTime() : 0,
+                      // max: typeof max_tgl != 'undefined' && max_tgl != null ? new Date(max_tgl).getTime() : 0
+                      // type: 'datetime',
+                      // min: formatDate(new Date(time_tank),'YYYY-MM-DD'
+                      // // categories untuk type 'category'
+                      // categories: JSON.parse(JSON.stringify(this.data_tinggi_tangki_perjam_categories))
+                    },
+                    dataLabels:{
+                      ...this.setChartJarakSensorJam.options.dataLabels,
+                      enabled: this.statusChecked?.['jarak_sensor'] ?? false
+                    }
+                }
+              }
+
+              // SET CHART TINGGI JAM
+              this.setChartTinggiJam = {
+                ...this.setChartTinggiJam,
+                statusFound: this.data_tinggi_tangki_perjam_series.length > 0 ? true : false,
+                series: JSON.parse(JSON.stringify(this.data_tinggi_tangki_perjam_series)),
+                options:{
+                    ...this.setChartTinggiJam.options,
+                    xaxis:{
+                      ...this.setChartTinggiJam.options.xaxis,
+                      // min: typeof min_tgl != 'undefined' && min_tgl != null ? new Date(min_tgl).getTime() : 0,
+                      // max: typeof max_tgl != 'undefined' && max_tgl != null ? new Date(max_tgl).getTime() : 0
+                      // type: 'datetime',
+                      // min: formatDate(new Date(time_tank),'YYYY-MM-DD'
+                      // // categories untuk type 'category'
+                      // categories: JSON.parse(JSON.stringify(this.data_tinggi_tangki_perjam_categories))
+                    },
+                    dataLabels:{
+                      ...this.setChartTinggiJam.options.dataLabels,
+                      enabled: this.statusChecked?.['tinggi'] ?? false
+                    }
+                }
+              }
+
+              // SET CHART TINGGI JAM
+
+              this.setChartVolumeJam = {
+                ...this.setChartVolumeJam,
+                statusFound: this.data_volume_tangki_perjam_series.length > 0 ? true : false,
+                series: JSON.parse(JSON.stringify(this.data_volume_tangki_perjam_series)),
+                options:{
+                    ...this.setChartVolumeJam.options,
+                    xaxis:{
+                      ...this.setChartVolumeJam.options.xaxis,
+                      // min: typeof min_tgl != 'undefined' && min_tgl != null ? new Date(min_tgl).getTime() : 0,
+                      // max: typeof max_tgl != 'undefined' && max_tgl != null ? new Date(max_tgl).getTime() : 0
+                      // type: 'datetime',
+                      // min: formatDate(new Date(time_tank),'YYYY-MM-DD'
+                      // // categories untuk type 'category'
+                      // categories: JSON.parse(JSON.stringify(this.data_tinggi_tangki_perjam_categories))
+                    },
+                    dataLabels:{
+                      ...this.setChartVolumeJam.options.dataLabels,
+                      enabled: this.statusChecked?.['volume'] ?? false
+                    }
+                }
+              }
               // ... END BALIKKIN
 
               // console.log("setChartSuhuJam")
@@ -2366,25 +2369,72 @@ class DashboardTangki extends React.Component {
               let suhu_tinggi_tangki_name_selected:any = this.state.chartSuhuTinggiJam.suhuTinggiSelected.name;
               let arr_final_suhutinggi_tangki_selected:any = [];
               
-              if (typeof suhu_tinggi_tangki_name_selected != 'undefined'){
-                arr_final_suhutinggi_tangki_selected = [...this.obj_suhu_tinggi_tangki_perjam_series[suhu_tinggi_tangki_name_selected]];
+              let found_suhu_Tinggi:boolean = false;
+
+              if (typeof suhu_tinggi_tangki_name_selected != 'undefined' &&
+                  typeof this.obj_suhu_tinggi_tangki_perjam_series?.[suhu_tinggi_tangki_name_selected] != 'undefined'){
+
+                  arr_final_suhutinggi_tangki_selected = [...this.obj_suhu_tinggi_tangki_perjam_series[suhu_tinggi_tangki_name_selected]];
               }
+
+              if (Object.keys(this.obj_suhu_tinggi_tangki_perjam_series).length > 0){
+                  found_suhu_Tinggi = true;
+              }
+
 
               // alert(JSON.stringify(arr_final_suhutinggi_tangki_selected))
 
-              this.setState({
+              // this.setState({
+              //     ...this.state,
+              //     loader:{
+              //         ...this.state.loader,
+              //         suhu_tinggi_tangki_jam: false,
+              //     },
+              //     waktu:{
+              //       tanggal: formatDate(new Date(time_first),'DD MMMM YYYY'),
+              //       tanggal_jam: formatDate(new Date(time_first),'DD MMMM YYYY HH:mm:ss')
+              //     },
+              //     chartSuhuTinggiJam: {
+              //       ...this.state.chartSuhuTinggiJam,
+              //       statusFound: true,
+              //       isDisabled: false,
+              //       suhuTinggiSelected:{
+              //         ...this.state.chartSuhuTinggiJam.suhuTinggiSelected
+              //       },
+              //       series:[
+              //         ...arr_final_suhutinggi_tangki_selected
+              //       ],
+              //       options:{
+              //           ...this.state.chartSuhuTinggiJam.options,
+              //           dataLabels:{
+              //               ...this.state.chartSuhuTinggiJam.options.dataLabels,
+              //               enabled: this.statusChecked?.['suhu_tinggi'] ?? false
+              //           }
+              //       }
+              //     }
+              // })  
+
+                this.setState({
                   ...this.state,
                   loader:{
-                      ...this.state.loader,
-                      suhu_tinggi_tangki_jam: false,
+                    ...this.state.loader,
+                    jarak_sensor_jam: false,
+                    suhu_tangki_jam: false,
+                    suhu_tinggi_tangki_jam: false,
+                    tinggi_isi_jam: false,
+                    volume_tangki_jam: false
                   },
                   waktu:{
-                    tanggal: formatDate(new Date(time_first),'DD MMMM YYYY'),
-                    tanggal_jam: formatDate(new Date(time_first),'DD MMMM YYYY HH:mm:ss')
+                      tanggal: formatDate(new Date(time_first),'DD MMMM YYYY'),
+                      tanggal_jam: formatDate(new Date(time_first),'DD MMMM YYYY HH:mm:ss')
                   },
+                  chartJarakSensorJam: {...this.setChartJarakSensorJam},
+                  chartSuhuJam: {...this.setChartSuhuJam},
+                  chartTinggiJam: {...this.setChartTinggiJam},
+                  chartVolumeJam: {...this.setChartVolumeJam},
                   chartSuhuTinggiJam: {
                     ...this.state.chartSuhuTinggiJam,
-                    statusFound: true,
+                    statusFound: found_suhu_Tinggi,
                     isDisabled: false,
                     suhuTinggiSelected:{
                       ...this.state.chartSuhuTinggiJam.suhuTinggiSelected
@@ -2400,26 +2450,8 @@ class DashboardTangki extends React.Component {
                         }
                     }
                   }
-              })  
-              // this.setState({
-              //   ...this.state,
-              //   loader:{
-              //     ...this.state.loader,
-              //     jarak_sensor_jam: false,
-              //     suhu_tangki_jam: false,
-              //     suhu_tinggi_tangki_jam: false,
-              //     tinggi_isi_jam: false,
-              //     volume_tangki_jam: false
-              //   },
-              //   waktu:{
-              //       tanggal: formatDate(new Date(time_first),'DD MMMM YYYY'),
-              //       tanggal_jam: formatDate(new Date(time_first),'DD MMMM YYYY HH:mm:ss')
-              //   },
-              //   chartJarakSensorJam: {...this.setChartJarakSensorJam},
-              //   chartSuhuJam: {...this.setChartSuhuJam},
-              //   chartTinggiJam: {...this.setChartTinggiJam},
-              //   chartVolumeJam: {...this.setChartVolumeJam},
-              // })
+                })
+
               // ... END BALIKKIN
 
               console.log(this.obj_suhu_tinggi_tangki_perjam_series)
@@ -3849,11 +3881,11 @@ class DashboardTangki extends React.Component {
                                                             this.state.chartJarakSensorJam.statusFound &&
 
                                                             <div className='w-100'>
-                                                                {/* <ReactApexChart 
+                                                                <ReactApexChart 
                                                                       options={this.state.chartJarakSensorJam.options} 
                                                                       series={this.state.chartJarakSensorJam.series} 
                                                                       type="area" 
-                                                                      height={350} /> */}
+                                                                      height={350} />
                                                             </div>
                                                         }
 
@@ -3918,11 +3950,11 @@ class DashboardTangki extends React.Component {
                                                             !this.state.loader.tinggi_isi_jam &&
                                                             this.state.chartJarakSensorJam.statusFound &&
                                                             <div className='w-100'>
-                                                                {/* <ReactApexChart 
+                                                                <ReactApexChart 
                                                                       options={this.state.chartTinggiJam.options} 
                                                                       series={this.state.chartTinggiJam.series} 
                                                                       type="area" 
-                                                                      height={350} /> */}
+                                                                      height={350} />
                                                             </div>
                                                         }
 
@@ -4111,11 +4143,11 @@ class DashboardTangki extends React.Component {
                                                             !this.state.loader.volume_tangki_jam &&
                                                             this.state.chartVolumeJam.statusFound &&
                                                             <div className='w-100'>
-                                                                {/* <ReactApexChart 
+                                                                <ReactApexChart 
                                                                       options={this.state.chartVolumeJam.options} 
                                                                       series={this.state.chartVolumeJam.series} 
                                                                       type="area" 
-                                                                      height={350} /> */}
+                                                                      height={350} />
                                                             </div>
                                                         }
 
