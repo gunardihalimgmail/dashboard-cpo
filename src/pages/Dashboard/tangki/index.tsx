@@ -185,11 +185,12 @@ class DashboardTangki extends React.Component {
     }
 
       // konstanta tinggi segitiga di atas tinggi tangki
+      // new => rata-rata sampai 24 Jan '23 - 10 feb 2023
     mst_avg_t_segitiga:any = {
-      'tangki_1':0.49629,
-      'tangki_2':0.70074,   // 0.71348  (prev)
-      'tangki_3':0.48733,   // 0.54700  (prev)
-      'tangki_4':0.47229,   // 0.47460  (prev)
+      'tangki_1':0.49629,   // 0.49629 (prev old -> new)
+      'tangki_2':0.69876,   // 0.71348, 0.70074 (prev)
+      'tangki_3':0.48870,   // 0.54700, 0.48733  (prev)
+      'tangki_4':0.46792,   // 0.47460, 0.47229  (prev)
     }
     // ... end
 
