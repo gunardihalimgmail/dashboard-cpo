@@ -188,9 +188,9 @@ class DashboardTangki extends React.Component {
       // new => rata-rata sampai 24 Jan '23 - 10 feb 2023
     mst_avg_t_segitiga:any = {
       'tangki_1':0.49629,   // 0.49629 (prev old -> new)
-      'tangki_2':0.69876,   // 0.71348, 0.70074 (prev)
+      'tangki_2':0.69818,   // 0.71348, 0.70074, 0.69876 (prev)
       'tangki_3':0.48870,   // 0.54700, 0.48733  (prev)
-      'tangki_4':0.46792,   // 0.47460, 0.47229  (prev)
+      'tangki_4':0.47070,   // 0.47460, 0.47229, 0.46792  (prev)
     }
     // ... end
 
