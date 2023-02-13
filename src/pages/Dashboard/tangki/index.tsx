@@ -831,9 +831,13 @@ class DashboardTangki extends React.Component {
         },
         tooltip: {
           x: {
-            format: 'dd MMM yy (HH:mm)'
+            format: 'dd MMM yy (HH:mm)',
+            formatter: (value:any, { series, seriesIndex, dataPointIndex, w }:any)=> {
+  
+              return formatDate(new Date(value),'HH:mm:ss')
+            }
           },
-        },
+        }
       }
         
   // ... end 
@@ -928,6 +932,20 @@ class DashboardTangki extends React.Component {
       },
       tooltip: {
         shared: true,
+        x: {
+          show:true,
+          format: 'dd MMM yy (HH:mm)',
+          formatter: (value:any, { series, seriesIndex, dataPointIndex, w }:any)=> {
+
+            return formatDate(new Date(value),'HH:mm:ss')
+
+          }
+          // custom: ({series, seriesIndex, dataPointIndex, w}:any) => {
+          //     var data = w.globals.initialSeries[seriesIndex].data[dataPointIndex];
+
+          //     return ''
+          // }
+        },
       },
       legend: {
         position: 'bottom',
@@ -1024,6 +1042,20 @@ class DashboardTangki extends React.Component {
       },
       tooltip: {
         shared: true,
+        x: {
+          show:true,
+          format: 'dd MMM yy (HH:mm)',
+          formatter: (value:any, { series, seriesIndex, dataPointIndex, w }:any)=> {
+
+            return formatDate(new Date(value),'HH:mm:ss')
+
+          }
+          // custom: ({series, seriesIndex, dataPointIndex, w}:any) => {
+          //     var data = w.globals.initialSeries[seriesIndex].data[dataPointIndex];
+
+          //     return ''
+          // }
+        },
       },
       legend: {
         position: 'bottom',
@@ -2062,7 +2094,7 @@ class DashboardTangki extends React.Component {
 
                       data_tinggi_temp.push(
                           {
-                            x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm'),
+                            x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm:ss'),
                             y: parseFloat(obj_temp_tank?.[tangki_name]?.['tinggi_minyak']),
                             x_time: new Date(time_tank).getTime()
                           }
@@ -2111,7 +2143,7 @@ class DashboardTangki extends React.Component {
                       }
                       data_jarak_sensor_temp.push(
                           {
-                            x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm'),
+                            x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm:ss'),
                             y: parseFloat(obj_temp_tank?.[tangki_name]?.['data_jarak_sensor_m']),
                             x_time: new Date(time_tank).getTime()
                           }
@@ -2159,7 +2191,7 @@ class DashboardTangki extends React.Component {
 
                       data_volume_temp.push(
                           {
-                            x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm'),
+                            x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm:ss'),
                             y: parseFloat(obj_temp_tank?.[tangki_name]?.['volume']),
                             x_time: new Date(time_tank).getTime()
                           }
@@ -2183,7 +2215,7 @@ class DashboardTangki extends React.Component {
                       }else{
                           this.data_volume_tangki_perjam_series[idx_arr_perjam_series] = {
                               ...this.data_volume_tangki_perjam_series[idx_arr_perjam_series],
-                              data: [...data_volume_temp]
+                              data: [...data_volume_temp] 
                           }
                       }
 
