@@ -1396,8 +1396,8 @@ class DashboardTangki extends React.Component {
         let length_mst_list_tangki:any = this.mst_list_tangki.length;
 
         // hit api yang getAllData
-        await postApi("https://platform.iotsolution.id:7004/api-v1/getLastData",null,true,'1',null,(res:any)=>{
-        // await postApi("http://192.168.1.120:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
+        // await postApi("https://platform.iotsolution.id:7004/api-v1/getLastData",null,true,'1',null,(res:any)=>{
+        await postApi("http://192.168.1.120:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
           
           if (res?.['responseCode'] == "200"){
               let res_data:any = res?.['data'];
@@ -1624,8 +1624,8 @@ class DashboardTangki extends React.Component {
       // "dateLast":formatDate(new Date(datelast),'YYYY-MM-DD')
 
       // LAGI FIXING PAK BAYU getDataHour banyak yg NaN
-      // await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
-      await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
+      await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
+      // await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
         {
           "date":formatDate(new Date(datebegin),'YYYY-MM-DD'),
           // // === BALIKKIN LAGI ===
