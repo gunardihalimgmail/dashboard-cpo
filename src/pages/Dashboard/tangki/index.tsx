@@ -1398,8 +1398,8 @@ class DashboardTangki extends React.Component {
         let length_mst_list_tangki:any = this.mst_list_tangki.length;
 
         // hit api yang getAllData
-        // await postApi("https://platform.iotsolution.id:7004/api-v1/getLastData",null,true,'1',null,(res:any)=>{
-        await postApi("http://192.168.1.120:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
+        await postApi("https://platform.iotsolution.id:7004/api-v1/getLastData",null,true,'1',null,(res:any)=>{
+        // await postApi("http://192.168.1.120:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
           
           if (res?.['responseCode'] == "200"){
               let res_data:any = res?.['data'];
@@ -1554,13 +1554,13 @@ class DashboardTangki extends React.Component {
                   obj_keys_suhutinggi_cek == null)
             {
                 // JIKA DATA TIDAK ADA 
-                console.error("DATA TEMPERATURE TANK")
-                console.log(data_temperature)   // Temperature Tank 2 BA tinggi 3 M
-                console.log(result_tinggi_tangki)   // json {0, input}
+                // console.error("DATA TEMPERATURE TANK")
+                // console.log(data_temperature)   // Temperature Tank 2 BA tinggi 3 M
+                // console.log(result_tinggi_tangki)   // json {0, input}
 
-                console.log(data_arr?.[data_temperature])   // 43.31
-                console.log(tanggal_format)   // 2023-02-08 09:00:57
-                console.log(result_final_tinggi[0])   // 5 M
+                // console.log(data_arr?.[data_temperature])   // 43.31
+                // console.log(tanggal_format)   // 2023-02-08 09:00:57
+                // console.log(result_final_tinggi[0])   // 5 M
 
                 this.obj_suhu_tinggi_tangki_perjam_series[nama_tangki] = [
                   {
@@ -1626,15 +1626,15 @@ class DashboardTangki extends React.Component {
       // "dateLast":formatDate(new Date(datelast),'YYYY-MM-DD')
 
       // LAGI FIXING PAK BAYU getDataHour banyak yg NaN
-      await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
-      // await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
+      // await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
+      await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
         {
           "date":formatDate(new Date(datebegin),'YYYY-MM-DD'),
           // // === BALIKKIN LAGI ===
           // "hourBegin": typeof hourbegin == 'undefined' || hourbegin == null ? '00:00' : hourbegin,
           "hourBegin": typeof hourbegin == 'undefined' || hourbegin == null ? '06:00' : hourbegin,
           // "hourLast": typeof hourlast == 'undefined' || hourlast == null ? '23:59' : hourlast,
-          "hourLast": typeof hourlast == 'undefined' || hourlast == null ? '09:00' : hourlast,
+          "hourLast": typeof hourlast == 'undefined' || hourlast == null ? '9:30' : hourlast,
           "minutes":true
         },
       (res:any)=>{
@@ -1777,7 +1777,7 @@ class DashboardTangki extends React.Component {
                                   
                                   // SHOW
                                   // SUHU BERDASARKAN TINGGI
-                                  let patt_tank_tinggi_num = new RegExp(/(tinggi [0-9]+.?M)/)
+                                  let patt_tank_tinggi_num = new RegExp(/(tinggi [0-9]+.?M)/,'gi')
                                   let patt_tank_tinggi_num_exec = patt_tank_tinggi_num.exec(data_temperature);
                                   
                                   let patt_tank_tinggi_num_exec_final = patt_tank_tinggi_num_exec != null 
@@ -1921,8 +1921,8 @@ class DashboardTangki extends React.Component {
 
                   })
 
-                  console.error("(TES) OBJECT TEMP")
-                  console.log(obj_temp_tank)
+                  // console.error("(TES) OBJECT TEMP")
+                  // console.log(obj_temp_tank)
 
                   // ... end LOOPING obj_keys_suhu (Object.keys(data_arr))
 
@@ -2005,7 +2005,9 @@ class DashboardTangki extends React.Component {
                           let arr_volume:any = this.json_arr_volume_tangki(tangki_name);
 
                           let findItem:any = arr_volume.find(res=>
-                                parseInt(res.tinggi) == Math.round(tinggi_tmp * 100)
+                                // parseInt(res.tinggi) == Math.round(tinggi_tmp.toFixed(2) * 100)
+                                parseInt(res.tinggi) == Math.round(parseFloat(parseFloat(tinggi_tmp).toFixed(2))*100)
+
                           )
 
                           let tanggal_tangki:any = new Date(obj_temp_tank[tangki_name]['tanggal']);
@@ -2036,6 +2038,7 @@ class DashboardTangki extends React.Component {
                           if (findItem){
                   
                               let volume_tbl:any = 0;
+
             
                               // VOLUME LITER ATAU KG tangki
                               volume_tbl = parseFloat(findItem.volume);
@@ -2054,6 +2057,7 @@ class DashboardTangki extends React.Component {
                                         Math.round(parseFloat(res.temperature)) == Math.round(avg_tmp)
                                     );
 
+
                                   // if (tangki_name == "tangki_3"){
                                     // console.error("tinggi tmp tangki_3 : " + tinggi_tmp)
                                     // console.error("tanggal jam tmp tangki_3 : " + formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm:ss'))
@@ -2065,6 +2069,14 @@ class DashboardTangki extends React.Component {
                                       volume_tbl = Math.round(volume_tbl * find_berat_jenis?.['berat_jenis']);
                                       volume_prev = volume_tbl;   // just info volume sebelumnya
                                   }
+
+                                   // SINI SINI
+                                    // console.error("CEK SINI GET ALL DATA")
+                                    // console.error(findItem)
+                                    // console.error("CEK SINI GET ALL BERAT JENIS")
+                                    // console.error(find_berat_jenis)
+                                    // console.error("CEK SINI GET ALL VOLUME TBL x BERAT JENIS")
+                                    // console.error(volume_tbl)
 
                                   // faktor koreksi
                                   faktor_koreksi_temp = this.faktor_koreksi(volume_tbl, parseFloat(avg_tmp));
@@ -2082,7 +2094,7 @@ class DashboardTangki extends React.Component {
                                       ...obj_temp_tank[tangki_name],
                                       volume_prev,
                                       faktor_koreksi: faktor_koreksi_temp,
-                                      volume: volume_tbl
+                                      volume: volume_tbl.toFixed(2)
                                   }
                                   
                                   // alert(JSON.stringify(arr_berat_jenis))
@@ -2773,12 +2785,19 @@ class DashboardTangki extends React.Component {
 
         Object.keys(realtime).forEach((tangki_name:any)=>{
 
-            let tinggi:any = realtime?.[tangki_name]?.['tinggi'] ?? null;
+            // let tinggi:any = realtime?.[tangki_name]?.['tinggi'] ?? null;
+            let tinggi:any = realtime?.[tangki_name]?.['tinggi'] != null 
+                  ? parseFloat(realtime?.[tangki_name]?.['tinggi']).toFixed(3)
+                  : null
+
             if (tinggi != null && tinggi != "-" && tinggi != ""){
                 // panggil array json tabel volume tangki yang sesuai
                 let arr_volume:any = this.json_arr_volume_tangki(tangki_name);
+                
+
                 let findItem:any = arr_volume.find(res=>
-                      parseInt(res.tinggi) == Math.round(tinggi.toFixed(2) * 100)
+                      // parseInt(res.tinggi) == Math.round(tinggi.toFixed(2) * 100)
+                      parseInt(res.tinggi) == Math.round(parseFloat(parseFloat(tinggi).toFixed(2))*100)
                 )
 
                 // this.arr_cpo_pko
@@ -2818,6 +2837,7 @@ class DashboardTangki extends React.Component {
                   
                   let volume_tbl:any = 0;
 
+
                   // VOLUME LITER ATAU KG tangki
                   volume_tbl = parseFloat(findItem.volume);
 
@@ -2836,18 +2856,28 @@ class DashboardTangki extends React.Component {
                       let find_berat_jenis:any = arr_berat_jenis.find(res=>
                             Math.round(parseFloat(res.temperature)) == Math.round(parseFloat(suhu_last))
                         );
+
+
                       if (find_berat_jenis){
                         volume_tbl = Math.round(volume_tbl * find_berat_jenis?.['berat_jenis']);
 
                         volume_prev = volume_tbl;   // just info volume sebelumnya
                       }
 
+                      // SINI SINI
+                      // console.error("CEK SINI GET REAL TIME")
+                      // console.error(findItem)
+                      // console.error("CEK SINI GET REAL TIME BERAT JENIS")
+                      // console.error(find_berat_jenis)
+                      // console.error("CEK SINI GET VOLUME TBL x BERAT JENIS")
+                      // console.error(volume_tbl)
 
                       // faktor koreksi
 
                       faktor_koreksi_temp = this.faktor_koreksi(volume_tbl, parseFloat(suhu_last));
                       if (faktor_koreksi_temp != null){
-                          volume_tbl *= faktor_koreksi_temp.toFixed(2);
+                          // volume_tbl *= faktor_koreksi_temp.toFixed(2);
+                          volume_tbl *= faktor_koreksi_temp;
                       }
                       
                       // alert(JSON.stringify(arr_berat_jenis))
@@ -2863,7 +2893,7 @@ class DashboardTangki extends React.Component {
                         ...this.state.realtime?.[tangki_name],
                         volume_prev,
                         faktor_koreksi: faktor_koreksi_temp,
-                        volume: volume_tbl
+                        volume: volume_tbl.toFixed(2)
                       }
                   }
 
@@ -2988,27 +3018,93 @@ class DashboardTangki extends React.Component {
                 let obj_keys_tangki:any = Object.keys(this.arr_json_tangki_last?.[tangki_name]);
 
                 temp_arr = [];
+                let temp_arr_suhu_num_exec_final:any = [];
+                let temp_arr_suhu_num_all_raw:any = []; // semua data [13,15,17,19,21]
+
+                let arr_tinggi_suhu_tmp:any = [];
+                let arr_tinggi_suhu_val_tmp:any = [];
+
                 // cari ada kata "Temperature Tank"
                 obj_keys_tangki.forEach((temperat:any)=>{
                     if (temperat.toLowerCase().indexOf("temperature tank") != -1){
-                        temp_arr.push(parseFloat(this.arr_json_tangki_last[tangki_name][temperat]));
+
+                        // SUHU BERDASARKAN TINGGI
+                        let patt_tank_tinggi_num = new RegExp(/(tinggi [0-9]+.?M)/,'gi')
+                        let patt_tank_tinggi_num_exec = patt_tank_tinggi_num.exec(temperat);
+
+                        let patt_tank_tinggi_num_exec_final = patt_tank_tinggi_num_exec != null 
+                                          ? parseFloat(patt_tank_tinggi_num_exec[0].replace(/(tinggi|M)/gi,'').trim())
+                                          : null
+                        
+                        temp_arr_suhu_num_exec_final.push(patt_tank_tinggi_num_exec_final);
+
+                        temp_arr_suhu_num_all_raw.push(this.arr_json_tangki_last?.[tangki_name]?.[temperat]);
+
+                        // ... END
+                        
+                        // temp_arr.push(parseFloat(this.arr_json_tangki_last[tangki_name][temperat]));
+
                     }
                 })
-                if (temp_arr.length > 0){
+                
+                if (temp_arr_suhu_num_all_raw.length > 0){
 
-                    // di totalkan dulu
-                    let total_temp_arr = temp_arr.reduce((acc:any, val:any)=>{
-                        return acc + val
+                    let obj_tmp_tank_tinggi_minyak:any = Math.floor(parseFloat(temp_updatedState_suhu['realtime']?.[tangki_name]?.['tinggi']));
+
+                    console.error(temp_updatedState_suhu)
+                    // console.error(this.arr_json_tangki_last[tangki_name])
+
+                    // BERDASARKAN KETINGGIAN SUHU
+                    if (obj_tmp_tank_tinggi_minyak >= 1){
+
+                        if (temp_arr_suhu_num_exec_final.length > 0){
+                            temp_arr_suhu_num_exec_final.forEach((ele_suhu_num,idx)=>{
+
+                                if (obj_tmp_tank_tinggi_minyak >= temp_arr_suhu_num_exec_final[idx])
+                                {
+                                    arr_tinggi_suhu_tmp.push(temp_arr_suhu_num_exec_final[idx]);
+                                    arr_tinggi_suhu_val_tmp.push(temp_arr_suhu_num_all_raw[idx]);
+                                }
+                            })  
+                        }
+                    }
+                    else{
+                        // JIKA MINUS, MAKA INJECT KETINGGIAN 1 M
+                        if (obj_tmp_tank_tinggi_minyak < 1){
+
+                          let arr_obj_tmp_tank_data:any = temp_arr_suhu_num_exec_final;
+                          let findIdx = arr_obj_tmp_tank_data.findIndex(ele=>ele == 1);
+                          if (findIdx != -1){
+                              arr_tinggi_suhu_tmp.push(1);
+                              arr_tinggi_suhu_val_tmp.push(temp_arr_suhu_num_all_raw[findIdx]);
+                          }
+                          // arr_tinggi_suhu_val_tmp.push(arr_obj_tmp_tank_data[1]);
+                        }
+                    }
+
+                    // totalkan semua 
+                    // let total_temp_arr = temp_arr.reduce((acc:any, val:any)=>{
+                    //     return acc + val
+                    // },0)
+
+                    // total SUHU BERDASARKAN TINGGI
+                    let total_temp_arr = arr_tinggi_suhu_val_tmp.reduce((tmp:any, val:any)=>{
+                        return tmp + parseFloat(val)
                     },0)
                     
                     // di rata-ratakan
-                    let avg_temp_arr = (total_temp_arr / temp_arr.length).toFixed(3);
+                    // let avg_temp_arr = (total_temp_arr / temp_arr.length).toFixed(3);
+                    let avg_temp_arr = (total_temp_arr / arr_tinggi_suhu_val_tmp.length).toFixed(3);
 
                     temp_updatedState_suhu['realtime'] = {
                         ...temp_updatedState_suhu['realtime'],
                         [tangki_name]: {
                           ...this.state['realtime'][tangki_name],
-                          suhu: avg_temp_arr
+                          suhu: avg_temp_arr,
+                          suhu_tank_num: temp_arr_suhu_num_exec_final,
+                          suhu_tank_num_raw: temp_arr_suhu_num_all_raw,
+                          avg_tinggi_suhu: [...arr_tinggi_suhu_tmp],
+                          avg_tinggi_suhu_val: [...arr_tinggi_suhu_val_tmp]
                       }
                     }
                 }
