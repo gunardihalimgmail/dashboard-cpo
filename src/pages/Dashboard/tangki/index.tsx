@@ -16,7 +16,7 @@ import ReactFC from 'react-fusioncharts';
 
 import './DashTangki.scss'
 import Icon from '@mdi/react';
-import { mdiHome, mdiChartLine, mdiOrnament, mdiGradientHorizontal, mdiThumbsUpDown } from '@mdi/js';
+import { mdiHome, mdiChartLine, mdiOrnament, mdiGradientHorizontal, mdiThumbsUpDown, mdiConsoleNetworkOutline } from '@mdi/js';
 import CardHeader from 'react-bootstrap/esm/CardHeader';
 import Card from 'react-bootstrap/esm/Card';
 import { Button } from 'react-bootstrap';
@@ -186,12 +186,14 @@ class DashboardTangki extends React.Component {
 
       // konstanta tinggi segitiga di atas tinggi tangki
       // new => rata-rata sampai 24 Jan '23 - 10 feb 2023
+
     mst_avg_t_segitiga:any = {
       'tangki_1':0.49629,   // 0.49629 (prev old -> new)
-      'tangki_2':0.69818,   // 0.71348, 0.70074, 0.69876 (prev)69818
+      'tangki_2':0.69460,   // 0.71348, 0.70074, 0.69876, 0.69818 (prev)
       'tangki_3':0.48870,   // 0.54700, 0.48733  (prev)
-      'tangki_4':0.47070,   // 0.47460, 0.47229, 0.46792  (prev)47070
+      'tangki_4':0.46650,   // 0.47460, 0.47229, 0.46792, 0.47070 (prev)
     }
+
     // ... end
 
 
@@ -1770,8 +1772,24 @@ class DashboardTangki extends React.Component {
                                   nama_tangki = find_mst_list?.['name'] ?? '';
                                   title_tangki = find_mst_list?.['title'] ?? '';
 
+                                  let patt_tank_number = new RegExp(/([0-9]+)/,'gi')
+                                  let patt_tank_number_exec = patt_tank_number.exec(patt_tank_exec[0]) ?? -1
+                                  
+                                  // SHOW
+                                  // SUHU BERDASARKAN TINGGI
+                                  let patt_tank_tinggi_num = new RegExp(/(tinggi [0-9]+.?M)/)
+                                  let patt_tank_tinggi_num_exec = patt_tank_tinggi_num.exec(data_temperature);
+                                  
+                                  let patt_tank_tinggi_num_exec_final = patt_tank_tinggi_num_exec != null 
+                                          ? parseFloat(patt_tank_tinggi_num_exec[0].replace(/(tinggi|M)/gi,'').trim())
+                                          : null
+
                                   // push data temperature ke dalam variable obj_temp_tank
 
+                                  // key "data" & "data_suhu_tank_num" mempunyai urutan yang sama secara suhu
+                                  // misal  => data : ['34.84', '32.66', '32.97', '36.09', '36.09']
+                                  //        => data : [10, 7, 5, 3, 1]
+                                  
                                   obj_temp_tank[nama_tangki] = {
                                       ...obj_temp_tank[nama_tangki],
                                       title: title_tangki,
@@ -1783,7 +1801,11 @@ class DashboardTangki extends React.Component {
                                       // tanggal_tz: new Date(time_tank),
                                       data: obj_temp_tank[nama_tangki]?.['data'] == null ? 
                                             [data_arr?.[data_temperature]] 
-                                            : [...obj_temp_tank[nama_tangki]?.['data'], data_arr?.[data_temperature]]
+                                            : [...obj_temp_tank[nama_tangki]?.['data'], data_arr?.[data_temperature]],
+
+                                      data_suhu_tank_num: obj_temp_tank[nama_tangki]?.['data_suhu_tank_num'] == null ? 
+                                            [patt_tank_tinggi_num_exec_final] 
+                                            : [...obj_temp_tank[nama_tangki]?.['data_suhu_tank_num'], patt_tank_tinggi_num_exec_final]
                                   }
 
                                   // AMBIL label tinggi (etc: 1 M, 3 M, 5 M, 7 M, 10 M)
@@ -1806,6 +1828,8 @@ class DashboardTangki extends React.Component {
                         }
 
                     }
+
+
                     // ... <end SUHU TANGKI>
 
 
@@ -1842,19 +1866,29 @@ class DashboardTangki extends React.Component {
 
                                       // cari tinggi minyak
                                       let tangki_jarak_sensor:any =  data_arr?.[data_jarak_sensor];
-                    
+
+                                      // if (nama_tangki == 'tangki_2'){
+                                        // INI BARU UPDATE (NANTI AKAN DIHAPUS)
+                                          // console.log("INI BARU TANGKI 2, " + time_tank + " -> " + tangki_jarak_sensor)
+                                          // console.log("INI BARU TANGKI 2")
+                                          // console.log(tangki_jarak_sensor)
+                                      // }
+
                                       if (typeof tangki_jarak_sensor != 'undefined' && tangki_jarak_sensor != null){
                                           if (typeof tangki_jarak_sensor == 'string'){
-                                            tangki_jarak_sensor = (parseFloat(tangki_jarak_sensor) / 100).toFixed(2);
+                                            tangki_jarak_sensor = (parseFloat(tangki_jarak_sensor) / 100);
+                                            // tangki_jarak_sensor = (parseFloat(tangki_jarak_sensor) / 100).toFixed(2);
                                           }else{
-                                            tangki_jarak_sensor = (tangki_jarak_sensor / 100).toFixed(2);
+                                            // tangki_jarak_sensor = (tangki_jarak_sensor / 100).toFixed(2);
+                                            tangki_jarak_sensor = (tangki_jarak_sensor / 100);
                                           }
                                       }else{tangki_jarak_sensor = 0}
 
                                       // let ruang_kosong:any = (parseFloat(data_arr?.[data_jarak_sensor]) / 100) - this.mst_avg_t_segitiga?.[nama_tangki];
-                                      let ruang_kosong:any = (tangki_jarak_sensor - this.mst_avg_t_segitiga?.[nama_tangki]).toFixed(2);
+                                      // let ruang_kosong:any = (tangki_jarak_sensor - this.mst_avg_t_segitiga?.[nama_tangki]).toFixed(2);
+                                      let ruang_kosong:any = (tangki_jarak_sensor - this.mst_avg_t_segitiga?.[nama_tangki]);
                                       
-                                      tinggi_hitung = this.mst_t_tangki?.[nama_tangki] - ruang_kosong;
+                                      tinggi_hitung = (this.mst_t_tangki?.[nama_tangki] - ruang_kosong).toFixed(3);
 
                                       // ... end tinggi minyak
 
@@ -1887,19 +1921,63 @@ class DashboardTangki extends React.Component {
 
                   })
 
+                  console.error("(TES) OBJECT TEMP")
+                  console.log(obj_temp_tank)
+
                   // ... end LOOPING obj_keys_suhu (Object.keys(data_arr))
 
                   // hitung rata-rata tangki "obj_temp_tank"
                   // === BALIKKIN LAGI (JARAK SENSOR) ===
                   let arr_obj_keys_avg = Object.keys(obj_temp_tank);
                   arr_obj_keys_avg.forEach((ele_tank_name:any) => {
-                      let total:any = obj_temp_tank[ele_tank_name]['data'].reduce((tmp:any, val:any)=>{
+
+                    // AMBIL DATA SUHU BERDASARKAN KETINGGIAN MINYAK CPO
+                    // data_suhu_tank_num
+                      let arr_tinggi_suhu_tmp:any = [];
+                      let arr_tinggi_suhu_val_tmp:any = [];
+                      let arr_obj_tmp_tank_data:any = obj_temp_tank[ele_tank_name]['data'];
+
+                      let obj_tmp_tank_tinggi_minyak:any = Math.floor(parseFloat(obj_temp_tank[ele_tank_name]['tinggi_minyak']));
+
+                      if (obj_tmp_tank_tinggi_minyak >= 1){
+
+                          if (arr_obj_tmp_tank_data.length > 0){
+                              arr_obj_tmp_tank_data.forEach((ele_suhu_num,idx)=>{
+                                  if (obj_tmp_tank_tinggi_minyak >= obj_temp_tank[ele_tank_name]['data_suhu_tank_num'][idx]
+                                      ){
+                                      arr_tinggi_suhu_tmp.push(obj_temp_tank[ele_tank_name]['data_suhu_tank_num'][idx]);
+                                      arr_tinggi_suhu_val_tmp.push(arr_obj_tmp_tank_data[idx]);
+                                  }
+                              })  
+                          }
+                      }else{
+                        // JIKA MINUS, MAKA INJECT KETINGGIAN 1 M
+                        if (obj_tmp_tank_tinggi_minyak < 1){
+
+                          let arr_obj_tmp_tank_data:any = obj_temp_tank[ele_tank_name]['data_suhu_tank_num'];
+                          let findIdx = arr_obj_tmp_tank_data.findIndex(ele=>ele == 1);
+                          if (findIdx != -1){
+                              arr_tinggi_suhu_tmp.push(1);
+                              arr_tinggi_suhu_val_tmp.push(obj_temp_tank[ele_tank_name]['data'][findIdx]);
+                          }
+                          // arr_tinggi_suhu_val_tmp.push(arr_obj_tmp_tank_data[1]);
+                        }
+                      }
+                    // ... END AMBIL DATA SUHU BERDASARKAN KETINGGIAN MINYAK CPO
+
+
+                      // let total:any = obj_temp_tank[ele_tank_name]['data'].reduce((tmp:any, val:any)=>{
+                      let total:any = arr_tinggi_suhu_val_tmp.reduce((tmp:any, val:any)=>{
                           return tmp + parseFloat(val);
                       },0)
-                      let avg_tank:any = (total / obj_temp_tank[ele_tank_name]['data'].length).toFixed(3);
+
+                      // let avg_tank:any = (total / obj_temp_tank[ele_tank_name]['data'].length).toFixed(3);
+                      let avg_tank:any = (total / arr_tinggi_suhu_val_tmp.length).toFixed(3);
                       obj_temp_tank[ele_tank_name] = {
                           ...obj_temp_tank[ele_tank_name],
-                          avg: avg_tank
+                          avg: avg_tank,
+                          avg_tinggi_suhu: [...arr_tinggi_suhu_tmp],
+                          avg_tinggi_suhu_val: [...arr_tinggi_suhu_val_tmp]
                       }
                   });
                   // ... <end>
@@ -1915,7 +1993,11 @@ class DashboardTangki extends React.Component {
 
                   arr_obj_keys_vol.forEach((tangki_name:any)=>{
 
-                      let tinggi_tmp:any = obj_temp_tank[tangki_name]['tinggi_minyak'];
+                    // console.error("HALO TINGGI MINYAK TANGKIIIIIIIIIIII")
+                    //   console.error(parseFloat(obj_temp_tank[tangki_name]['tinggi_minyak']).toFixed(3))
+
+                      let tinggi_tmp:any = parseFloat(obj_temp_tank[tangki_name]['tinggi_minyak']).toFixed(3);
+
                       let avg_tmp:any = parseFloat(obj_temp_tank[tangki_name]['avg']);
 
                       if (tinggi_tmp != null){
@@ -1923,7 +2005,7 @@ class DashboardTangki extends React.Component {
                           let arr_volume:any = this.json_arr_volume_tangki(tangki_name);
 
                           let findItem:any = arr_volume.find(res=>
-                                parseInt(res.tinggi) == Math.round(tinggi_tmp.toFixed(2) * 100)
+                                parseInt(res.tinggi) == Math.round(tinggi_tmp * 100)
                           )
 
                           let tanggal_tangki:any = new Date(obj_temp_tank[tangki_name]['tanggal']);
@@ -1987,11 +2069,11 @@ class DashboardTangki extends React.Component {
                                   // faktor koreksi
                                   faktor_koreksi_temp = this.faktor_koreksi(volume_tbl, parseFloat(avg_tmp));
                                   if (faktor_koreksi_temp != null){
-                                      console.error('volume tbl ',volume_tbl)
+                                      // console.error('volume tbl ',volume_tbl)
                                       volume_tbl *= faktor_koreksi_temp;
-                                      console.log(tangki_name)
-                                      console.error('faktor koreksi ',faktor_koreksi_temp)
-                                      console.error('volume tbl final ',volume_tbl)
+                                      // console.log(tangki_name)
+                                      // console.error('faktor koreksi ',faktor_koreksi_temp)
+                                      // console.error('volume tbl final ',volume_tbl)
                                   }
 
                                     
@@ -2553,18 +2635,29 @@ class DashboardTangki extends React.Component {
 
                     // JARAK SENSOR
                     let tangki_jarak_sensor:any =  this.arr_json_tangki_last?.[tangki_name]?.[findJarakSensor];
+
+                    // if (nama_tangki == 'tangki_2'){
+                    // INI BARU UPDATE (NANTI AKAN DIHAPUS)
+                      // console.log("INI BARU TANGKI 2, " + time_tank + " -> " + tangki_jarak_sensor)
+                      // console.log("INI BARU TANGKI 2")
+                      // console.log(tangki_jarak_sensor)
+                    // }
                     
                     
                     if (typeof tangki_jarak_sensor != 'undefined' && tangki_jarak_sensor != null){
                         if (typeof tangki_jarak_sensor == 'string'){
-                          tangki_jarak_sensor = (parseFloat(tangki_jarak_sensor) / 100).toFixed(2);
+                          // tangki_jarak_sensor = (parseFloat(tangki_jarak_sensor) / 100).toFixed(2);
+                          tangki_jarak_sensor = (parseFloat(tangki_jarak_sensor) / 100);
                         }else{
-                          tangki_jarak_sensor = (tangki_jarak_sensor / 100).toFixed(2);
+                          // tangki_jarak_sensor = (tangki_jarak_sensor / 100).toFixed(2);
+                          tangki_jarak_sensor = (tangki_jarak_sensor / 100);
                         }
                     }else{tangki_jarak_sensor = 0}
 
-                    let ruang_kosong_tangki:any = (tangki_jarak_sensor - mst_avg_t_segitiga_temp).toFixed(2);
-                    let tinggi_minyak:any = (mst_t_tangki_temp - ruang_kosong_tangki).toFixed(2);
+                    // let ruang_kosong_tangki:any = (tangki_jarak_sensor - mst_avg_t_segitiga_temp).toFixed(2);
+                    let ruang_kosong_tangki:any = (tangki_jarak_sensor - mst_avg_t_segitiga_temp);
+                    // let tinggi_minyak:any = (mst_t_tangki_temp - ruang_kosong_tangki).toFixed(2);
+                    let tinggi_minyak:any = (mst_t_tangki_temp - ruang_kosong_tangki).toFixed(3);
 
                     this.arr_json_tangki_last[tangki_name]['jarak_sensor'] = tinggi_minyak;
 
@@ -2909,7 +3002,7 @@ class DashboardTangki extends React.Component {
                     },0)
                     
                     // di rata-ratakan
-                    let avg_temp_arr = (total_temp_arr / temp_arr.length).toFixed(2);
+                    let avg_temp_arr = (total_temp_arr / temp_arr.length).toFixed(3);
 
                     temp_updatedState_suhu['realtime'] = {
                         ...temp_updatedState_suhu['realtime'],
