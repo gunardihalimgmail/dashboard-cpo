@@ -24,7 +24,7 @@ import Badge from 'react-bootstrap/Badge';
 import Col from 'react-bootstrap/esm/Col';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/esm/Row';
-import { Img_Facebook, No_Found, SVG_Circle } from '../../../assets'
+import { Img_Facebook, MotionSensor, MotionSensorRed, No_Found, SVG_Circle, Tank, TermSensor, Thermometer, WeightTank } from '../../../assets'
 import ReactApexChart from 'react-apexcharts';
 
 import ThermometerFC from '../thermometer';
@@ -4064,9 +4064,14 @@ class DashboardTangki extends React.Component {
                                             <Row className='mt-2'>
                                                 <hr></hr>
                                                 <div className='d-flex justify-content-between'>
-                                                    <div>
-                                                        <h5 className='dashtangki-title'>Jarak Sensor ( m / jam )</h5>
-                                                        <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
+                                                    <div className='d-flex justify-content-start align-items-center gap-2'>
+                                                        <div className='d-flex justify-content-start align-items-center'>
+                                                            <img src = {MotionSensorRed} width="30" height="30" />
+                                                        </div>
+                                                        <div>
+                                                            <h5 className='dashtangki-title'>Jarak Sensor ( m / jam )</h5>
+                                                            <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
+                                                        </div>
                                                     </div>
                                                     <div>
                                                             {/* <Form.Check
@@ -4134,10 +4139,17 @@ class DashboardTangki extends React.Component {
                                             <Row className='mt-2'>
                                                 <hr></hr>
                                                 <div className='d-flex justify-content-between'>
-                                                    <div>
-                                                        <h5 className='dashtangki-title'>Tinggi Isi Tangki ( m / jam )</h5>
-                                                        <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
+
+                                                    <div className='d-flex justify-content-start align-items-center gap-2'>
+                                                      <div className='d-flex justify-content-start align-items-center'>
+                                                          <img src = {Tank} width="30" height="30" />
+                                                      </div>
+                                                      <div>
+                                                          <h5 className='dashtangki-title'>Tinggi Isi Tangki ( m / jam )</h5>
+                                                          <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
+                                                      </div>
                                                     </div>
+
                                                     <div>
                                                             {/* <Form.Check
                                                               inline
@@ -4203,10 +4215,16 @@ class DashboardTangki extends React.Component {
                                             <Row className='mt-3'>
                                                 <hr></hr>
                                                 <div className='d-flex justify-content-between'>
-                                                    <div>
-                                                        <h5 className='dashtangki-title'>Suhu Tangki ( °C / jam )</h5>
-                                                        <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
+                                                    <div className='d-flex justify-content-start align-items-center gap-2'>
+                                                        <div className='d-flex justify-content-start align-items-center'>
+                                                            <img src = {TermSensor} width="30" height="30" />
+                                                        </div>
+                                                        <div>
+                                                            <h5 className='dashtangki-title'>Suhu Tangki ( °C / jam )</h5>
+                                                            <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
+                                                        </div>
                                                     </div>
+
                                                     <div>
                                                         <Form.Check type={'checkbox'} inline>
                                                             <Form.Check.Input type={'checkbox'} onChange={(val)=>{this.checkChartJam(val,'suhu_jam')}}/>
@@ -4263,9 +4281,16 @@ class DashboardTangki extends React.Component {
                                                 <hr></hr>
                                                 <div className='d-flex justify-content-between'>
                                                     <div>
+                                                        <div className='d-flex justify-content-start align-items-center gap-2'>
+                                                            <div className='d-flex justify-content-start align-items-center'>
+                                                                <img src = {Thermometer} width="30" height="30" />
+                                                            </div>
+                                                            <div>
+                                                                <h5 className='dashtangki-title'>Suhu Tinggi Tangki ( °C / jam )</h5>
+                                                                <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
+                                                            </div>
+                                                        </div>
 
-                                                        <h5 className='dashtangki-title'>Suhu Tinggi Tangki ( °C / jam )</h5>
-                                                        <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
 
                                                         {/* FILTER TANGKI */}
                                                         <div className='d-flex justify-content-start align-items-center'>
@@ -4337,10 +4362,16 @@ class DashboardTangki extends React.Component {
                                             <Row className='mt-3'>
                                                 <hr></hr>
                                                 <div className='d-flex justify-content-between'>
-                                                    <div>
-                                                        <h5 className='dashtangki-title'>Volume Tangki ( kg / jam )</h5>
-                                                        <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
+                                                    <div className='d-flex justify-content-start align-items-center gap-2'>
+                                                        <div className='d-flex justify-content-start align-items-center'>
+                                                            <img src = {WeightTank} width="30" height="30" />
+                                                        </div>
+                                                        <div>
+                                                            <h5 className='dashtangki-title'>Volume Tangki ( kg / jam )</h5>
+                                                            <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
+                                                        </div>
                                                     </div>
+
                                                     <div>
                                                         <Form.Check type={'checkbox'} inline>
                                                             <Form.Check.Input type={'checkbox'} onChange={(val)=>{this.checkChartJam(val,'volume_jam')}}/>
