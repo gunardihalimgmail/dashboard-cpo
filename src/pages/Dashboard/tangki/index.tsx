@@ -189,9 +189,9 @@ class DashboardTangki extends React.Component {
 
     mst_avg_t_segitiga:any = {
       'tangki_1':0.49629,   // 0.49629 (prev old -> new)
-      'tangki_2':0.69460,   // 0.71348, 0.70074, 0.69876, 0.69818 (prev)
-      'tangki_3':0.48870,   // 0.54700, 0.48733  (prev)
-      'tangki_4':0.46650,   // 0.47460, 0.47229, 0.46792, 0.47070 (prev)
+      'tangki_2':0.6917,   // 0.71348, 0.70074, 0.69876, 0.69818, 0.69460 (prev)
+      'tangki_3':0.4890,   // 0.54700, 0.48733, 0.48870  (prev)
+      'tangki_4':0.4708,   // 0.47460, 0.47229, 0.46792, 0.47070, 0.46650 (prev)
     }
 
     // ... end
@@ -1634,7 +1634,7 @@ class DashboardTangki extends React.Component {
           // "hourBegin": typeof hourbegin == 'undefined' || hourbegin == null ? '00:00' : hourbegin,
           "hourBegin": typeof hourbegin == 'undefined' || hourbegin == null ? '06:00' : hourbegin,
           // "hourLast": typeof hourlast == 'undefined' || hourlast == null ? '23:59' : hourlast,
-          "hourLast": typeof hourlast == 'undefined' || hourlast == null ? '9:30' : hourlast,
+          "hourLast": typeof hourlast == 'undefined' || hourlast == null ? '08:30' : hourlast,
           "minutes":true
         },
       (res:any)=>{
@@ -2006,9 +2006,13 @@ class DashboardTangki extends React.Component {
 
                           let findItem:any = arr_volume.find(res=>
                                 // parseInt(res.tinggi) == Math.round(tinggi_tmp.toFixed(2) * 100)
-                                parseInt(res.tinggi) == Math.round(parseFloat(parseFloat(tinggi_tmp).toFixed(2))*100)
-
+                                // in chrome toFixed not rounding (.5) => misal: 5.335 -> 5.33; 5.336 -> 5.34
+                                // parseInt(res.tinggi) == Math.round(parseFloat(parseFloat(tinggi_tmp).toFixed(2))*100)
+                                parseInt(res.tinggi) == Math.round(parseFloat(tinggi_tmp)*100)
                           )
+                          // console.error("FIND ITEM MATH ROUND")
+                          // console.error(findItem)
+
 
                           let tanggal_tangki:any = new Date(obj_temp_tank[tangki_name]['tanggal']);
 
@@ -2805,7 +2809,8 @@ class DashboardTangki extends React.Component {
 
                 let findItem:any = arr_volume.find(res=>
                       // parseInt(res.tinggi) == Math.round(tinggi.toFixed(2) * 100)
-                      parseInt(res.tinggi) == Math.round(parseFloat(parseFloat(tinggi).toFixed(2))*100)
+                      // parseInt(res.tinggi) == Math.round(parseFloat(parseFloat(tinggi).toFixed(2))*100)
+                      parseInt(res.tinggi) == Math.round(parseFloat(tinggi)*100)
                 )
 
                 // this.arr_cpo_pko
