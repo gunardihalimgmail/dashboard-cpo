@@ -2065,30 +2065,38 @@ class DashboardTangki extends React.Component {
                                     // console.error("berat jenis tangki_3 : " + find_berat_jenis?.['berat_jenis'])
                                   // }
 
+                                  // console.error("CEK SINI GET ALL DATA (VOLUME PREV)")
+                                  // console.error(volume_tbl)
+
                                   if (find_berat_jenis){
-                                      volume_tbl = Math.round(volume_tbl * find_berat_jenis?.['berat_jenis']);
+                                      volume_tbl = volume_tbl * find_berat_jenis?.['berat_jenis'];
                                       volume_prev = volume_tbl;   // just info volume sebelumnya
                                   }
 
                                    // SINI SINI
                                     // console.error("CEK SINI GET ALL DATA")
                                     // console.error(findItem)
+                                    
+                                    // console.error("CEK SINI GET ALL DATA (TIME TANK)")
+                                    // console.error(time_tank)
                                     // console.error("CEK SINI GET ALL BERAT JENIS")
                                     // console.error(find_berat_jenis)
                                     // console.error("CEK SINI GET ALL VOLUME TBL x BERAT JENIS")
                                     // console.error(volume_tbl)
 
                                   // faktor koreksi
-                                  faktor_koreksi_temp = this.faktor_koreksi(volume_tbl, parseFloat(avg_tmp));
+                                  // console.error("CEK SINI GET ALL ERROR avg_tmp")
+                                  // console.error(Math.round(parseFloat(avg_tmp)))
+
+                                  faktor_koreksi_temp = this.faktor_koreksi(volume_tbl, Math.round(parseFloat(avg_tmp)));
                                   if (faktor_koreksi_temp != null){
                                       // console.error('volume tbl ',volume_tbl)
-                                      volume_tbl *= faktor_koreksi_temp;
                                       // console.log(tangki_name)
-                                      // console.error('faktor koreksi ',faktor_koreksi_temp)
-                                      // console.error('volume tbl final ',volume_tbl)
+                                      // console.error('faktor koreksi : ',faktor_koreksi_temp)
+                                      // console.error('volume tbl :  ',volume_tbl)
+                                      volume_tbl *= faktor_koreksi_temp;
+                                      // console.error('volume tbl (final) :  ',volume_tbl)
                                   }
-
-                                    
 
                                   obj_temp_tank[tangki_name] = {
                                       ...obj_temp_tank[tangki_name],
@@ -2859,7 +2867,7 @@ class DashboardTangki extends React.Component {
 
 
                       if (find_berat_jenis){
-                        volume_tbl = Math.round(volume_tbl * find_berat_jenis?.['berat_jenis']);
+                        volume_tbl = volume_tbl * find_berat_jenis?.['berat_jenis'];
 
                         volume_prev = volume_tbl;   // just info volume sebelumnya
                       }
@@ -2874,7 +2882,7 @@ class DashboardTangki extends React.Component {
 
                       // faktor koreksi
 
-                      faktor_koreksi_temp = this.faktor_koreksi(volume_tbl, parseFloat(suhu_last));
+                      faktor_koreksi_temp = this.faktor_koreksi(volume_tbl, Math.round(parseFloat(suhu_last)));
                       if (faktor_koreksi_temp != null){
                           // volume_tbl *= faktor_koreksi_temp.toFixed(2);
                           volume_tbl *= faktor_koreksi_temp;
