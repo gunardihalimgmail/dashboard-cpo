@@ -2001,6 +2001,26 @@ class DashboardTangki extends React.Component {
                       let avg_tmp:any = parseFloat(obj_temp_tank[tangki_name]['avg']);
 
                       if (tinggi_tmp != null){
+                          
+                          // REVISI TINGGI FLOOR
+                          // tinggi cpo jangan di bulatkan, ambil floor utk perhitungan volume
+                          // 1010,7 -> 1010, sisa desimal 0,7 dikali beda liter
+
+                          // REVISI VOLUME BEDA LITER
+                          let tinggi_tmp_floor:any = Math.floor(parseFloat(tinggi_tmp) * 100); // angka floor ( 1010 )
+                          let tinggi_tmp_all:any = parseFloat((parseFloat(tinggi_tmp) * 100).toFixed(3));   // angka plus decimal ( 1010,7 )
+                          let tinggi_tmp_dec:any = (Math.round((tinggi_tmp_all - tinggi_tmp_floor) * 1000)) / 1000;   // (1010,7777 - 1010 = 0,778)
+                          // ... end <REVISI VOLUME BEDA LITER>
+
+                          // if (tinggi_tmp_dec < 1){
+                          //     console.error("TINGGI TMP DEC")
+                          //     console.error(tinggi_tmp_floor) 
+                          //     console.error(tinggi_tmp_all)
+                          //     console.error(tinggi_tmp_dec)
+                          // }
+                          // END REVISI
+
+
                           // panggil array json tabel volume tangki yang sesuai
                           let arr_volume:any = this.json_arr_volume_tangki(tangki_name);
 
@@ -2008,7 +2028,8 @@ class DashboardTangki extends React.Component {
                                 // parseInt(res.tinggi) == Math.round(tinggi_tmp.toFixed(2) * 100)
                                 // in chrome toFixed not rounding (.5) => misal: 5.335 -> 5.33; 5.336 -> 5.34
                                 // parseInt(res.tinggi) == Math.round(parseFloat(parseFloat(tinggi_tmp).toFixed(2))*100)
-                                parseInt(res.tinggi) == Math.round(parseFloat(tinggi_tmp)*100)
+                                // parseInt(res.tinggi) == Math.round(parseFloat(tinggi_tmp)*100)
+                                parseInt(res.tinggi) == tinggi_tmp_floor
                           )
                           // console.error("FIND ITEM MATH ROUND")
                           // console.error(findItem)
@@ -2042,14 +2063,32 @@ class DashboardTangki extends React.Component {
                           if (findItem){
                   
                               let volume_tbl:any = 0;
+                              let beda_liter_mst:any = 0;
+                              let beda_liter_hitung:any = 0;
 
-            
                               // VOLUME LITER ATAU KG tangki
                               volume_tbl = parseFloat(findItem.volume);
+                              beda_liter_mst = parseFloat(findItem.beda_liter);
+
+                              // * 1000 / 1000 => tujuan nya decimal 5 bisa dibulatkan
+                              beda_liter_hitung = Math.round((beda_liter_mst * tinggi_tmp_dec) * 1000) / 1000; // cth : (dari 1010,7) 0.7 * 4613 => 3229,1 
                               // dikali dengan berat jenis nya apakah cpo atau pko
 
                               let faktor_koreksi_temp:any;
                               let volume_prev:any = volume_tbl;
+
+                              // REVISI VOLUME BEDA LITER
+
+                              let volume_tbl_plus_beda_liter:any;
+                              if (typeof findItem?.['volume'] != 'undefined' &&
+                                    findItem?.['volume'] != null)
+                              {
+                                  volume_tbl_plus_beda_liter = volume_tbl + beda_liter_hitung;
+                              }
+
+                              volume_tbl = volume_tbl_plus_beda_liter;
+
+                              // end <REVISI VOLUME BEDA LITER>
 
                               if (jenis != '' && jenis != null){
 
@@ -2074,7 +2113,7 @@ class DashboardTangki extends React.Component {
 
                                   if (find_berat_jenis){
                                       volume_tbl = volume_tbl * find_berat_jenis?.['berat_jenis'];
-                                      volume_prev = volume_tbl;   // just info volume sebelumnya
+                                      // volume_prev = volume_tbl;   // just info volume sebelumnya
                                   }
 
                                    // SINI SINI
@@ -2104,10 +2143,19 @@ class DashboardTangki extends React.Component {
 
                                   obj_temp_tank[tangki_name] = {
                                       ...obj_temp_tank[tangki_name],
-                                      volume_prev,
+                                      volume_prev,    // volume master
+                                      volume_tbl_plus_beda_liter,
+                                      berat_jenis: find_berat_jenis?.['berat_jenis'],
                                       faktor_koreksi: faktor_koreksi_temp,
+                                      tinggi_tmp_floor,
+                                      tinggi_tmp_all,
+                                      tinggi_tmp_dec,
+                                      beda_liter_mst,
+                                      beda_liter_hitung,
                                       volume: volume_tbl.toFixed(2)
                                   }
+
+                                  console.error(obj_temp_tank[tangki_name])
                                   
                                   // alert(JSON.stringify(arr_berat_jenis))
                                   // volume_tbl => volume dari tabel
@@ -2802,6 +2850,12 @@ class DashboardTangki extends React.Component {
                   ? parseFloat(realtime?.[tangki_name]?.['tinggi']).toFixed(3)
                   : null
 
+            // REVISI VOLUME BEDA LITER
+            let tinggi_tmp_floor:any = Math.floor(parseFloat(tinggi) * 100); // angka floor ( 1010 )
+            let tinggi_tmp_all:any = parseFloat((parseFloat(tinggi) * 100).toFixed(3));   // angka plus decimal ( 1010,7 )
+            let tinggi_tmp_dec:any = (Math.round((tinggi_tmp_all - tinggi_tmp_floor) * 1000)) / 1000;   // (1010,7777 - 1010 = 0,778)
+            // ... end <REVISI VOLUME BEDA LITER>
+
             if (tinggi != null && tinggi != "-" && tinggi != ""){
                 // panggil array json tabel volume tangki yang sesuai
                 let arr_volume:any = this.json_arr_volume_tangki(tangki_name);
@@ -2810,14 +2864,14 @@ class DashboardTangki extends React.Component {
                 let findItem:any = arr_volume.find(res=>
                       // parseInt(res.tinggi) == Math.round(tinggi.toFixed(2) * 100)
                       // parseInt(res.tinggi) == Math.round(parseFloat(parseFloat(tinggi).toFixed(2))*100)
-                      parseInt(res.tinggi) == Math.round(parseFloat(tinggi)*100)
+                      // parseInt(res.tinggi) == Math.round(parseFloat(tinggi)*100)
+                      parseInt(res.tinggi) == tinggi_tmp_floor
                 )
 
                 // this.arr_cpo_pko
                 console.log("REAL TIME STATE : ===")
                 console.log(this.state.realtime)
                 
-
                 let tanggal_tangki:any = new Date(this.arr_json_tangki_last[tangki_name]['time']);
 
                 let jenis:any = '';
@@ -2849,15 +2903,34 @@ class DashboardTangki extends React.Component {
                 if (findItem){
                   
                   let volume_tbl:any = 0;
+                  let beda_liter_mst:any = 0;
+                  let beda_liter_hitung:any = 0;
 
+                  let berat_jenis:any;
 
                   // VOLUME LITER ATAU KG tangki
                   volume_tbl = parseFloat(findItem.volume);
+                  beda_liter_mst = parseFloat(findItem.beda_liter);
 
+                  // * 1000 / 1000 => tujuan nya decimal 5 bisa dibulatkan
+                  beda_liter_hitung = Math.round((beda_liter_mst * tinggi_tmp_dec) * 1000) / 1000; // cth : (dari 1010,7) 0.7 * 4613 => 3229,1 
                   // dikali dengan berat jenis nya apakah cpo atau pko
 
                   let faktor_koreksi_temp:any;
                   let volume_prev:any = volume_tbl;
+
+                  // REVISI VOLUME BEDA LITER
+
+                  let volume_tbl_plus_beda_liter:any;
+                  if (typeof findItem?.['volume'] != 'undefined' &&
+                        findItem?.['volume'] != null)
+                  {
+                      volume_tbl_plus_beda_liter = volume_tbl + beda_liter_hitung;
+                  }
+
+                  volume_tbl = volume_tbl_plus_beda_liter;
+
+                  // end <REVISI VOLUME BEDA LITER>
 
                   if (jenis != '' && jenis != null){
                       let arr_berat_jenis:any = this.json_arr_berat_jenis_tangki(jenis);
@@ -2874,7 +2947,8 @@ class DashboardTangki extends React.Component {
                       if (find_berat_jenis){
                         volume_tbl = volume_tbl * find_berat_jenis?.['berat_jenis'];
 
-                        volume_prev = volume_tbl;   // just info volume sebelumnya
+                        berat_jenis = find_berat_jenis?.['berat_jenis'];
+                        // volume_prev = volume_tbl;   // just info volume sebelumnya
                       }
 
                       // SINI SINI
@@ -2905,7 +2979,14 @@ class DashboardTangki extends React.Component {
                       [tangki_name]: {
                         ...this.state.realtime?.[tangki_name],
                         volume_prev,
+                        volume_tbl_plus_beda_liter,
+                        berat_jenis,
                         faktor_koreksi: faktor_koreksi_temp,
+                        tinggi_tmp_floor,
+                        tinggi_tmp_all,
+                        tinggi_tmp_dec,
+                        beda_liter_mst,
+                        beda_liter_hitung,
                         volume: volume_tbl.toFixed(2)
                       }
                   }
