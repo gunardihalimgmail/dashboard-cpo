@@ -2155,7 +2155,7 @@ class DashboardTangki extends React.Component {
                                       volume: volume_tbl.toFixed(2)
                                   }
 
-                                  console.error(obj_temp_tank[tangki_name])
+                                  // console.error(obj_temp_tank[tangki_name])
                                   
                                   // alert(JSON.stringify(arr_berat_jenis))
                                   // volume_tbl => volume dari tabel
@@ -3145,7 +3145,7 @@ class DashboardTangki extends React.Component {
 
                     let obj_tmp_tank_tinggi_minyak:any = Math.floor(parseFloat(temp_updatedState_suhu['realtime']?.[tangki_name]?.['tinggi']));
 
-                    console.error(temp_updatedState_suhu)
+                    // console.error(temp_updatedState_suhu)
                     // console.error(this.arr_json_tangki_last[tangki_name])
 
                     // BERDASARKAN KETINGGIAN SUHU
