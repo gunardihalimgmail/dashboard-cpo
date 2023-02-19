@@ -190,8 +190,8 @@ class DashboardTangki extends React.Component {
     mst_avg_t_segitiga:any = {
       'tangki_1':0.49629,   // 0.49629 (prev old -> new)
       'tangki_2':0.6917,   // 0.71348, 0.70074, 0.69876, 0.69818, 0.69460 (prev)
-      'tangki_3':0.4890,   // 0.54700, 0.48733, 0.48870  (prev)
-      'tangki_4':0.4708,   // 0.47460, 0.47229, 0.46792, 0.47070, 0.46650 (prev)
+      'tangki_3':0.4890,   // 0.54700, 0.48733, 0.48870  (prev) => TGL DIPAKAI *10 FEB '23 - 16 FEB '23
+      'tangki_4':0.4734,   // 0.47460, 0.47229, 0.46792, 0.47070, 0.46650, 0.4708 (prev) => TGL DIPAKAI *10 feb '23 - 16 feb '23
     }
 
     // ... end
