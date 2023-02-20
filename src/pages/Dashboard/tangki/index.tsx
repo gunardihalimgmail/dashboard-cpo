@@ -189,7 +189,7 @@ class DashboardTangki extends React.Component {
 
     mst_avg_t_segitiga:any = {
       'tangki_1':0.49629,   // 0.49629 (prev old -> new)
-      'tangki_2':0.6917,   // 0.71348, 0.70074, 0.69876, 0.69818, 0.69460 (prev)
+      'tangki_2':0.6917,   // 0.71348, 0.70074, 0.69876, 0.69818, 0.69460, 0,6917 (prev)
       'tangki_3':0.4890,   // 0.54700, 0.48733, 0.48870  (prev) => TGL DIPAKAI *10 FEB '23 - 16 FEB '23
       'tangki_4':0.4734,   // 0.47460, 0.47229, 0.46792, 0.47070, 0.46650, 0.4708 (prev) => TGL DIPAKAI *10 feb '23 - 16 feb '23
     }
@@ -1398,8 +1398,8 @@ class DashboardTangki extends React.Component {
         let length_mst_list_tangki:any = this.mst_list_tangki.length;
 
         // hit api yang getAllData
-        // await postApi("https://platform.iotsolution.id:7004/api-v1/getLastData",null,true,'1',null,(res:any)=>{
-        await postApi("http://192.168.1.120:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
+        await postApi("https://platform.iotsolution.id:7004/api-v1/getLastData",null,true,'1',null,(res:any)=>{
+        // await postApi("http://192.168.1.120:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
           
           if (res?.['responseCode'] == "200"){
               let res_data:any = res?.['data'];
@@ -1626,8 +1626,8 @@ class DashboardTangki extends React.Component {
       // "dateLast":formatDate(new Date(datelast),'YYYY-MM-DD')
 
       // LAGI FIXING PAK BAYU getDataHour banyak yg NaN
-      await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
-      // await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
+      // await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
+      await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
         {
           "date":formatDate(new Date(datebegin),'YYYY-MM-DD'),
           // // === BALIKKIN LAGI ===
@@ -1937,17 +1937,71 @@ class DashboardTangki extends React.Component {
                       let arr_tinggi_suhu_val_tmp:any = [];
                       let arr_obj_tmp_tank_data:any = obj_temp_tank[ele_tank_name]['data'];
 
-                      let obj_tmp_tank_tinggi_minyak:any = Math.floor(parseFloat(obj_temp_tank[ele_tank_name]['tinggi_minyak']));
+                      // let obj_tmp_tank_tinggi_minyak:any = Math.floor(parseFloat(obj_temp_tank[ele_tank_name]['tinggi_minyak']));
+
+                      // REVISI KETINGGIAN SUHU yang KE CELUP  20 feb '23
+                      let obj_tmp_tank_tinggi_minyak:any = parseFloat(obj_temp_tank[ele_tank_name]['tinggi_minyak']);
+                      // ... <end REVISI KETINGGIAN>
 
                       if (obj_tmp_tank_tinggi_minyak >= 1){
 
                           if (arr_obj_tmp_tank_data.length > 0){
                               arr_obj_tmp_tank_data.forEach((ele_suhu_num,idx)=>{
-                                  if (obj_tmp_tank_tinggi_minyak >= obj_temp_tank[ele_tank_name]['data_suhu_tank_num'][idx]
-                                      ){
-                                      arr_tinggi_suhu_tmp.push(obj_temp_tank[ele_tank_name]['data_suhu_tank_num'][idx]);
-                                      arr_tinggi_suhu_val_tmp.push(arr_obj_tmp_tank_data[idx]);
+
+                                // [1, 3, 5, 7, 10]
+                                let data_suhu_tank_num_idx:any = obj_temp_tank[ele_tank_name]['data_suhu_tank_num'][idx];
+
+                                // REVISI KETINGGIAN SUHU yang KE CELUP 20 feb '23
+
+                                  if (obj_tmp_tank_tinggi_minyak < 4)
+                                  {
+                                      // jika tinggi di bawah 4 m, maka ambil ketinggian suhu [1]
+                                      if (data_suhu_tank_num_idx == 1){
+                                          arr_tinggi_suhu_tmp.push(obj_temp_tank[ele_tank_name]['data_suhu_tank_num'][idx]);
+                                          arr_tinggi_suhu_val_tmp.push(arr_obj_tmp_tank_data[idx]);
+                                      }
+                                  } 
+                                  else
+                                  if (obj_tmp_tank_tinggi_minyak >= 4 && obj_tmp_tank_tinggi_minyak < 6){
+                                      // jika tinggi di bawah 4 m s/d 5.99, maka ambil ketinggian suhu [1,3]
+                                      if (data_suhu_tank_num_idx <= 3){    // ambil [1,3]
+                                          arr_tinggi_suhu_tmp.push(obj_temp_tank[ele_tank_name]['data_suhu_tank_num'][idx]);
+                                          arr_tinggi_suhu_val_tmp.push(arr_obj_tmp_tank_data[idx]);
+                                      }
                                   }
+                                  else
+                                  if (obj_tmp_tank_tinggi_minyak >= 6 && obj_tmp_tank_tinggi_minyak < 8){
+                                      // jika tinggi di bawah 6 m s/d 7.99, maka ambil ketinggian suhu [1,3,5]
+                                      if (data_suhu_tank_num_idx <= 5){    // ambil [1,3,5]
+                                          arr_tinggi_suhu_tmp.push(obj_temp_tank[ele_tank_name]['data_suhu_tank_num'][idx]);
+                                          arr_tinggi_suhu_val_tmp.push(arr_obj_tmp_tank_data[idx]);
+                                      }
+                                  }
+                                  else
+                                  if (obj_tmp_tank_tinggi_minyak >= 8 && obj_tmp_tank_tinggi_minyak < 10){
+                                      // jika tinggi di bawah 8 m s/d 9.99, maka ambil ketinggian suhu [1,3,5,7]
+                                      if (data_suhu_tank_num_idx <= 7){    // ambil [1,3,5,7]
+                                          arr_tinggi_suhu_tmp.push(obj_temp_tank[ele_tank_name]['data_suhu_tank_num'][idx]);
+                                          arr_tinggi_suhu_val_tmp.push(arr_obj_tmp_tank_data[idx]);
+                                      }
+                                  }
+                                  else
+                                  if (obj_tmp_tank_tinggi_minyak >= 10){
+                                      // jika tinggi di bawah 10 m, maka ambil ketinggian suhu [1,3,5,7,10]
+                                      if (data_suhu_tank_num_idx <= 10){    // ambil [1,3,5,7,10]
+                                          arr_tinggi_suhu_tmp.push(obj_temp_tank[ele_tank_name]['data_suhu_tank_num'][idx]);
+                                          arr_tinggi_suhu_val_tmp.push(arr_obj_tmp_tank_data[idx]);
+                                      }
+                                  }
+
+                                // ... <end REVISI KETINGGIAN>
+
+
+                                  // if (obj_tmp_tank_tinggi_minyak >= obj_temp_tank[ele_tank_name]['data_suhu_tank_num'][idx]
+                                  //     ){
+                                  //     arr_tinggi_suhu_tmp.push(obj_temp_tank[ele_tank_name]['data_suhu_tank_num'][idx]);
+                                  //     arr_tinggi_suhu_val_tmp.push(arr_obj_tmp_tank_data[idx]);
+                                  // }
                               })  
                           }
                       }else{
@@ -3154,11 +3208,55 @@ class DashboardTangki extends React.Component {
                         if (temp_arr_suhu_num_exec_final.length > 0){
                             temp_arr_suhu_num_exec_final.forEach((ele_suhu_num,idx)=>{
 
-                                if (obj_tmp_tank_tinggi_minyak >= temp_arr_suhu_num_exec_final[idx])
+                                // REVISI KETINGGIAN SUHU yang KE CELUP 20 feb '23
+
+                                if (obj_tmp_tank_tinggi_minyak < 4)
                                 {
-                                    arr_tinggi_suhu_tmp.push(temp_arr_suhu_num_exec_final[idx]);
-                                    arr_tinggi_suhu_val_tmp.push(temp_arr_suhu_num_all_raw[idx]);
+                                    // jika tinggi di bawah 4 m, maka ambil ketinggian suhu [1]
+                                    if (temp_arr_suhu_num_exec_final[idx] == 1){
+                                        arr_tinggi_suhu_tmp.push(temp_arr_suhu_num_exec_final[idx]);
+                                        arr_tinggi_suhu_val_tmp.push(temp_arr_suhu_num_all_raw[idx]);
+                                    }
                                 }
+                                else
+                                if (obj_tmp_tank_tinggi_minyak >= 4 && obj_tmp_tank_tinggi_minyak < 6){
+                                    // jika tinggi di bawah 4 m s/d 5.99, maka ambil ketinggian suhu [1,3]
+                                    if (temp_arr_suhu_num_exec_final[idx] <= 3){    // ambil [1,3]
+                                        arr_tinggi_suhu_tmp.push(temp_arr_suhu_num_exec_final[idx]);
+                                        arr_tinggi_suhu_val_tmp.push(temp_arr_suhu_num_all_raw[idx]);
+                                    }
+                                }
+                                else
+                                if (obj_tmp_tank_tinggi_minyak >= 6 && obj_tmp_tank_tinggi_minyak < 8){
+                                    // jika tinggi di bawah 6 m s/d 7.99, maka ambil ketinggian suhu [1,3,5]
+                                    if (temp_arr_suhu_num_exec_final[idx] <= 5){    // ambil [1,3,5]
+                                        arr_tinggi_suhu_tmp.push(temp_arr_suhu_num_exec_final[idx]);
+                                        arr_tinggi_suhu_val_tmp.push(temp_arr_suhu_num_all_raw[idx]);
+                                    }
+                                }
+                                else
+                                if (obj_tmp_tank_tinggi_minyak >= 8 && obj_tmp_tank_tinggi_minyak < 10){
+                                    // jika tinggi di bawah 8 m s/d 9.99, maka ambil ketinggian suhu [1,3,5,7]
+                                    if (temp_arr_suhu_num_exec_final[idx] <= 7){    // ambil [1,3,5,7]
+                                        arr_tinggi_suhu_tmp.push(temp_arr_suhu_num_exec_final[idx]);
+                                        arr_tinggi_suhu_val_tmp.push(temp_arr_suhu_num_all_raw[idx]);
+                                    }
+                                }
+                                else
+                                if (obj_tmp_tank_tinggi_minyak >= 10){
+                                    // jika tinggi di bawah 10 m, maka ambil ketinggian suhu [1,3,5,7,10]
+                                    if (temp_arr_suhu_num_exec_final[idx] <= 10){    // ambil [1,3,5,7,10]
+                                        arr_tinggi_suhu_tmp.push(temp_arr_suhu_num_exec_final[idx]);
+                                        arr_tinggi_suhu_val_tmp.push(temp_arr_suhu_num_all_raw[idx]);
+                                    }
+                                }
+                                // ... <end REVISI KETINGGIAN>
+                                  
+                                // if (obj_tmp_tank_tinggi_minyak >= temp_arr_suhu_num_exec_final[idx])
+                                // {
+                                //     arr_tinggi_suhu_tmp.push(temp_arr_suhu_num_exec_final[idx]);
+                                //     arr_tinggi_suhu_val_tmp.push(temp_arr_suhu_num_all_raw[idx]);
+                                // }
                             })  
                         }
                     }
