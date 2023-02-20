@@ -4084,9 +4084,9 @@ class DashboardTangki extends React.Component {
                                         <Row className='mt-5'>
                                             {/* <hr></hr> */}
                                             <Col> 
-                                                <div className='d-flex justify-content-start align-items-start'> 
+                                                <div className='d-flex flex-md-row flex-column justify-content-start align-items-start'> 
 
-                                                    <div className='d-flex justify-content-center filter-css-titles'>
+                                                    <div className='d-flex justify-content-center filter-css-titles mb-2 mb-md-0'>
                                                         <div className='filter-css-title'>Filter :</div>
                                                         <Select options={this.options_filter} 
                                                             className="select-class"
@@ -4098,11 +4098,14 @@ class DashboardTangki extends React.Component {
 
                                                     {
                                                       this.state.show.datepicker && 
-                                                        <DatePicker 
-                                                          dateFormat="dd MMMM yyyy"
-                                                          selected={this.state.dateSelected} 
-                                                          onChange={(date) => this.setFilterDate(date)}
-                                                        />
+                                                        <div className='d-flex mb-2 mb-lg-0'>
+                                                          <div className='d-block d-md-none filter-css-title'>Tanggal :</div>
+                                                          <DatePicker 
+                                                            dateFormat="dd MMMM yyyy"
+                                                            selected={this.state.dateSelected} 
+                                                            onChange={(date) => this.setFilterDate(date)}
+                                                          />
+                                                        </div>
                                                     }
 
                                                     {
@@ -4113,23 +4116,26 @@ class DashboardTangki extends React.Component {
                                                         //         startMoment={this.state.timeSelected.startMoment} 
                                                         //         endMoment={this.state.timeSelected.endMoment} 
                                                         // />
-                                                        <TimeRangePicker 
-                                                          locale="id"
-                                                          minTime="00:00:00"
-                                                          maxTime="23:59:59"
-                                                          minutePlaceholder="mm"
-                                                          hourPlaceholder="hh"
-                                                          required={true}
-                                                          onChange={(e)=>{this.onChangeTimePicker(e)}} 
-                                                          value={this.state.timeSelected}
-                                                          onBlur={(e)=>{this.onBlurTimePicker(e)}}/>
+                                                        <div className='d-flex mb-2 mb-lg-0'>
+                                                            <div className='d-block d-md-none filter-css-title'>Waktu :</div>
+                                                            <TimeRangePicker 
+                                                              locale="id"
+                                                              minTime="00:00:00"
+                                                              maxTime="23:59:59"
+                                                              minutePlaceholder="mm"
+                                                              hourPlaceholder="hh"
+                                                              required={true}
+                                                              onChange={(e)=>{this.onChangeTimePicker(e)}} 
+                                                              value={this.state.timeSelected}
+                                                              onBlur={(e)=>{this.onBlurTimePicker(e)}}/>
+                                                        </div>
                                                     }
 
-                                                    <div className='btn-filter-ml'>
-                                                      <button className='btn btn-sm btn-primary' onClick={()=>this.clickFilter()}>Filter</button>
+                                                    <div className=' btn-filter-ml w-100 mb-2 mb-md-0 mt-3 mt-md-0'>
+                                                      <button className='btn btn-sm btn-primary mediaClassFilter' onClick={()=>this.clickFilter()}>Filter</button>
                                                     </div>
 
-                                                    <div className='w-100 d-flex justify-content-end align-items-center'>
+                                                    <div className=' w-100 d-flex justify-content-end align-items-center btn-filter-ml'>
                                                       
                                                         <ReactToPrint
                                                             content={() => this.componentRef}
@@ -4141,7 +4147,7 @@ class DashboardTangki extends React.Component {
                                                             //   PrintElem.innerHTML = header;
                                                             //   return PrintElem;
                                                             // }}
-                                                            trigger={() => <button className="btn btn-sm btn-success">Print to PDF!</button>}
+                                                            trigger={() => <button className="btn btn-sm btn-success mediaClassFilter">Print to PDF!</button>}
                                                         />
                                                     </div>
 

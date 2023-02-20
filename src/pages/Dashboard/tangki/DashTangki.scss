@@ -112,7 +112,7 @@ h4.dashtangki-cardbody-ontop{
     font-size:20px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin-right:10px;
-    width:80px;
+    width:90px;
 }
 
 .filter-subcap-css-title {
@@ -124,7 +124,7 @@ h4.dashtangki-cardbody-ontop{
 }
 
 .select-class{
-    width:300px;
+    width:190px;
     margin-right:10px;
     
 }
@@ -165,3 +165,21 @@ h4.dashtangki-cardbody-ontop{
     font-size:15px;
     font-weight: 500;
 }
+
+
+@media(max-width:767px){
+    .mediaClassFilter {
+        width:100%
+    }
+}
+
+// @media (min-width: 576px) { ... }
+
+// // Medium devices (tablets, 768px and up)
+// @media (min-width: 768px) { ... }
+
+// // Large devices (desktops, 992px and up)
+// @media (min-width: 992px) { ... }
+
+// // Extra large devices (large desktops, 1200px and up)
+// @media (min-width: 1200px) { ... }
