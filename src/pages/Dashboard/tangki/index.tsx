@@ -2803,9 +2803,10 @@ class DashboardTangki extends React.Component {
                       let tanggal:any = formatDate(new Date(this.arr_json_tangki_last?.[tangki_name]?.['time']),'DD MMMM YYYY');
                       let jam:any = formatDate(new Date(this.arr_json_tangki_last?.[tangki_name]?.['time']),'HH:mm');
 
+                      // TITLE TINGGI ISI TANGKI (m)
                       arr_tangki_name.push(
-                          [find_tangki_title['title'], tanggal, jam]
-                          // find_tangki_title['title']
+                          // [find_tangki_title['title'], tanggal, jam]
+                          find_tangki_title['title']
                       );
 
                     }
