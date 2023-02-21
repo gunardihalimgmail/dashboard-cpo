@@ -107,14 +107,6 @@ h4.dashtangki-cardbody-ontop{
     margin-top:-7px;
 }
 
-.filter-css-title {
-    font-weight: bold;
-    font-size:20px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin-right:10px;
-    width:90px;
-}
-
 .filter-subcap-css-title {
     font-weight: 700;
     font-size:15px;
@@ -167,9 +159,29 @@ h4.dashtangki-cardbody-ontop{
 }
 
 
+.filter-css-title {
+    font-weight: bold;
+    font-size:20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-right:10px;
+    width:90px;
+}
+
 @media(max-width:767px){
     .mediaClassFilter {
         width:100%
+    }
+    .filter-css-title {
+        font-weight: bold;
+        font-size:20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        // margin-right:10px;
+        width:100px;
+    }
+
+    // buat timerangepicker dengan width 0, supaya tidak melebihi batas
+    .react-timerange-picker__inputGroup {
+        min-width: 0 !important;
     }
 }
 

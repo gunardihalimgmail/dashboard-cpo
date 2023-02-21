@@ -136,7 +136,8 @@ class DashboardTangki extends React.Component {
 
   // ARRAY CPO & PKO berdasarkan tanggal berlaku
     arr_cpo_pko = [
-      {name: 'tangki_1', jenis:'CPO', datebegin:'1970-01-01 00:00', datelast:''},
+      {name: 'tangki_1', jenis:'CPO', datebegin:'1970-01-01 00:00', datelast:'2023-02-20 23:59'},
+      {name: 'tangki_1', jenis:'PKO', datebegin:'2023-02-21 00:00', datelast:''},
 
       {name: 'tangki_2', jenis:'PKO', datebegin:'1970-01-01 00:00', datelast:''},
 
@@ -188,8 +189,8 @@ class DashboardTangki extends React.Component {
       // new => rata-rata sampai 24 Jan '23 - 10 feb 2023
 
     mst_avg_t_segitiga:any = {
-      'tangki_1':0.49629,   // 0.49629 (prev old -> new)
-      'tangki_2':0.6917,   // 0.71348, 0.70074, 0.69876, 0.69818, 0.69460, 0,6917 (prev)
+      'tangki_1':0.4030,   // 0.49629 (prev old -> new) tgl 21 feb '23
+      'tangki_2':0.6946,   // 0.71348, 0.70074, 0.69876, 0.69818, 0.69460, 0,6917 (prev) => TGL DIPAKAI *10 FEB - 21 FEB '23
       'tangki_3':0.4890,   // 0.54700, 0.48733, 0.48870  (prev) => TGL DIPAKAI *10 FEB '23 - 16 FEB '23
       'tangki_4':0.4734,   // 0.47460, 0.47229, 0.46792, 0.47070, 0.46650, 0.4708 (prev) => TGL DIPAKAI *10 feb '23 - 16 feb '23
     }
@@ -1398,8 +1399,8 @@ class DashboardTangki extends React.Component {
         let length_mst_list_tangki:any = this.mst_list_tangki.length;
 
         // hit api yang getAllData
-        await postApi("https://platform.iotsolution.id:7004/api-v1/getLastData",null,true,'1',null,(res:any)=>{
-        // await postApi("http://192.168.1.120:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
+        // await postApi("https://platform.iotsolution.id:7004/api-v1/getLastData",null,true,'1',null,(res:any)=>{
+        await postApi("http://192.168.1.120:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
           
           if (res?.['responseCode'] == "200"){
               let res_data:any = res?.['data'];
@@ -1626,8 +1627,8 @@ class DashboardTangki extends React.Component {
       // "dateLast":formatDate(new Date(datelast),'YYYY-MM-DD')
 
       // LAGI FIXING PAK BAYU getDataHour banyak yg NaN
-      // await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
-      await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
+      await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
+      // await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
         {
           "date":formatDate(new Date(datebegin),'YYYY-MM-DD'),
           // // === BALIKKIN LAGI ===
