@@ -621,8 +621,16 @@ class DashboardTangki extends React.Component {
               return value + " °C"
             },
             title: {
-              formatter: (seriesName:any) => {
-                return seriesName + " : "  // nama series pada tooltip sewaktu di hover
+              formatter: (seriesName:any, {series, seriesIndex, dataPointIndex, w }:any) => {
+                // console.log(w.globals.initialSeries[seriesIndex].data[dataPointIndex]?.['jenis'])
+                let jenis_tmp:any = w.globals.initialSeries[seriesIndex].data[dataPointIndex]?.['jenis'];
+
+                return seriesName +
+                      (typeof jenis_tmp != 'undefined' && jenis_tmp != null 
+                      ? ' (' + jenis_tmp + ')'
+                      : '') 
+                      + ' : '
+                        // nama series pada tooltip sewaktu di hover
               }
             },
           }
@@ -733,8 +741,16 @@ class DashboardTangki extends React.Component {
               return value + " °C"
             },
             title: {
-              formatter: (seriesName:any) => {
-                return seriesName + " : "  // nama series pada tooltip sewaktu di hover
+              formatter: (seriesName:any, { series, seriesIndex, dataPointIndex, w }:any) => {
+
+                // let jenis_tmp:any = w.globals.initialSeries[seriesIndex].data[dataPointIndex]?.['jenis'];
+                // console.log(w.globals.initialSeries)
+
+                return seriesName + " : "
+                      // + (typeof jenis_tmp != 'undefined' && jenis_tmp != null 
+                      // ? ' (' + jenis_tmp + ')'
+                      // : '')
+                    // nama series pada tooltip sewaktu di hover
               }
             },
           }
@@ -840,6 +856,22 @@ class DashboardTangki extends React.Component {
               return formatDate(new Date(value),'HH:mm:ss')
             }
           },
+          y: {
+            title: {
+              formatter: (seriesName:any, { series, seriesIndex, dataPointIndex, w }:any) => {
+
+                let jenis_tmp:any = w.globals.initialSeries[seriesIndex].data[dataPointIndex]?.['jenis'];
+                // console.log(w.globals.initialSeries)
+
+                return seriesName
+                      + (typeof jenis_tmp != 'undefined' && jenis_tmp != null 
+                      ? ' (' + jenis_tmp + ')'
+                      : '')
+                      + ' : '
+                    // nama series pada tooltip sewaktu di hover
+              }
+            },
+          }
         }
       }
         
@@ -847,7 +879,7 @@ class DashboardTangki extends React.Component {
     }
 
 
-    chartTinggiJam_OptionsChart:ApexOptions = {
+    chartTinggiJam_OptionsChart = {
       chart: {
         type: 'area',
         // stacked: false,
@@ -949,6 +981,35 @@ class DashboardTangki extends React.Component {
           //     return ''
           // }
         },
+        y:{
+            title:{
+              formatter(seriesName, { series, seriesIndex, dataPointIndex, w }:any) {
+
+                let jenis_tmp:any = w.globals.initialSeries[seriesIndex].data[dataPointIndex]?.['jenis'];
+                return seriesName
+                      + (typeof jenis_tmp != 'undefined' && jenis_tmp != null 
+                      ? ' (' + jenis_tmp + ')'
+                      : '')
+                      + ' : '
+              },
+            }
+        }
+        // y: {
+        //     title: {
+        //       formatter: (seriesName:any, { series, seriesIndex, dataPointIndex, w }:any) => {
+
+        //         let jenis_tmp:any = w.globals.initialSeries[seriesIndex].data[dataPointIndex]?.['jenis'];
+        //         // console.log(w.globals.initialSeries)
+
+        //         return seriesName
+        //               + (typeof jenis_tmp != 'undefined' && jenis_tmp != null 
+        //               ? ' (' + jenis_tmp + ')'
+        //               : '')
+        //               + ' : '
+        //             // nama series pada tooltip sewaktu di hover
+        //       }
+        //     },
+        // }
       },
       legend: {
         position: 'bottom',
@@ -957,7 +1018,8 @@ class DashboardTangki extends React.Component {
       },
     }
 
-    chartJarakSensorJam_OptionsChart:ApexOptions = {
+    // chartJarakSensorJam_OptionsChart:ApexOptions = {
+    chartJarakSensorJam_OptionsChart = {
       chart: {
         type: 'area',
         // stacked: false,
@@ -1059,6 +1121,19 @@ class DashboardTangki extends React.Component {
           //     return ''
           // }
         },
+        y:{
+          title:{
+            formatter(seriesName, { series, seriesIndex, dataPointIndex, w }:any) {
+
+              let jenis_tmp:any = w.globals.initialSeries[seriesIndex].data[dataPointIndex]?.['jenis'];
+              return seriesName
+                    + (typeof jenis_tmp != 'undefined' && jenis_tmp != null 
+                    ? ' (' + jenis_tmp + ')'
+                    : '')
+                    + ' : '
+            },
+          }
+        }
       },
       legend: {
         position: 'bottom',
@@ -1529,7 +1604,7 @@ class DashboardTangki extends React.Component {
         }
     }
 
-    updateSuhuTinggiTangki_PerJam(nama_tangki:any, patt_exec:any, time_tank:any, data_arr:any, data_temperature:any){
+    updateSuhuTinggiTangki_PerJam(nama_tangki:any, patt_exec:any, time_tank:any, data_arr:any, data_temperature:any, obj_temp_tank?:any){
 
       let patt_tinggi_tangki:any = new RegExp(/tinggi [0-9]+.?M/,'gi')
       // patt_exec['input'] = "Temperature Tank 1 BA tinggi 7 M"
@@ -1570,13 +1645,12 @@ class DashboardTangki extends React.Component {
                       {
                         x: tanggal_format,
                         y: data_arr?.[data_temperature],
-                        x_time: new Date(tanggal_format).getTime()
+                        x_time: new Date(tanggal_format).getTime(),
+                        jenis: obj_temp_tank?.[nama_tangki]?.['jenis']
                       }
                     ]
                   }
                 ]
-
-                // console.log(this.obj_suhu_tinggi_tangki_perjam_series)
             }
             else
             {
@@ -1592,7 +1666,8 @@ class DashboardTangki extends React.Component {
                             {
                               x: tanggal_format,
                               y: data_arr?.[data_temperature],
-                              x_time: new Date(tanggal_format).getTime()
+                              x_time: new Date(tanggal_format).getTime(),
+                              jenis: obj_temp_tank?.[nama_tangki]?.['jenis']
                             }
                           ]
                       }
@@ -1604,7 +1679,8 @@ class DashboardTangki extends React.Component {
                       {
                         x: tanggal_format,
                         y: data_arr?.[data_temperature],
-                        x_time: new Date(tanggal_format).getTime()
+                        x_time: new Date(tanggal_format).getTime(),
+                        jenis: obj_temp_tank?.[nama_tangki]?.['jenis']
                       }
                   )
                 }
@@ -1812,7 +1888,7 @@ class DashboardTangki extends React.Component {
                                   // AMBIL label tinggi (etc: 1 M, 3 M, 5 M, 7 M, 10 M)
 
                                   // UPDATE SUHU TINGGI TANGKI
-                                  this.updateSuhuTinggiTangki_PerJam(nama_tangki, patt_exec, time_tank, data_arr, data_temperature);
+                                  this.updateSuhuTinggiTangki_PerJam(nama_tangki, patt_exec, time_tank, data_arr, data_temperature, obj_temp_tank);
                                   // ... end UPDATE SUHU TINGGI TANGKI
                                   
 
@@ -2207,7 +2283,8 @@ class DashboardTangki extends React.Component {
                                       tinggi_tmp_dec,
                                       beda_liter_mst,
                                       beda_liter_hitung,
-                                      volume: volume_tbl.toFixed(2)
+                                      volume: volume_tbl.toFixed(2),
+                                      jenis
                                   }
 
                                   // console.error(obj_temp_tank[tangki_name])
@@ -2264,7 +2341,8 @@ class DashboardTangki extends React.Component {
                           {
                             x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm:ss'),
                             y: parseFloat(obj_temp_tank?.[tangki_name]?.['avg']),
-                            x_time: new Date(time_tank).getTime()
+                            x_time: new Date(time_tank).getTime(),
+                            jenis: obj_temp_tank?.[tangki_name]?.['jenis']
                           }
                       );
 
@@ -2311,7 +2389,8 @@ class DashboardTangki extends React.Component {
                           {
                             x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm:ss'),
                             y: parseFloat(obj_temp_tank?.[tangki_name]?.['tinggi_minyak']),
-                            x_time: new Date(time_tank).getTime()
+                            x_time: new Date(time_tank).getTime(),
+                            jenis: obj_temp_tank?.[tangki_name]?.['jenis']
                           }
                       );
                       // SORTING data_tinggi_temp
@@ -2360,7 +2439,8 @@ class DashboardTangki extends React.Component {
                           {
                             x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm:ss'),
                             y: parseFloat(obj_temp_tank?.[tangki_name]?.['data_jarak_sensor_m']),
-                            x_time: new Date(time_tank).getTime()
+                            x_time: new Date(time_tank).getTime(),
+                            jenis: obj_temp_tank?.[tangki_name]?.['jenis']
                           }
                       );
                        // SORTING data_tinggi_temp
@@ -2408,7 +2488,8 @@ class DashboardTangki extends React.Component {
                           {
                             x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm:ss'),
                             y: parseFloat(obj_temp_tank?.[tangki_name]?.['volume']),
-                            x_time: new Date(time_tank).getTime()
+                            x_time: new Date(time_tank).getTime(),
+                            jenis: obj_temp_tank?.[tangki_name]?.['jenis']
                           }
                       );
 
@@ -3043,7 +3124,8 @@ class DashboardTangki extends React.Component {
                         tinggi_tmp_dec,
                         beda_liter_mst,
                         beda_liter_hitung,
-                        volume: volume_tbl.toFixed(2)
+                        volume: volume_tbl.toFixed(2),
+                        jenis
                       }
                   }
 
@@ -3853,7 +3935,14 @@ class DashboardTangki extends React.Component {
                                                               <Card.Body className='mb-3'>
                                                                   <img src = {SVG_Circle} className="dashtangki-image-circle" />
                                                                   <h4 className='text-white dashtangki-cardbody-ontop d-flex justify-content-between'>
-                                                                      {ele.title}
+                                                                      {
+                                                                        // typeof this.state.realtime?.[ele.name]?.['jenis'] != 'undefined' 
+                                                                        ele.title + 
+                                                                          (typeof this.state.realtime?.[ele.name]?.['jenis'] != 'undefined' &&
+                                                                            this.state.realtime?.[ele.name]?.['jenis'] != null 
+                                                                          ? ' (' + this.state.realtime?.[ele.name]?.['jenis'] + ')'
+                                                                          : '')
+                                                                        }
                                                                       <Icon path={mdiChartLine} size = {1} className="float-right" />
                                                                   </h4>
                                                                   <div className  ='dashtangki-subtitle-card mb-3'>
@@ -4109,10 +4198,17 @@ class DashboardTangki extends React.Component {
                                                       this.mst_list_tangki.map((ele,idx)=>{
                                                         return (
                                                           <div className='snap-col' key = {ele.name}>
-                                                            <ThermometerFC caption = {ele.title} 
-                                                                      subcaption2={this.state.realtime?.[ele.name]?.['tanggal_jam']}
-                                                                      subcaption={this.state.realtime?.[ele.name]?.['tanggal']} 
-                                                                      value={this.state.realtime?.[ele.name]?.['suhu']}/>
+                                                            <ThermometerFC 
+                                                                  caption = {
+                                                                        ele.title + 
+                                                                        (typeof this.state.realtime?.[ele.name]?.['jenis'] != 'undefined' &&
+                                                                        this.state.realtime?.[ele.name]?.['jenis'] != null 
+                                                                        ? ' (' + this.state.realtime?.[ele.name]?.['jenis'] + ')'
+                                                                        : '')
+                                                                  } 
+                                                                  subcaption2={this.state.realtime?.[ele.name]?.['tanggal_jam']}
+                                                                  subcaption={this.state.realtime?.[ele.name]?.['tanggal']} 
+                                                                  value={this.state.realtime?.[ele.name]?.['suhu']}/>
                                                           </div>
                                                         )
                                                       })
@@ -4151,10 +4247,16 @@ class DashboardTangki extends React.Component {
                                                   this.mst_list_tangki.map((ele,idx)=>{
                                                     return (
                                                       <div className='snap-col' key = {ele.name}>
-                                                        <CylinderFC caption = {ele.title} 
-                                                                  subcaption2={this.state.realtime?.[ele.name]?.['tanggal_jam']}
-                                                                  subcaption={this.state.realtime?.[ele.name]?.['tanggal']} 
-                                                                  value={this.state.realtime?.[ele.name]?.['volume']} plottooltext_hover="Volume"/>
+                                                        <CylinderFC 
+                                                                caption = {ele.title + 
+                                                                        (typeof this.state.realtime?.[ele.name]?.['jenis'] != 'undefined' &&
+                                                                        this.state.realtime?.[ele.name]?.['jenis'] != null 
+                                                                        ? ' (' + this.state.realtime?.[ele.name]?.['jenis'] + ')'
+                                                                        : '')
+                                                                      } 
+                                                                subcaption2={this.state.realtime?.[ele.name]?.['tanggal_jam']}
+                                                                subcaption={this.state.realtime?.[ele.name]?.['tanggal']} 
+                                                                value={this.state.realtime?.[ele.name]?.['volume']} plottooltext_hover="Volume"/>
                                                       </div>
                                                     )
                                                   })
