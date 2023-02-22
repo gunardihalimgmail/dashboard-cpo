@@ -623,12 +623,12 @@ class DashboardTangki extends React.Component {
             title: {
               formatter: (seriesName:any, {series, seriesIndex, dataPointIndex, w }:any) => {
                 // console.log(w.globals.initialSeries[seriesIndex].data[dataPointIndex]?.['jenis'])
-                let jenis_tmp:any = w.globals.initialSeries[seriesIndex].data[dataPointIndex]?.['jenis'];
+                // let jenis_tmp:any = w.globals.initialSeries[seriesIndex].data[dataPointIndex]?.['jenis'];
 
-                return seriesName +
-                      (typeof jenis_tmp != 'undefined' && jenis_tmp != null 
-                      ? ' (' + jenis_tmp + ')'
-                      : '') 
+                return seriesName
+                      // + (typeof jenis_tmp != 'undefined' && jenis_tmp != null 
+                      // ? ' (' + jenis_tmp + ')'
+                      // : '') 
                       + ' : '
                         // nama series pada tooltip sewaktu di hover
               }
@@ -860,13 +860,13 @@ class DashboardTangki extends React.Component {
             title: {
               formatter: (seriesName:any, { series, seriesIndex, dataPointIndex, w }:any) => {
 
-                let jenis_tmp:any = w.globals.initialSeries[seriesIndex].data[dataPointIndex]?.['jenis'];
+                // let jenis_tmp:any = w.globals.initialSeries[seriesIndex].data[dataPointIndex]?.['jenis'];
                 // console.log(w.globals.initialSeries)
 
                 return seriesName
-                      + (typeof jenis_tmp != 'undefined' && jenis_tmp != null 
-                      ? ' (' + jenis_tmp + ')'
-                      : '')
+                      // + (typeof jenis_tmp != 'undefined' && jenis_tmp != null 
+                      // ? ' (' + jenis_tmp + ')'
+                      // : '')
                       + ' : '
                     // nama series pada tooltip sewaktu di hover
               }
@@ -987,9 +987,9 @@ class DashboardTangki extends React.Component {
 
                 let jenis_tmp:any = w.globals.initialSeries[seriesIndex].data[dataPointIndex]?.['jenis'];
                 return seriesName
-                      + (typeof jenis_tmp != 'undefined' && jenis_tmp != null 
-                      ? ' (' + jenis_tmp + ')'
-                      : '')
+                      // + (typeof jenis_tmp != 'undefined' && jenis_tmp != null 
+                      // ? ' (' + jenis_tmp + ')'
+                      // : '')
                       + ' : '
               },
             }
@@ -1125,11 +1125,11 @@ class DashboardTangki extends React.Component {
           title:{
             formatter(seriesName, { series, seriesIndex, dataPointIndex, w }:any) {
 
-              let jenis_tmp:any = w.globals.initialSeries[seriesIndex].data[dataPointIndex]?.['jenis'];
+              // let jenis_tmp:any = w.globals.initialSeries[seriesIndex].data[dataPointIndex]?.['jenis'];
               return seriesName
-                    + (typeof jenis_tmp != 'undefined' && jenis_tmp != null 
-                    ? ' (' + jenis_tmp + ')'
-                    : '')
+                    // + (typeof jenis_tmp != 'undefined' && jenis_tmp != null 
+                    // ? ' (' + jenis_tmp + ')'
+                    // : '')
                     + ' : '
             },
           }
