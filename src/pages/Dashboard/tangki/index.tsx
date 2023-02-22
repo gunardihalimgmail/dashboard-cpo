@@ -1965,9 +1965,17 @@ class DashboardTangki extends React.Component {
                                       // let ruang_kosong:any = (tangki_jarak_sensor - this.mst_avg_t_segitiga?.[nama_tangki]).toFixed(2);
                                       let ruang_kosong:any = (tangki_jarak_sensor - this.mst_avg_t_segitiga?.[nama_tangki]);
                                       
-                                      tinggi_hitung = (this.mst_t_tangki?.[nama_tangki] - ruang_kosong).toFixed(3);
+                                      // tinggi_hitung = (this.mst_t_tangki?.[nama_tangki] - ruang_kosong).toFixed(3);
+                                      // REVISI TINGGI MINYAK PEMBULATAN tiga decimal (TGL 22 FEB '23)
+                                      let tinggi_hitung:any = Math.round((this.mst_t_tangki?.[nama_tangki] - ruang_kosong) * 1000) / 1000;
 
                                       // ... end tinggi minyak
+
+                                      // JIKA HASIL NYA MINUS, maka di nol kan saja 
+                                      // REVISI (TGL 22 FEB '23)
+                                      if (tinggi_hitung < 0){
+                                        tinggi_hitung = 0;
+                                      }
 
 
                                       obj_temp_tank[nama_tangki] = {
@@ -2865,7 +2873,17 @@ class DashboardTangki extends React.Component {
                     // let ruang_kosong_tangki:any = (tangki_jarak_sensor - mst_avg_t_segitiga_temp).toFixed(2);
                     let ruang_kosong_tangki:any = (tangki_jarak_sensor - mst_avg_t_segitiga_temp);
                     // let tinggi_minyak:any = (mst_t_tangki_temp - ruang_kosong_tangki).toFixed(2);
-                    let tinggi_minyak:any = (mst_t_tangki_temp - ruang_kosong_tangki).toFixed(3);
+
+                    // let tinggi_minyak:any = (mst_t_tangki_temp - ruang_kosong_tangki).toFixed(3);
+
+                    // REVISI TINGGI MINYAK PEMBULATAN tiga decimal (TGL 22 FEB '23)
+                    let tinggi_minyak:any = Math.round((mst_t_tangki_temp - ruang_kosong_tangki) * 1000) / 1000;
+
+                    // JIKA HASIL NYA MINUS, maka di nol kan saja 
+                    // REVISI (TGL 22 FEB '23)
+                    if (tinggi_minyak < 0){
+                      tinggi_minyak = 0;
+                    }
 
                     this.arr_json_tangki_last[tangki_name]['jarak_sensor'] = tinggi_minyak;
 
@@ -2878,6 +2896,13 @@ class DashboardTangki extends React.Component {
                             tinggi: parseFloat(tinggi_minyak),
                         }
                     }
+                    console.log("KONDISI REAL TIME")
+                    console.log("Jarak Sensor : " + tangki_jarak_sensor)
+                    console.log("Avg Delta Temp : " + mst_avg_t_segitiga_temp)
+
+                    console.log("Mst Tinggi Tangki Temp : " + mst_t_tangki_temp)
+                    console.log("Ruang kosong Tangki : " + ruang_kosong_tangki)
+                    console.log(temp_updatedState_tinggi)
                     
                     // cari title tangki (Tangki 1, Tangki 2, dst...)
                     let find_tangki_title:any = this.mst_list_tangki.find(res_tank=>res_tank.name == tangki_name);
