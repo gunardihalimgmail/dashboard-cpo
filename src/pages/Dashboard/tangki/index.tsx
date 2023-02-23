@@ -1716,8 +1716,8 @@ class DashboardTangki extends React.Component {
         let length_mst_list_tangki:any = this.mst_list_tangki.length;
 
         // hit api yang getAllData
-        // await postApi("https://platform.iotsolution.id:7004/api-v1/getLastData",null,true,'1',null,(res:any)=>{
-        await postApi("http://192.168.1.120:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
+        await postApi("https://platform.iotsolution.id:7004/api-v1/getLastData",null,true,'1',null,(res:any)=>{
+        // await postApi("http://192.168.1.120:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
           
           if (res?.['responseCode'] == "200"){
               let res_data:any = res?.['data'];
@@ -1945,8 +1945,8 @@ class DashboardTangki extends React.Component {
       // "dateLast":formatDate(new Date(datelast),'YYYY-MM-DD')
 
       // LAGI FIXING PAK BAYU getDataHour banyak yg NaN
-      await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
-      // await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
+      // await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
+      await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
         {
           "date":formatDate(new Date(datebegin),'YYYY-MM-DD'),
           // // === BALIKKIN LAGI ===
@@ -2927,8 +2927,8 @@ class DashboardTangki extends React.Component {
               console.error(arr_tinggi_modus_jam_series)
 
               this.getAllData_Suhu_Modus(arr_tinggi_modus_jam_series, this.data_suhu_tangki_perjam_series)
-              console.error('ARR SUHU MODUS JAM FINAL')
-              console.error(this.data_suhu_tangki_perjam_series)
+              // console.error('ARR SUHU MODUS JAM FINAL')
+              // console.error(this.data_suhu_tangki_perjam_series)
 
 
               this.setChartTinggi_Modus_Jam = {
@@ -3115,6 +3115,66 @@ class DashboardTangki extends React.Component {
         console.error(arr_tinggi)
         console.error("GET ALL SUHU MODUS")
         console.error(arr_suhu_param)
+
+        let arr_suhu_param_filter:any = [];
+
+        if (Array.isArray(arr_suhu_param)){
+
+            arr_suhu_param.forEach((elefor,idxfor)=>{
+                let nama_tangki_suhu:any = elefor?.['name']
+                let data_tangki_suhu:any = elefor?.['data']
+                
+                let filter_tangki_tinggi:any = arr_tinggi.filter(elefil=>elefil?.['name'] == nama_tangki_suhu);
+
+                // COCOKKIN HASIL FILTER TINGGI DENGAN SUHU DARI SISI TANGGAL (x_time)
+                
+
+                data_tangki_suhu.forEach((elesuhu, idxsuhu)=>{
+
+                  let find_xtime_tinggi:any = filter_tangki_tinggi[0]['data'].find(eletinggifind=>eletinggifind?.['x_time'] == elesuhu?.['x_time'])
+                  console.error("FILTER TANGKI TINGGI")
+                  console.error(find_xtime_tinggi)
+                  // if (find_xtime_tinggi){
+
+                  //   // cari apakah sudah ada nama tangki di arr_temp
+                      
+
+                  //       if (arr_temp.length > 0){
+
+                  //           let findTangki_arrtemp:any = arr_temp.find(eletemp => eletemp?.['name'] == nama_tangki_suhu)
+                  //           if (!findTangki_arrtemp){
+                  //             // jika tidak ada di arr_temp, maka di push
+                  //             arr_temp.push({
+                  //                 name: nama_tangki_suhu,
+                  //                 data: {...elesuhu}
+                  //             })
+                  //           }
+                  //           else{
+                  //             arr_temp[nama_tangki_suhu]['data'] = [
+                  //                 ...arr_temp[nama_tangki_suhu]['data'],
+                  //                 {...elesuhu}
+                  //             ]
+                  //           }
+                  //       }
+                  //       else{
+                  //           // jika length arr_temp kosong, langsung push
+                  //           arr_temp.push({
+                  //               name: nama_tangki_suhu,
+                  //               data: {...elesuhu}
+                  //           })
+                  //       }
+                        
+                  //   }
+                })
+                // console.error(filter_tangki_tinggi)
+            })
+
+        }
+
+        console.error("GET ALL SUHU MODUS (FILTER)")
+        console.error(arr_temp)
+
+        return arr_temp;
         
     }
 
