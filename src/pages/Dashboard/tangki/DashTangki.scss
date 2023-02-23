@@ -167,6 +167,13 @@ h4.dashtangki-cardbody-ontop{
     width:90px;
 }
 
+
+.modus-flex {
+    // flex:0 0 270px;
+    flex:0 0 50%;
+    padding-right: 10px;
+}
+
 @media(max-width:767px){
     .mediaClassFilter {
         width:100%
@@ -183,6 +190,10 @@ h4.dashtangki-cardbody-ontop{
     .react-timerange-picker__inputGroup {
         min-width: 0 !important;
     }
+
+    .modus-flex {
+        flex:0 0 270px; 
+    }
 }
 
 // @media (min-width: 576px) { ... }
@@ -195,3 +206,18 @@ h4.dashtangki-cardbody-ontop{
 
 // // Extra large devices (large desktops, 1200px and up)
 // @media (min-width: 1200px) { ... }
+
+.show-data-label-font {
+    font-size:12px;
+    font-style: italic;
+}
+
+.dashtangki-title-width{
+    width:100%
+}
+
+.checkbox-shift {
+    padding-right:'10px';
+    position: relative;
+    top:-10px
+}

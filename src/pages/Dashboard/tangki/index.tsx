@@ -1,6 +1,8 @@
 import React, { useRef, useState } from 'react';
 import ReactToPrint from 'react-to-print'
 
+import _ from 'lodash'
+
 // import FusionCharts from 'fusioncharts';
 // import Charts from 'fusioncharts/fusioncharts.charts';
 // // import PowerCharts from 'fusioncharts/fusioncharts.powercharts';
@@ -151,6 +153,7 @@ class DashboardTangki extends React.Component {
     statusChecked:any = {
       jarak_sensor: false,
       tinggi: false,
+      tinggi_modus: false,
       suhu: false,
       suhu_tinggi: false,
       volume: false
@@ -825,7 +828,8 @@ class DashboardTangki extends React.Component {
               offsetX: 0,
               formatter: (val:any) => {
                 // return (val / 1000000).toFixed(2);
-                return parseFloat(val?.toFixed(3)) + " kg";
+                // return parseFloat(val?.toFixed(3)) + " kg";
+                return Math.round(parseFloat(val)*1000)/1000 + " kg";
               },
           },
           axisBorder: {
@@ -903,7 +907,7 @@ class DashboardTangki extends React.Component {
       dataLabels: {
         enabled: false,
         formatter:(val:any)=>{
-          return !isNaN(val) ? (val.toFixed(3) + " m") : ''
+          return !isNaN(val) ? ((Math.round(val * 1000)/1000) + " m") : ''
         }
         // style: {
         //   colors: ['#F44336', '#E91E63', '#9C27B0']
@@ -930,7 +934,146 @@ class DashboardTangki extends React.Component {
             offsetX: 0,
             formatter: (val:any) => {
               // return (val / 1000000).toFixed(2);
-              return parseFloat(val?.toFixed(3)) + " m";
+              return (Math.round(parseFloat(val)*1000)/1000) + " m";
+            },
+        },
+        axisBorder: {
+            show: false,
+        },
+        axisTicks: {
+            show: false
+        }
+      },
+      xaxis: {
+        type: 'datetime',
+        // type: 'category',
+        // tickAmount:0,
+        // categories:[],
+        // categories:['2023-01-01 12:00:00','2023-01-01 13:00:00','2023-01-01 14:00:00'],
+        // tickAmount: 24,
+        // tickPlacement: 'on',
+        // min: new Date("01/01/2014 05:00").getTime(),
+        // max: new Date("01/01/2014 19:00").getTime(),
+        labels: {
+            rotate: -45,
+            rotateAlways: true,
+            formatter: (val:any) =>{
+              return formatDate(new Date(val),'HH:mm')
+                // return (formatDate(new Date(timestamp),'HH:mm'))
+              // return moment(new Date(timestamp)).format("DD MMM YYYY")
+            }
+        }
+      },
+      title: {
+        // text: 'Irregular Data in Time Series',
+        align: 'left',
+        offsetX: 14
+      },
+      tooltip: {
+        shared: true,
+        x: {
+          show:true,
+          format: 'dd MMM yy (HH:mm)',
+          formatter: (value:any, { series, seriesIndex, dataPointIndex, w }:any)=> {
+
+            return formatDate(new Date(value),'HH:mm:ss')
+
+          }
+          // custom: ({series, seriesIndex, dataPointIndex, w}:any) => {
+          //     var data = w.globals.initialSeries[seriesIndex].data[dataPointIndex];
+
+          //     return ''
+          // }
+        },
+        y:{
+            title:{
+              formatter(seriesName, { series, seriesIndex, dataPointIndex, w }:any) {
+
+                let jenis_tmp:any = w.globals.initialSeries[seriesIndex].data[dataPointIndex]?.['jenis'];
+                return seriesName
+                      // + (typeof jenis_tmp != 'undefined' && jenis_tmp != null 
+                      // ? ' (' + jenis_tmp + ')'
+                      // : '')
+                      + ' : '
+              },
+            }
+        }
+        // y: {
+        //     title: {
+        //       formatter: (seriesName:any, { series, seriesIndex, dataPointIndex, w }:any) => {
+
+        //         let jenis_tmp:any = w.globals.initialSeries[seriesIndex].data[dataPointIndex]?.['jenis'];
+        //         // console.log(w.globals.initialSeries)
+
+        //         return seriesName
+        //               + (typeof jenis_tmp != 'undefined' && jenis_tmp != null 
+        //               ? ' (' + jenis_tmp + ')'
+        //               : '')
+        //               + ' : '
+        //             // nama series pada tooltip sewaktu di hover
+        //       }
+        //     },
+        // }
+      },
+      legend: {
+        position: 'bottom',
+        horizontalAlign: 'center',
+        offsetX: 0
+      },
+    }
+
+    chartTinggiJam_Modus_OptionsChart = {
+      chart: {
+        type: 'area',
+        // stacked: false,
+        height: 350,
+        toolbar:{
+          show:true,
+          tools:{
+            download:false,
+          //   zoomin:true,
+          //   pan:true,
+          //   reset:true,
+          //   selection:true,
+          //   zoom:true,
+          //   zoomout:true
+          }
+        },
+        zoom: {
+          enabled: false
+        },
+      },
+      dataLabels: {
+        enabled: false,
+        formatter:(val:any)=>{
+          return !isNaN(val) ? ((Math.round(parseFloat(val)*1000)/1000) + " m") : ''
+        }
+        // style: {
+        //   colors: ['#F44336', '#E91E63', '#9C27B0']
+        // }
+      },
+      markers: {
+        size: 0,
+      },
+      fill: {
+        type: 'gradient',
+        gradient: {
+            shadeIntensity: 1,
+            inverseColors: false,
+            opacityFrom: 0.45,
+            opacityTo: 0.05,
+            stops: [50, 100, 100, 100]
+          },
+      },
+      yaxis: {
+        labels: {
+            style: {
+                colors: '#8e8da4',
+            },
+            offsetX: 0,
+            formatter: (val:any) => {
+              // return (val / 1000000).toFixed(2);
+              return (Math.round(parseFloat(val)*1000)/1000) + " m";
             },
         },
         axisBorder: {
@@ -1198,6 +1341,39 @@ class DashboardTangki extends React.Component {
       options: {...this.chartTinggiJam_OptionsChart}
     }
 
+    // Tinggi Isi Tangki (Jam) (Angka Modus / yang sering muncul)
+    setChartTinggi_Modus_Jam = {
+
+      statusFound: false,
+      series: [
+        // {
+        //   name:'Tangki 1',
+        //   data:[30,50,60]
+        // },
+        // {
+        //   name:'Tangki 2',
+        //   data:[70,30,90]
+        // }
+
+        // {
+        //   name: 'Tangki 1',
+        //   data: [{ x: '12/01/2013 06:00', y: 54 }, { x: '01/01/2014 14:00', y: 60 } , { x: '01/01/2014 19:00', y: 70 }]
+        // }, {
+        //   name: 'Tangki 2',
+        //   data: [{ x: '01/01/2014 07:00', y: 30 }, { x: '01/01/2014 15:00', y: 40 } , { x: '01/01/2014 19:00', y: 45 }]
+        // }
+        // , {
+        //   name: 'Tangki 3',
+        //   data: [{ x: '01/01/2014 06:00', y: 15 }, { x: '01/01/2014 14:00', y: 25 } , { x: '01/01/2014 19:00', y: 40 }]
+        // }
+        // , {
+        //   name: 'Tangki 4',
+        //   data: [{ x: '01/01/2014 06:00', y: 20 }, { x: '01/01/2014 14:00', y: 35 } , { x: '01/01/2014 19:00', y: 45 }]
+        // }
+      ],
+      options: {...this.chartTinggiJam_Modus_OptionsChart}
+    }
+
     state:any = {
         dateSelected:new Date(),
         timeSelected:[null,null],
@@ -1244,6 +1420,7 @@ class DashboardTangki extends React.Component {
             jarak_sensor_jam: true,
             tinggi_isi: true,
             tinggi_isi_jam: true,
+            tinggi_isi_modus_jam: true,
             suhu_tangki: true,
             suhu_tangki_jam: true,
             suhu_tinggi_tangki_jam:true,
@@ -1252,6 +1429,7 @@ class DashboardTangki extends React.Component {
         chartJarakSensorJam:{...this.setChartJarakSensorJam},
         chartTinggi:{...this.setChartTinggi},
         chartTinggiJam:{...this.setChartTinggiJam},
+        chartTinggiModusJam:{...this.setChartTinggi_Modus_Jam},
         chartSuhuJam:{...this.setChartSuhuJam},
         chartSuhuTinggiJam:{...this.setChartSuhuTinggiJam},
         chartVolumeJam:{...this.setChartVolumeJam}
@@ -1313,6 +1491,70 @@ class DashboardTangki extends React.Component {
 
     constructor(props:any){
         super(props)
+
+
+        // filter item
+        // let cari = _.filter(users, function(e){
+        //   return e.age < 40
+        // })
+
+
+        // frequent item 
+          // let arr:any = []
+          // const arr2 = [{tinggi:12.34},{tinggi:12.34}, {tinggi:9.560}, {tinggi:9.56}, {tinggi:12.40}]
+          // // // const bc = _.maxBy(arr,'length')
+          
+          // arr = arr2.map((ele)=>{
+          //   return ele.tinggi   // [12.34, 12.40, 9.56]
+          // })
+
+          // let arr_countBy = []
+          // let max_countBy_brief_all = _.countBy(arr);
+          // let max_countBy_brief = _(arr).countBy().entries().maxBy(_.last);
+
+          // let managecountby = _.countBy(arr);
+          // let manageentries = _.entries(managecountby);
+
+          // console.error(manageentries)
+
+          // console.error("MAX COUNT BY BRIEF")
+          // console.error(max_countBy_brief_all)
+          // console.error(max_countBy_brief)
+          // if (max_countBy_brief.length >= 1){
+          //     // bila ada occurance (kemunculan) yang sama, maka ambil angka paling maksimal
+          //     let obj_values_brief_all = Object.entries(max_countBy_brief_all);
+
+          //     // filter yang memiliki kemunculan angka yang sama (misal, [[12.34, 2], [9.56, 2]]) == [2]
+          //     let filter_values_brief_all = obj_values_brief_all.filter(elefil=>elefil[1] == max_countBy_brief[1]);
+
+          //     let arr_getMax_Values = filter_values_brief_all.map((ele_max,idx_max)=>{
+          //         return parseFloat(ele_max[0])
+          //     })
+          //     // ambil angka yang paling maksimal
+          //     let getMax_Value = Math.max.apply(null, arr_getMax_Values)
+
+          //     console.error(obj_values_brief_all)
+          //     console.error(filter_values_brief_all)
+          //     console.error(arr_getMax_Values)
+          //     console.error(getMax_Value)
+          // }
+
+        // ... <END>
+
+        // const tes:any = [['11',2], ['10',1], ['3',5]]
+        // console.error(tes)
+        // console.error(_(tes).maxBy(_.last))
+
+        // let tes3 = _.maxBy(_.last(tes))
+        // console.error(tes3)
+        // let getdata:any = _.maxBy(_.first(tes))
+        // console.error(getdata) 
+
+        // console.error(max_countBy)
+
+        // console.error(max_2)
+
+        // ... <end frequent item>
 
         // this.buttonPlus = this.buttonPlus.bind(this);
 
@@ -1711,7 +1953,7 @@ class DashboardTangki extends React.Component {
           // "hourBegin": typeof hourbegin == 'undefined' || hourbegin == null ? '00:00' : hourbegin,
           "hourBegin": typeof hourbegin == 'undefined' || hourbegin == null ? '06:00' : hourbegin,
           // "hourLast": typeof hourlast == 'undefined' || hourlast == null ? '23:59' : hourlast,
-          "hourLast": typeof hourlast == 'undefined' || hourlast == null ? '08:30' : hourlast,
+          "hourLast": typeof hourlast == 'undefined' || hourlast == null ? '06:30' : hourlast,
           "minutes":true
         },
       (res:any)=>{
@@ -1728,6 +1970,11 @@ class DashboardTangki extends React.Component {
 
             this.setChartTinggiJam = {
               ...this.setChartTinggiJam,
+              statusFound: false
+            }
+
+            this.setChartTinggi_Modus_Jam = {
+              ...this.setChartTinggi_Modus_Jam,
               statusFound: false
             }
 
@@ -1751,6 +1998,7 @@ class DashboardTangki extends React.Component {
                 ...this.state.loader,
                 jarak_sensor_jam: false,
                 tinggi_isi_jam: false,
+                tinggi_isi_modus_jam: false,
                 suhu_tangki_jam: false,
                 suhu_tinggi_tangki_jam: false,
                 volume_tangki_jam: false
@@ -2671,7 +2919,41 @@ class DashboardTangki extends React.Component {
                 }
               }
 
-              // SET CHART TINGGI JAM
+              // SET CHART TINGGI MODUS JAM (angka yang sering muncul)
+
+              // getAllData_Modus => ambil data value y yang paling sering muncul
+              let arr_tinggi_modus_jam_series:any = this.getAllData_Modus(this.data_tinggi_tangki_perjam_series)
+              console.error("ARR TINGGI MODUS JAM FINAL")
+              console.error(arr_tinggi_modus_jam_series)
+
+              this.getAllData_Suhu_Modus(arr_tinggi_modus_jam_series, this.data_suhu_tangki_perjam_series)
+              console.error('ARR SUHU MODUS JAM FINAL')
+              console.error(this.data_suhu_tangki_perjam_series)
+
+
+              this.setChartTinggi_Modus_Jam = {
+                ...this.setChartTinggi_Modus_Jam,
+                statusFound: this.data_tinggi_tangki_perjam_series.length > 0 ? true : false,
+                series: JSON.parse(JSON.stringify(arr_tinggi_modus_jam_series)),
+                options:{
+                    ...this.setChartTinggi_Modus_Jam.options,
+                    xaxis:{
+                      ...this.setChartTinggi_Modus_Jam.options.xaxis,
+                      // min: typeof min_tgl != 'undefined' && min_tgl != null ? new Date(min_tgl).getTime() : 0,
+                      // max: typeof max_tgl != 'undefined' && max_tgl != null ? new Date(max_tgl).getTime() : 0
+                      // type: 'datetime',
+                      // min: formatDate(new Date(time_tank),'YYYY-MM-DD'
+                      // // categories untuk type 'category'
+                      // categories: JSON.parse(JSON.stringify(this.data_tinggi_tangki_perjam_categories))
+                    },
+                    dataLabels:{
+                      ...this.setChartTinggi_Modus_Jam.options.dataLabels,
+                      enabled: this.statusChecked?.['tinggi_modus'] ?? false
+                    }
+                }
+              }
+
+              // SET CHART VOLUME JAM
 
               this.setChartVolumeJam = {
                 ...this.setChartVolumeJam,
@@ -2759,6 +3041,7 @@ class DashboardTangki extends React.Component {
                     suhu_tangki_jam: false,
                     suhu_tinggi_tangki_jam: false,
                     tinggi_isi_jam: false,
+                    tinggi_isi_modus_jam: false,
                     volume_tangki_jam: false
                   },
                   waktu:{
@@ -2768,6 +3051,7 @@ class DashboardTangki extends React.Component {
                   chartJarakSensorJam: {...this.setChartJarakSensorJam},
                   chartSuhuJam: {...this.setChartSuhuJam},
                   chartTinggiJam: {...this.setChartTinggiJam},
+                  chartTinggiModusJam: {...this.setChartTinggi_Modus_Jam},
                   chartVolumeJam: {...this.setChartVolumeJam},
                   chartSuhuTinggiJam: {
                     ...this.state.chartSuhuTinggiJam,
@@ -2789,9 +3073,15 @@ class DashboardTangki extends React.Component {
                   }
                 })
 
+                setTimeout(()=>{
+                  console.error("FINAL SET STATE")
+                  console.error(this.state)
+                },1000)
+
               // ... END BALIKKIN
 
-              console.log(this.obj_suhu_tinggi_tangki_perjam_series)
+              // console.log(this.obj_suhu_tinggi_tangki_perjam_series)
+
 
               // console.log("INI ADALAH TIME TANK")
               // console.log(time_tank)
@@ -2816,6 +3106,135 @@ class DashboardTangki extends React.Component {
           }
         }
       })
+    }
+
+    getAllData_Suhu_Modus(arr_tinggi:any, arr_suhu_param:any){
+        // ambil suhu data berdasarkan tinggi cpo / pko
+        let arr_temp:any = [];
+        console.error("GET ALL TINGGI MODUS")
+        console.error(arr_tinggi)
+        console.error("GET ALL SUHU MODUS")
+        console.error(arr_suhu_param)
+        
+    }
+
+    getAllData_Modus(arr_param:any){
+        console.error("=== MODUS MODUS MODUS DATA ===")
+        console.log(arr_param)
+
+        let arr_temp:any = [];
+
+        // === SAMPLE DATA ===
+        // [{name : 'Tangki 1', 
+        //  data :
+        //    [ 
+        //      {jenis: "PKO", x: "2023-02-23 06:00:13", x_time: 1677106813000, y: 3.861},
+        //      {jenis: "PKO", x: "2023-02-23 06:01:18", x_time: 1677106878000, y: 3.844}
+        //    ]
+        // },
+        // {name : 'Tangki 2', 
+        //  data :
+        //    [ 
+        //      {jenis: "PKO", x: "2023-02-23 06:00:13", x_time: 1677106813000, y: 3.861},
+        //      {jenis: "PKO", x: "2023-02-23 06:01:18", x_time: 1677106878000, y: 3.844}
+        //    ]
+        // }]
+        
+        if (Array.isArray(arr_param)){
+
+            if (arr_param.length > 0){
+
+              arr_param.forEach((ele,idx)=>{
+
+                  // nama tangki 
+                  let ele_name:any = ele?.['name'];
+                  // data array tangki
+                  let ele_data:any = ele?.['data'];
+
+                  if (typeof ele_name != 'undefined' && ele_name != null){
+
+                      if (Array.isArray(ele_data)){
+                          if (ele_data.length > 0){
+
+                              // ambil semua angka y di simpan single ke array
+                              let arr_val_y:any = ele_data.map((ele_val, idx_val) => {
+                                  return parseFloat(ele_val?.['y'])
+                              })
+
+                              // hanya sebagai referensi master
+                              let arr_val_y_countBy = _.countBy(arr_val_y);
+
+                              // hanya menghasilkan satu record array yang paling maksimal
+                              let getFrequentItem:any = _(arr_val_y)
+                                                  .countBy()
+                                                  .entries()
+                                                  .maxBy(_.last)
+                                                  ;
+                              
+                              if (getFrequentItem.length >= 1){
+                                  // bila ada occurance (kemunculan) yang sama, maka ambil angka paling maksimal
+                                  let arr_val_y_countBy_entries = Object.entries(arr_val_y_countBy);
+
+                                  // filter yang memiliki kemunculan angka yang sama (misal, [[12.34, 2], [9.56, 2]]) => [2] == [2]
+                                  let filter_val_y_countBy_entries = arr_val_y_countBy_entries.filter(elefil => elefil[1] == getFrequentItem[1]);
+
+                                  let arr_getMax_Values = filter_val_y_countBy_entries.map((ele_max,idx_max)=>{
+                                      return parseFloat(ele_max[0])
+                                  })
+
+                                  // ambil angka yang paling maksimal (misal : 12.34)
+                                  let getMax_Value:any = Math.max.apply(null, arr_getMax_Values)
+
+                                  // ambil data lengkap object key lainnya berdasarkan angka maksimal
+                                  // hanya ada satu angka saja yang akan di ambil
+                                  let filter_getMax_Value = ele_data.filter((elemax) => parseFloat(elemax?.['y']) == parseFloat(getMax_Value));
+
+                                  // console.error("arr_val_y")
+                                  // console.error(arr_val_y)
+                                  // console.error("arr_val_y_countBy")
+                                  // console.error(arr_val_y_countBy)
+                                  // console.error("getFrequentItem")
+                                  // console.error(getFrequentItem)
+                                  // console.error("filter_val_y_countBy_entries")
+                                  // console.error(filter_val_y_countBy_entries)
+                                  
+                                  // console.error("arr_getMax_Values")
+                                  // console.error(arr_getMax_Values)
+                                  // console.error("getMax_Value")
+                                  // console.error(getMax_Value)
+
+                                  // console.error("filter_getMax_Value")
+                                  // console.error(filter_getMax_Value)
+
+                                  arr_temp.push(
+                                    {
+                                      name: ele_name,
+                                      data: JSON.parse(JSON.stringify(filter_getMax_Value))
+                                    }
+                                  )
+                                  // masukkan data tangki dalam bentuk object
+                                  // if (typeof arr_temp?.[ele_name] == 'undefined' || 
+                                  //      arr_temp?.[ele_name] == null)
+                                  // {
+                                      // arr_temp[ele_name] = JSON.parse(JSON.stringify(filter_getMax_Value));
+                                  // }
+
+                              }
+
+
+                          }
+                      }
+                  }
+              })
+
+              // console.error("ARR TEMP FINAL")
+              // console.error(arr_temp)
+
+              return arr_temp
+
+            }
+        }
+
     }
 
     kalkulasi_tinggi_tangki(callback:any){
@@ -3624,6 +4043,7 @@ class DashboardTangki extends React.Component {
                     ...this.state.loader,
                     jarak_sensor_jam: true,
                     tinggi_isi_jam: true,
+                    tinggi_isi_modus_jam: true,
                     suhu_tangki_jam: true,
                     suhu_tinggi_tangki_jam: true,
                     volume_tangki_jam: true
@@ -3658,6 +4078,7 @@ class DashboardTangki extends React.Component {
                         ...this.state.loader,
                         jarak_sensor_jam: true,
                         tinggi_isi_jam: true,
+                        tinggi_isi_modus_jam: true,
                         suhu_tangki_jam: true,
                         suhu_tinggi_tangki_jam: true,
                         volume_tangki_jam: true
@@ -3695,6 +4116,7 @@ class DashboardTangki extends React.Component {
             ...this.state.loader,
             jarak_sensor_jam: true,
             tinggi_isi_jam: true,
+            tinggi_isi_modus_jam: true,
             suhu_tangki_jam: true,
             suhu_tinggi_tangki_jam: true,
             volume_tangki_jam: true
@@ -3746,7 +4168,8 @@ class DashboardTangki extends React.Component {
     alert(JSON.stringify(e))
   }
 
-  checkChartJam(val:any, type:'jarak_sensor'|'tinggi'|'suhu_jam'|'volume_jam'|'suhu_tinggi_jam'){
+  checkChartJam(val:any, type:'jarak_sensor'|'tinggi'|'suhu_jam'|'volume_jam'|'suhu_tinggi_jam'|
+                'tinggi_modus'){
     
     // console.log(val.target.checked)
     // if (val.target.checked){
@@ -3780,7 +4203,32 @@ class DashboardTangki extends React.Component {
                   dataLabels:{
                     ...this.state.chartTinggiJam.options.dataLabels,
                     formatter:(val:any)=>{
-                      return !isNaN(val) ? val.toFixed(3) + " m" : ''
+                      return !isNaN(val) ? (Math.round(parseFloat(val)*1000)/1000) + " m" : ''
+                    },
+                    enabled: val.target.checked
+                  }
+                }
+            }
+          })
+      }
+      else if (type == 'tinggi_modus'){
+          this.statusChecked['tinggi_modus'] = val.target.checked
+
+          console.log('check chart JAM')
+          console.log(this.state)
+          this.setState({
+            ...this.state,
+            chartTinggiModusJam: {
+                ...this.state.chartTinggiModusJam,
+                options:{
+                  ...this.state.chartTinggiModusJam.options,
+                  xaxis:{
+                    ...this.state.chartTinggiModusJam.options.xaxis,
+                  },
+                  dataLabels:{
+                    ...this.state.chartTinggiModusJam.options.dataLabels,
+                    formatter:(val:any)=>{
+                      return !isNaN(val) ? (Math.round(parseFloat(val)*1000)/1000) + " m" : ''
                     },
                     enabled: val.target.checked
                   }
@@ -4387,6 +4835,176 @@ class DashboardTangki extends React.Component {
 
                                         <div 
                                               ref={(response)=>this.componentRef=response}>
+
+                                            {/* TINGGI MODUS JAM */}
+                                            <Row className='mt-2'>
+                                                <hr></hr>
+                                                <div className='d-flex flex-nowrap customclass-snap gap-3'>
+
+                                                    <div className='modus-flex'>
+                                                        <div className='d-flex justify-content-between'>
+
+                                                            <div className='d-flex justify-content-start align-items-start gap-2'
+                                                                    style={{width:'100%'}}>
+                                                              <div className='d-flex justify-content-center align-items-start'>
+                                                                  <img src = {Tank} width="30" height="30" />
+                                                              </div>
+                                                              <div className='dashtangki-title-width'>
+                                                                {/* MODUS TINGGI */}
+                                                                  <h5 className='dashtangki-title'>Tinggi Isi Tangki</h5>
+                                                                  <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
+                                                                  <div className='d-flex justify-content-end checkbox-shift'>
+
+                                                                      <Form.Check type={'checkbox'}>
+                                                                          <Form.Check.Input type={'checkbox'} onChange={(val)=>{this.checkChartJam(val,'tinggi_modus')}}/>
+                                                                          <Form.Check.Label className='show-data-label-font'>{`Show Data Label`}</Form.Check.Label>
+                                                                          {/* <Form.Control.Feedback type="valid">
+                                                                            You did it! 
+                                                                          </Form.Control.Feedback> */}
+                                                                      </Form.Check>
+                                                                  </div>
+                                                              </div>
+                                                            </div>
+
+                                                            <div>
+                                                                    {/* <Form.Check
+                                                                      inline
+                                                                      label="1"
+                                                                      name="group1"
+                                                                      type='checkbox'
+                                                                      id={`inline-${'1'}-1`}
+                                                                    /> */}
+                                                                    
+                                                            </div>
+
+
+                                                        </div>
+                                                        <Col> 
+                                                            <div id="chart" className='d-flex justify-content-center align-items-center'>
+
+                                                              <ThreeCircles
+                                                                    height="100"
+                                                                    width="100"
+                                                                    color="#4fa94d"
+                                                                    wrapperStyle={{}}
+                                                                    wrapperClass=""
+                                                                    visible={this.state.loader.tinggi_isi_jam}
+                                                                    ariaLabel="three-circles-rotating"
+                                                                    outerCircleColor=""
+                                                                    innerCircleColor=""
+                                                                    middleCircleColor=""
+                                                                />
+
+                                                                { 
+                                                                    !this.state.loader.tinggi_isi_modus_jam &&
+                                                                    this.state.chartTinggiModusJam.statusFound &&
+                                                                    <div className='w-100'>
+                                                                        <ReactApexChart 
+                                                                              options={this.state.chartTinggiModusJam.options} 
+                                                                              series={this.state.chartTinggiModusJam.series} 
+                                                                              type="area" 
+                                                                              height={350} />
+                                                                    </div>
+                                                                }
+
+                                                                {
+                                                                    !this.state.loader.tinggi_isi_modus_jam &&
+                                                                    !this.state.chartTinggiModusJam.statusFound &&
+                                                                    <div className='d-flex flex-column justify-content-center align-items-center'>
+                                                                        <img src = {No_Found} className="nofound-class" />
+                                                                        <div className='nofound-label'> No Data Found </div>
+                                                                    </div>
+                                                                }
+
+                                                                
+                                                            </div>
+                                                        </Col>
+                                                    </div>
+
+                                                    <div className='modus-flex'>
+
+                                                        <div className='d-flex justify-content-between'>
+
+                                                            <div className='d-flex justify-content-start align-items-start gap-2'
+                                                                    style={{width:'100%'}}>
+                                                              <div className='d-flex justify-content-center align-items-start'>
+                                                                  <img src = {TermSensor} width="30" height="30" />
+                                                              </div>
+                                                              <div className='dashtangki-title-width'>
+                                                                {/* MODUS SUHU*/}
+                                                                  <h5 className='dashtangki-title'>Suhu Tangki</h5>
+                                                                  <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
+                                                                  <div className='d-flex justify-content-end checkbox-shift'>
+
+                                                                      <Form.Check type={'checkbox'}>
+                                                                          <Form.Check.Input type={'checkbox'} onChange={(val)=>{this.checkChartJam(val,'tinggi_modus')}}/>
+                                                                          <Form.Check.Label className='show-data-label-font'>{`Show Data Label`}</Form.Check.Label>
+                                                                          {/* <Form.Control.Feedback type="valid">
+                                                                            You did it! 
+                                                                          </Form.Control.Feedback> */}
+                                                                      </Form.Check>
+                                                                  </div>
+                                                              </div>
+                                                            </div>
+
+                                                            <div>
+                                                                    {/* <Form.Check
+                                                                      inline
+                                                                      label="1"
+                                                                      name="group1"
+                                                                      type='checkbox'
+                                                                      id={`inline-${'1'}-1`}
+                                                                    /> */}
+                                                                    
+                                                            </div>
+
+
+                                                        </div>
+                                                        <Col> 
+                                                            <div id="chart" className='d-flex justify-content-center align-items-center'>
+
+                                                              <ThreeCircles
+                                                                    height="100"
+                                                                    width="100"
+                                                                    color="#4fa94d"
+                                                                    wrapperStyle={{}}
+                                                                    wrapperClass=""
+                                                                    visible={this.state.loader.tinggi_isi_jam}
+                                                                    ariaLabel="three-circles-rotating"
+                                                                    outerCircleColor=""
+                                                                    innerCircleColor=""
+                                                                    middleCircleColor=""
+                                                                />
+
+                                                                { 
+                                                                    !this.state.loader.tinggi_isi_modus_jam &&
+                                                                    this.state.chartTinggiModusJam.statusFound &&
+                                                                    <div className='w-100'>
+                                                                        <ReactApexChart 
+                                                                              options={this.state.chartTinggiModusJam.options} 
+                                                                              series={this.state.chartTinggiModusJam.series} 
+                                                                              type="area" 
+                                                                              height={350} />
+                                                                    </div>
+                                                                }
+
+                                                                {
+                                                                    !this.state.loader.tinggi_isi_modus_jam &&
+                                                                    !this.state.chartTinggiModusJam.statusFound &&
+                                                                    <div className='d-flex flex-column justify-content-center align-items-center'>
+                                                                        <img src = {No_Found} className="nofound-class" />
+                                                                        <div className='nofound-label'> No Data Found </div>
+                                                                    </div>
+                                                                }
+
+                                                                
+                                                            </div>
+                                                        </Col>
+                                                    </div>
+                                                </div>
+
+                                            </Row>
+                                            {/* ... end <TINGGI MODUS JAM> */}
 
                                             <Row className='mt-2'>
                                                 <hr></hr>
