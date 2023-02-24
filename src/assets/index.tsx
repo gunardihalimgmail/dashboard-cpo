@@ -12,7 +12,8 @@ import Tank from './images/tank-4038640.png';
 import TermSensor from './images/term-sensor-6375688.png';
 import Thermometer from './images/thermometer-2100130.png';
 import WeightTank from './images/weight-3332223.png';
+import BlueWavyCurve from './images/blue wavy curve shape business_8773569.png';
 
 export {Logo, LukePorter, Img_Instagram, Img_Linkedin, Img_Facebook, Img_Twitter, SVG_Circle,
         No_Found, MotionSensor, MotionSensorRed, Tank,
-        TermSensor, Thermometer, WeightTank}
+        TermSensor, Thermometer, WeightTank, BlueWavyCurve}

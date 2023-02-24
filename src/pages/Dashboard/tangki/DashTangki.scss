@@ -45,7 +45,8 @@
 }
 .bg-gradient-warning {
     // background:linear-gradient(90deg,#f6e384,#ffd500)
-    background:linear-gradient(90deg,#b9dd77,#46ee25)
+    // background:linear-gradient(90deg,#b9dd77,#46ee25)
+    background:linear-gradient(90deg,#b9dd77,#3cca20)
 }
 
 span.dashtangki-mdi-span {
@@ -221,3 +222,32 @@ h4.dashtangki-cardbody-ontop{
     position: relative;
     top:-10px
 }
+
+
+.header-banner{
+    position: absolute;
+    width: 100%;
+    // background: url('../../../assets/images/blue\ wavy\ curve\ shape\ business_8773569.png') no-repeat center center fixed;
+    // background-size: cover;
+
+    // background-color: red;
+    top:0;
+    left:0;
+    // background-image: linear-gradient(#8459f9, #4c3196);
+    // background-image: linear-gradient(45deg, #4397d8, rgb(112, 90, 235));
+    // background-image: linear-gradient(45deg, #6385b3, #6f93bd);
+    height:300px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 20% 60px;
+    border-bottom-left-radius: 20% 60px;
+    overflow: hidden;
+}
+
+// .header-banner-img {
+//     object-fit: cover;
+//     width:70%;
+//     height:300px;
+//     position: relative;
+//     border:1px solid red;
+// }

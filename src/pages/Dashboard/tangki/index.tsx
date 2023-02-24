@@ -18,7 +18,7 @@ import ReactFC from 'react-fusioncharts';
 
 import './DashTangki.scss'
 import Icon from '@mdi/react';
-import { mdiHome, mdiChartLine, mdiOrnament, mdiGradientHorizontal, mdiThumbsUpDown, mdiConsoleNetworkOutline } from '@mdi/js';
+import { mdiHome, mdiChartLine, mdiOrnament, mdiGradientHorizontal, mdiThumbsUpDown, mdiConsoleNetworkOutline, mdiFolderHome, mdiViewDashboard, mdiViewDashboardVariant, mdiMonitorDashboard, mdiChartAreaspline, mdiChartAreasplineVariant, mdiChartDonutVariant, mdiChartBarStacked, mdiCogSyncOutline } from '@mdi/js';
 import CardHeader from 'react-bootstrap/esm/CardHeader';
 import Card from 'react-bootstrap/esm/Card';
 import { Button } from 'react-bootstrap';
@@ -26,7 +26,7 @@ import Badge from 'react-bootstrap/Badge';
 import Col from 'react-bootstrap/esm/Col';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/esm/Row';
-import { Img_Facebook, MotionSensor, MotionSensorRed, No_Found, SVG_Circle, Tank, TermSensor, Thermometer, WeightTank } from '../../../assets'
+import { BlueWavyCurve, Img_Facebook, MotionSensor, MotionSensorRed, No_Found, SVG_Circle, Tank, TermSensor, Thermometer, WeightTank } from '../../../assets'
 import ReactApexChart from 'react-apexcharts';
 
 import ThermometerFC from '../thermometer';
@@ -151,11 +151,12 @@ class DashboardTangki extends React.Component {
     ]
 
     statusChecked:any = {
-      jarak_sensor: false,
-      tinggi: false,
-      tinggi_modus: false,
-      suhu: false,
-      suhu_tinggi: false,
+      jarak_sensor: true,
+      tinggi: true,
+      tinggi_modus: true,
+      suhu: true,
+      suhu_modus: true,
+      suhu_tinggi: true,
       volume: false
     }
     
@@ -643,6 +644,124 @@ class DashboardTangki extends React.Component {
   // ... end 
     }
 
+    setChartSuhuModusJam = {
+
+      statusFound: false,
+      series: [
+      ],
+      // series: [
+      //   {
+      //     name: 'PRODUCT A',
+      //     data: [{ x: '2014-01-01 05:00', y: 54 }, { x: '01/01/2014 14:00', y: 60 } , { x: '01/01/2014 19:00', y: 70 }]
+      //   }, {
+      //     name: 'PRODUCT B',
+      //     data: [
+      //       { x: '2014-01-01 07:00', y: 30 }, 
+      //       { x: '2014-01-01 09:00', y: 30 }, 
+      //       { x: '01/01/2014 15:00', y: 40 } , { x: '01/01/2014 19:00', y: 45 }]
+      //   }, {
+      //     name: 'PRODUCT C',
+      //     data: [{ x: '01/01/2014 06:00', y: 15 }, { x: '01/01/2014 14:00', y: 25 } , { x: '01/01/2014 19:00', y: 40 }]
+      //   }
+      // ],
+
+      options: {
+        chart: {
+          height: 350,
+          type: 'area',
+          toolbar:{
+            show:true,
+            tools:{
+              download:false,
+            }
+          },
+          zoom:{
+            enabled:false
+          }
+        },
+        
+        dataLabels: {
+          enabled: true,
+          formatter: (val:any) => {
+            return val + "°C";
+          },
+        },
+        stroke: {
+          curve: 'smooth'
+        },
+        xaxis: {
+          type: 'datetime',
+          // type: 'category',
+          // tickAmount:30,
+          // categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"],
+          // min: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 0, 0).getTime(),
+          // max: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 23, 59).getTime(),
+          // categories: [],
+
+          labels:{
+              rotate: -45,
+              rotateAlways:true,
+              formatter:(val:any)=>{
+                return formatDate(new Date(val), 'HH:mm')
+                // return val
+              }
+          //   formatDate(
+          //     (new Date(val).getTime() + new Date(val).getTimezoneOffset() * 60000)
+          // ,'HH:mm')
+          }
+        },
+        yaxis:{
+          labels:{
+            formatter: (val:any)=>{ return parseInt(val) + " °C" }
+          }
+        },
+        tooltip: {
+          enabled:true,
+          x: {
+            show:true,
+            format: 'dd MMM yy (HH:mm)',
+            formatter: (value:any, { series, seriesIndex, dataPointIndex, w }:any)=> {
+              // console.log(series)
+              // console.log(seriesIndex)
+              // console.log(dataPointIndex)
+
+              // return new Date(value)
+              return formatDate(new Date(value),'HH:mm:ss')
+
+              // let waktu:any = w.globals.categoryLabels[dataPointIndex];
+                // return waktu;
+            }
+            // custom: ({series, seriesIndex, dataPointIndex, w}:any) => {
+            //     var data = w.globals.initialSeries[seriesIndex].data[dataPointIndex];
+
+            //     return ''
+            // }
+          },
+          y: {
+            formatter: (value:any, { series, seriesIndex, dataPointIndex, w }:any)=> {
+              // console.log(w.globals);
+              return value + " °C"
+            },
+            title: {
+              formatter: (seriesName:any, {series, seriesIndex, dataPointIndex, w }:any) => {
+                // console.log(w.globals.initialSeries[seriesIndex].data[dataPointIndex]?.['jenis'])
+                // let jenis_tmp:any = w.globals.initialSeries[seriesIndex].data[dataPointIndex]?.['jenis'];
+
+                return seriesName
+                      // + (typeof jenis_tmp != 'undefined' && jenis_tmp != null 
+                      // ? ' (' + jenis_tmp + ')'
+                      // : '') 
+                      + ' : '
+                        // nama series pada tooltip sewaktu di hover
+              }
+            },
+          }
+        },
+      }
+        
+  // ... end 
+    }
+
     setChartSuhuTinggiJam = {
 
       statusFound: false,
@@ -905,7 +1024,7 @@ class DashboardTangki extends React.Component {
         },
       },
       dataLabels: {
-        enabled: false,
+        enabled: true,
         formatter:(val:any)=>{
           return !isNaN(val) ? ((Math.round(val * 1000)/1000) + " m") : ''
         }
@@ -1044,7 +1163,7 @@ class DashboardTangki extends React.Component {
         },
       },
       dataLabels: {
-        enabled: false,
+        enabled: true,
         formatter:(val:any)=>{
           return !isNaN(val) ? ((Math.round(parseFloat(val)*1000)/1000) + " m") : ''
         }
@@ -1184,7 +1303,7 @@ class DashboardTangki extends React.Component {
         },
       },
       dataLabels: {
-        enabled: false,
+        enabled: true,
         formatter:(val:any)=>{
           return !isNaN(val) ? (val.toFixed(3) + " m") : ''
         }
@@ -1422,6 +1541,7 @@ class DashboardTangki extends React.Component {
             tinggi_isi_jam: true,
             tinggi_isi_modus_jam: true,
             suhu_tangki: true,
+            suhu_tangki_modus_jam: true,
             suhu_tangki_jam: true,
             suhu_tinggi_tangki_jam:true,
             volume_tangki_jam: true,
@@ -1431,6 +1551,7 @@ class DashboardTangki extends React.Component {
         chartTinggiJam:{...this.setChartTinggiJam},
         chartTinggiModusJam:{...this.setChartTinggi_Modus_Jam},
         chartSuhuJam:{...this.setChartSuhuJam},
+        chartSuhuModusJam:{...this.setChartSuhuModusJam},
         chartSuhuTinggiJam:{...this.setChartSuhuTinggiJam},
         chartVolumeJam:{...this.setChartVolumeJam}
     };
@@ -1716,7 +1837,9 @@ class DashboardTangki extends React.Component {
         let length_mst_list_tangki:any = this.mst_list_tangki.length;
 
         // hit api yang getAllData
-        await postApi("https://platform.iotsolution.id:7004/api-v1/getLastData",null,true,'1',null,(res:any)=>{
+        await postApi("https://platform.iotsolution.id:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
+
+
         // await postApi("http://192.168.1.120:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
           
           if (res?.['responseCode'] == "200"){
@@ -1772,6 +1895,21 @@ class DashboardTangki extends React.Component {
                   console.log(this.arr_json_tangki_last);
               }
               
+
+              // ===== MODUS DATA =====
+
+              // AMBIL DATA YANG PALING SERING MUNCUL UNTUK MASING-MASING TANGKI
+              // AMBIL KELIPATAN 10 MENIT TERAKHIR
+              // MISAL : WAKTU 07:26, AMBIL 07:11 - 07:20
+              // MISAL : WAKTU 07:00, AMBIL 06:41 - 06:50
+              this.processPreviousMinTank_fromLast(this.arr_json_tangki_last);
+              
+              return
+              // ===== <END MODUS DATA> =====
+
+              
+              // ISI DATA arr_json_tangki_last (di proses pada kalkulasi tinggi)
+              // 
               this.kalkulasi_tinggi_tangki(()=>{
                 this.kalkulasi_suhu_tangki(()=>{
                   this.kalkulasi_set_others_tangki(()=>{
@@ -1823,6 +1961,43 @@ class DashboardTangki extends React.Component {
 
         // alert(formatDate(new Date(),'HH:mm'))
         return
+    }
+
+    processPreviousMinTank_fromLast(arr_json_tangki_last:any){
+        // array json tangki last
+        console.error(arr_json_tangki_last)
+        // LOOPING NAMA TANGKI (KEY PERTAMA)
+        let obj_keys_last:any = Object.keys(arr_json_tangki_last);
+        obj_keys_last.forEach((ele_name, idx_rec)=>{
+            let time_tank:any;
+
+            try {
+              time_tank = new Date(arr_json_tangki_last[ele_name]?.['time']);
+            }catch(e){
+              time_tank = null
+            }
+            
+            if (time_tank != null){
+                // jika tanggal, maka di proses
+                // let ten_fold_prior:any = 1000 * 60 * 
+                let time_tank_getMinutes:any = time_tank.getMinutes();    //menit : 41
+                let mod_ten:any = time_tank_getMinutes % 10;        //mod : 1
+                let time_tank_dispute:any = time_tank_getMinutes - mod_ten; // 41-1=40
+
+                let time_tank_final:any;
+
+                if (time_tank_dispute == time_tank_getMinutes){
+                  // jika menit nya sama, maka kurangi 19 menit
+                  // jika tidak, maka kurangi 9 menit
+                }
+                else{
+                  time_tank_final = time_tank_dispute - 9
+                }
+
+                alert(time_tank_getMinutes + ' -> ' + mod_ten + ' -> ' +
+                      time_tank_dispute + ' -> ' + time_tank_final)
+            }
+        })
     }
 
     getDateMax_From_TangkiLast(){
@@ -1945,8 +2120,8 @@ class DashboardTangki extends React.Component {
       // "dateLast":formatDate(new Date(datelast),'YYYY-MM-DD')
 
       // LAGI FIXING PAK BAYU getDataHour banyak yg NaN
-      // await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
-      await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
+      await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
+      // await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
         {
           "date":formatDate(new Date(datebegin),'YYYY-MM-DD'),
           // // === BALIKKIN LAGI ===
@@ -1982,6 +2157,12 @@ class DashboardTangki extends React.Component {
               ...this.setChartSuhuJam,
               statusFound: false
             }
+
+            this.setChartSuhuModusJam = {
+              ...this.setChartSuhuModusJam,
+              statusFound: false
+            }
+
             this.setChartSuhuTinggiJam = {
               ...this.setChartSuhuTinggiJam,
               statusFound: false
@@ -2000,12 +2181,14 @@ class DashboardTangki extends React.Component {
                 tinggi_isi_jam: false,
                 tinggi_isi_modus_jam: false,
                 suhu_tangki_jam: false,
+                suhu_tangki_modus_jam: false,
                 suhu_tinggi_tangki_jam: false,
                 volume_tangki_jam: false
               },
               chartJarakSensorJam: {...this.setChartJarakSensorJam},
               chartTinggiJam: {...this.setChartTinggiJam},
               chartSuhuJam:{...this.setChartSuhuJam},
+              chartSuhuModusJam:{...this.setChartSuhuModusJam},
               chartSuhuTinggiJam: {...this.setChartSuhuTinggiJam},
               chartVolumeJam:{...this.setChartVolumeJam}
             })
@@ -2921,20 +3104,42 @@ class DashboardTangki extends React.Component {
 
               // SET CHART TINGGI MODUS JAM (angka yang sering muncul)
 
+              // DATA MODUS (DATA YANG SERING MUNCUL)
               // getAllData_Modus => ambil data value y yang paling sering muncul
-              let arr_tinggi_modus_jam_series:any = this.getAllData_Modus(this.data_tinggi_tangki_perjam_series)
-              console.error("ARR TINGGI MODUS JAM FINAL")
-              console.error(arr_tinggi_modus_jam_series)
 
-              this.getAllData_Suhu_Modus(arr_tinggi_modus_jam_series, this.data_suhu_tangki_perjam_series)
+              // TINGGI MODUS
+              let arr_tinggi_modus_jam_series:any = this.getAllData_Modus(this.data_tinggi_tangki_perjam_series)
+              // console.error("ARR TINGGI MODUS JAM FINAL")
+              // console.error(arr_tinggi_modus_jam_series)
+              if (arr_tinggi_modus_jam_series.length == 0){
+                arr_tinggi_modus_jam_series = []
+              }else{
+                arr_tinggi_modus_jam_series = JSON.parse(JSON.stringify(arr_tinggi_modus_jam_series));
+              }
+              
+              // SUHU MODUS 
+
+              let arr_suhu_modus_jam_series:any = this.getAllData_Suhu_Modus(arr_tinggi_modus_jam_series, this.data_suhu_tangki_perjam_series)
+
+              // let status_process_suhuModus:boolean = false;
+
+              if (arr_suhu_modus_jam_series.length == 0){
+                arr_suhu_modus_jam_series = []
+                // status_process_suhuModus = true
+              }else{
+                arr_suhu_modus_jam_series = JSON.parse(JSON.stringify(arr_suhu_modus_jam_series));
+                // status_process_suhuModus = true
+              }
+
               // console.error('ARR SUHU MODUS JAM FINAL')
               // console.error(this.data_suhu_tangki_perjam_series)
 
 
               this.setChartTinggi_Modus_Jam = {
                 ...this.setChartTinggi_Modus_Jam,
-                statusFound: this.data_tinggi_tangki_perjam_series.length > 0 ? true : false,
-                series: JSON.parse(JSON.stringify(arr_tinggi_modus_jam_series)),
+                statusFound: arr_tinggi_modus_jam_series.length > 0 ? true : false,
+                // series: JSON.parse(JSON.stringify(arr_tinggi_modus_jam_series)),
+                series: arr_tinggi_modus_jam_series,
                 options:{
                     ...this.setChartTinggi_Modus_Jam.options,
                     xaxis:{
@@ -2949,6 +3154,28 @@ class DashboardTangki extends React.Component {
                     dataLabels:{
                       ...this.setChartTinggi_Modus_Jam.options.dataLabels,
                       enabled: this.statusChecked?.['tinggi_modus'] ?? false
+                    }
+                }
+              }
+
+              
+              // series: JSON.parse(JSON.stringify(arr_suhu_modus_jam_series)),
+              this.setChartSuhuModusJam = {
+                ...this.setChartSuhuModusJam,
+                statusFound: arr_suhu_modus_jam_series.length > 0 ? true : false,
+                series: arr_suhu_modus_jam_series,
+                options:{
+                    ...this.setChartSuhuModusJam.options,
+                    xaxis:{
+                      ...this.setChartSuhuModusJam.options.xaxis,
+                      // min: typeof min_suhu_tgl != 'undefined' && min_suhu_tgl != null ? new Date(min_suhu_tgl).getTime() : 0,
+                      // max: typeof max_suhu_tgl != 'undefined' && max_suhu_tgl != null ? new Date(max_suhu_tgl).getTime() : 0
+                      // type:'datetime',
+                      // categories: JSON.parse(JSON.stringify(this.data_suhu_tangki_perjam_categories))
+                    },
+                    dataLabels:{
+                      ...this.setChartSuhuModusJam.options.dataLabels,
+                      enabled: this.statusChecked?.['suhu_modus'] ?? false
                     }
                 }
               }
@@ -3039,6 +3266,7 @@ class DashboardTangki extends React.Component {
                     ...this.state.loader,
                     jarak_sensor_jam: false,
                     suhu_tangki_jam: false,
+                    suhu_tangki_modus_jam: false,
                     suhu_tinggi_tangki_jam: false,
                     tinggi_isi_jam: false,
                     tinggi_isi_modus_jam: false,
@@ -3050,6 +3278,7 @@ class DashboardTangki extends React.Component {
                   },
                   chartJarakSensorJam: {...this.setChartJarakSensorJam},
                   chartSuhuJam: {...this.setChartSuhuJam},
+                  chartSuhuModusJam: {...this.setChartSuhuModusJam},
                   chartTinggiJam: {...this.setChartTinggiJam},
                   chartTinggiModusJam: {...this.setChartTinggi_Modus_Jam},
                   chartVolumeJam: {...this.setChartVolumeJam},
@@ -3132,40 +3361,34 @@ class DashboardTangki extends React.Component {
                 data_tangki_suhu.forEach((elesuhu, idxsuhu)=>{
 
                   let find_xtime_tinggi:any = filter_tangki_tinggi[0]['data'].find(eletinggifind=>eletinggifind?.['x_time'] == elesuhu?.['x_time'])
-                  console.error("FILTER TANGKI TINGGI")
-                  console.error(find_xtime_tinggi)
-                  // if (find_xtime_tinggi){
+                  if (find_xtime_tinggi){
+                      // console.error("FILTER TANGKI TINGGI")
+                      // console.error(find_xtime_tinggi)
 
-                  //   // cari apakah sudah ada nama tangki di arr_temp
-                      
-
-                  //       if (arr_temp.length > 0){
-
-                  //           let findTangki_arrtemp:any = arr_temp.find(eletemp => eletemp?.['name'] == nama_tangki_suhu)
-                  //           if (!findTangki_arrtemp){
-                  //             // jika tidak ada di arr_temp, maka di push
-                  //             arr_temp.push({
-                  //                 name: nama_tangki_suhu,
-                  //                 data: {...elesuhu}
-                  //             })
-                  //           }
-                  //           else{
-                  //             arr_temp[nama_tangki_suhu]['data'] = [
-                  //                 ...arr_temp[nama_tangki_suhu]['data'],
-                  //                 {...elesuhu}
-                  //             ]
-                  //           }
-                  //       }
-                  //       else{
-                  //           // jika length arr_temp kosong, langsung push
-                  //           arr_temp.push({
-                  //               name: nama_tangki_suhu,
-                  //               data: {...elesuhu}
-                  //           })
-                  //       }
-                        
-                  //   }
+                      // cari jika ada nama tangki yang sama, maka tinggal push ke data
+                      let findIdxTangki_inSuhu = arr_temp.findIndex(elesuhu => elesuhu?.['name'] == nama_tangki_suhu)
+                      if (findIdxTangki_inSuhu == -1){
+                          // jika tidak ada, create nama tangki baru
+                          arr_temp = [
+                            ...arr_temp,
+                            {
+                              name: nama_tangki_suhu,
+                              data: [{...elesuhu}]
+                            }
+                          ]
+                      }
+                      else
+                      {
+                          arr_temp[findIdxTangki_inSuhu]['data'] = [
+                              ...arr_temp[findIdxTangki_inSuhu]['data'],
+                              {...elesuhu}
+                          ]
+                      }
+                  }
                 })
+
+                console.error("INJECT KE ARR_TEMP SUHU")
+                console.error(arr_temp)
                 // console.error(filter_tangki_tinggi)
             })
 
@@ -3897,7 +4120,8 @@ class DashboardTangki extends React.Component {
                 ...this.state,
                 loader:{
                   ...this.state.loader,
-                  suhu_tangki:false
+                  suhu_tangki:false,
+                  suhu_tangki_modus_jam: false,
                 },
                 ...temp_updatedState_suhu
               })
@@ -4105,6 +4329,7 @@ class DashboardTangki extends React.Component {
                     tinggi_isi_jam: true,
                     tinggi_isi_modus_jam: true,
                     suhu_tangki_jam: true,
+                    suhu_tangki_modus_jam: true,
                     suhu_tinggi_tangki_jam: true,
                     volume_tangki_jam: true
                   },
@@ -4140,6 +4365,7 @@ class DashboardTangki extends React.Component {
                         tinggi_isi_jam: true,
                         tinggi_isi_modus_jam: true,
                         suhu_tangki_jam: true,
+                        suhu_tangki_modus_jam: true,
                         suhu_tinggi_tangki_jam: true,
                         volume_tangki_jam: true
                       },
@@ -4178,6 +4404,7 @@ class DashboardTangki extends React.Component {
             tinggi_isi_jam: true,
             tinggi_isi_modus_jam: true,
             suhu_tangki_jam: true,
+            suhu_tangki_modus_jam: true,
             suhu_tinggi_tangki_jam: true,
             volume_tangki_jam: true
           },
@@ -4229,7 +4456,7 @@ class DashboardTangki extends React.Component {
   }
 
   checkChartJam(val:any, type:'jarak_sensor'|'tinggi'|'suhu_jam'|'volume_jam'|'suhu_tinggi_jam'|
-                'tinggi_modus'){
+                'tinggi_modus'|'suhu_modus'){
     
     // console.log(val.target.checked)
     // if (val.target.checked){
@@ -4310,6 +4537,26 @@ class DashboardTangki extends React.Component {
                   },
                   dataLabels:{
                     ...this.state.chartSuhuJam.options.dataLabels,
+                    enabled: val.target.checked
+                  }
+                }
+            }
+          })
+      }
+      else if(type == 'suhu_modus'){
+          this.statusChecked['suhu_modus'] = val.target.checked
+
+          this.setState({
+            ...this.state,
+            chartSuhuModusJam: {
+                ...this.state.chartSuhuModusJam,
+                options:{
+                  ...this.state.chartSuhuModusJam.options,
+                  xaxis:{
+                    ...this.state.chartSuhuModusJam.options.xaxis,
+                  },
+                  dataLabels:{
+                    ...this.state.chartSuhuModusJam.options.dataLabels,
                     enabled: val.target.checked
                   }
                 }
@@ -4439,13 +4686,18 @@ class DashboardTangki extends React.Component {
                 
                     <div className='dashtangki-contain-wrapper'>
                         <div className='dashtangki-subcontain'>
+                                <div className='header-banner'>
+                                      {/* <img src={BlueWavyCurve} 
+                                          className='header-banner-img'/> */}
+                                </div>
                                 <Row className='dashtangki-row-1'>
                                     <Col>
+
                                         <Row>
                                             <Col>
                                                 <h3 className='dashtangki-page-title'>
                                                     <span className='bg-gradient-primary dashtangki-mdi-span'>
-                                                        <Icon path={mdiHome} size={0.7} color= "white" className='good'/>
+                                                        <Icon path={mdiChartBarStacked} size={1} color= "white"/>
                                                     </span>
                                                     Dashboard
                                                 </h3>
@@ -4916,7 +5168,9 @@ class DashboardTangki extends React.Component {
                                                                   <div className='d-flex justify-content-end checkbox-shift'>
 
                                                                       <Form.Check type={'checkbox'}>
-                                                                          <Form.Check.Input type={'checkbox'} onChange={(val)=>{this.checkChartJam(val,'tinggi_modus')}}/>
+                                                                          <Form.Check.Input type={'checkbox'} 
+                                                                              onChange={(val)=>{this.checkChartJam(val,'tinggi_modus')}} 
+                                                                              defaultChecked={this.state.chartTinggiModusJam.options.dataLabels.enabled}/>
                                                                           <Form.Check.Label className='show-data-label-font'>{`Show Data Label`}</Form.Check.Label>
                                                                           {/* <Form.Control.Feedback type="valid">
                                                                             You did it! 
@@ -4997,7 +5251,10 @@ class DashboardTangki extends React.Component {
                                                                   <div className='d-flex justify-content-end checkbox-shift'>
 
                                                                       <Form.Check type={'checkbox'}>
-                                                                          <Form.Check.Input type={'checkbox'} onChange={(val)=>{this.checkChartJam(val,'tinggi_modus')}}/>
+                                                                          <Form.Check.Input type={'checkbox'} 
+                                                                                onChange={(val)=>{this.checkChartJam(val,'suhu_modus')}}
+                                                                                defaultChecked={this.state.chartSuhuModusJam.options.dataLabels.enabled}
+                                                                          />
                                                                           <Form.Check.Label className='show-data-label-font'>{`Show Data Label`}</Form.Check.Label>
                                                                           {/* <Form.Control.Feedback type="valid">
                                                                             You did it! 
@@ -5037,18 +5294,22 @@ class DashboardTangki extends React.Component {
                                                                 />
 
                                                                 { 
-                                                                    !this.state.loader.tinggi_isi_modus_jam &&
-                                                                    this.state.chartTinggiModusJam.statusFound &&
+                                                                    !this.state.loader.suhu_tangki_modus_jam &&
+                                                                    this.state.chartSuhuModusJam.statusFound &&
                                                                     <div className='w-100'>
                                                                         <ReactApexChart 
-                                                                              options={this.state.chartTinggiModusJam.options} 
-                                                                              series={this.state.chartTinggiModusJam.series} 
+                                                                              options={this.state.chartSuhuModusJam.options} 
+                                                                              series={this.state.chartSuhuModusJam.series} 
                                                                               type="area" 
                                                                               height={350} />
                                                                     </div>
                                                                 }
 
                                                                 {
+                                                                    // !this.state.loader.suhu_tangki_modus_jam &&
+                                                                    // !this.state.chartSuhuModusJam.statusFound &&
+
+                                                                    // LOADER MENGIKUTI TINGGI MODUS TANGKI
                                                                     !this.state.loader.tinggi_isi_modus_jam &&
                                                                     !this.state.chartTinggiModusJam.statusFound &&
                                                                     <div className='d-flex flex-column justify-content-center align-items-center'>
@@ -5087,7 +5348,10 @@ class DashboardTangki extends React.Component {
                                                               id={`inline-${'1'}-1`}
                                                             /> */}
                                                             <Form.Check type={'checkbox'} inline>
-                                                                <Form.Check.Input type={'checkbox'} onChange={(val)=>{this.checkChartJam(val,'jarak_sensor')}}/>
+                                                                <Form.Check.Input type={'checkbox'} 
+                                                                    onChange={(val)=>{this.checkChartJam(val,'jarak_sensor')}}
+                                                                    defaultChecked={this.state.chartSuhuModusJam.options.dataLabels.enabled}
+                                                                />
                                                                 <Form.Check.Label>{`Show Data Label`}</Form.Check.Label>
                                                                 {/* <Form.Control.Feedback type="valid">
                                                                   You did it! 
@@ -5164,7 +5428,11 @@ class DashboardTangki extends React.Component {
                                                               id={`inline-${'1'}-1`}
                                                             /> */}
                                                             <Form.Check type={'checkbox'} inline>
-                                                                <Form.Check.Input type={'checkbox'} onChange={(val)=>{this.checkChartJam(val,'tinggi')}}/>
+                                                                <Form.Check.Input 
+                                                                    type={'checkbox'} 
+                                                                    onChange={(val)=>{this.checkChartJam(val,'tinggi')}}
+                                                                    defaultChecked={this.state.chartTinggiJam.options.dataLabels.enabled}
+                                                                />
                                                                 <Form.Check.Label>{`Show Data Label`}</Form.Check.Label>
                                                                 {/* <Form.Control.Feedback type="valid">
                                                                   You did it! 
@@ -5232,7 +5500,11 @@ class DashboardTangki extends React.Component {
 
                                                     <div>
                                                         <Form.Check type={'checkbox'} inline>
-                                                            <Form.Check.Input type={'checkbox'} onChange={(val)=>{this.checkChartJam(val,'suhu_jam')}}/>
+                                                            <Form.Check.Input 
+                                                                  type={'checkbox'} 
+                                                                  onChange={(val)=>{this.checkChartJam(val,'suhu_jam')}}
+                                                                  defaultChecked={this.state.chartSuhuJam.options.dataLabels.enabled}
+                                                            />
                                                             <Form.Check.Label>{`Show Data Label`}</Form.Check.Label>
                                                             {/* <Form.Control.Feedback type="valid">
                                                               You did it! 
@@ -5315,7 +5587,11 @@ class DashboardTangki extends React.Component {
                                                     </div>
                                                     <div>
                                                         <Form.Check type={'checkbox'} inline>
-                                                            <Form.Check.Input type={'checkbox'} onChange={(val)=>{this.checkChartJam(val,'suhu_tinggi_jam')}}/>
+                                                            <Form.Check.Input 
+                                                                type={'checkbox'} 
+                                                                onChange={(val)=>{this.checkChartJam(val,'suhu_tinggi_jam')}}
+                                                                defaultChecked={this.state.chartSuhuTinggiJam.options.dataLabels.enabled}
+                                                            />
                                                             <Form.Check.Label>{`Show Data Label`}</Form.Check.Label>
                                                             {/* <Form.Control.Feedback type="valid">
                                                               You did it! 
