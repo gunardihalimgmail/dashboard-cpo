@@ -32,7 +32,7 @@ import ReactApexChart from 'react-apexcharts';
 import ThermometerFC from '../thermometer';
 import CylinderFC from '../cylinder';
 
-import { formatDate, notify, postApi } from '../../../services/functions';
+import { formatDate, notify, postApi, postApiSync } from '../../../services/functions';
 import { ApexOptions } from 'apexcharts';
 
 import { Audio, Dna, ThreeCircles } from  'react-loader-spinner'
@@ -136,6 +136,8 @@ class DashboardTangki extends React.Component {
 
     getFirstTangki_Default:any = {};
 
+    arr_tangki_last_from_dataHour:any = {};
+
   // ARRAY CPO & PKO berdasarkan tanggal berlaku
     arr_cpo_pko = [
       {name: 'tangki_1', jenis:'CPO', datebegin:'1970-01-01 00:00', datelast:'2023-02-20 23:59'},
@@ -194,7 +196,7 @@ class DashboardTangki extends React.Component {
 
     mst_avg_t_segitiga:any = {
       'tangki_1':0.4030,   // 0.49629 (prev old -> new) tgl 21 feb '23
-      'tangki_2':0.6946,   // 0.71348, 0.70074, 0.69876, 0.69818, 0.69460, 0,6917 (prev) => TGL DIPAKAI *10 FEB - 21 FEB '23
+      'tangki_2':0.6946,   // 0.71348, 0.70074, 0.69876, 0.69818, 0.69460, 0,6917, 0.6946 (prev) => TGL DIPAKAI *10 FEB - 21 FEB '23
       'tangki_3':0.4890,   // 0.54700, 0.48733, 0.48870  (prev) => TGL DIPAKAI *10 FEB '23 - 16 FEB '23
       'tangki_4':0.4734,   // 0.47460, 0.47229, 0.46792, 0.47070, 0.46650, 0.4708 (prev) => TGL DIPAKAI *10 feb '23 - 16 feb '23
     }
@@ -1896,7 +1898,7 @@ class DashboardTangki extends React.Component {
               }
               
 
-              // ===== MODUS DATA =====
+              // ===== MODUS DATA REAL TIME =====
 
               // AMBIL DATA YANG PALING SERING MUNCUL UNTUK MASING-MASING TANGKI
               // AMBIL KELIPATAN 10 MENIT TERAKHIR
@@ -1964,10 +1966,21 @@ class DashboardTangki extends React.Component {
     }
 
     processPreviousMinTank_fromLast(arr_json_tangki_last:any){
-        // array json tangki last
+        // array json tangki last (REAL TIME)
         console.error(arr_json_tangki_last)
+
+        this.arr_tangki_last_from_dataHour = {};
+
+        // variable menampung data semua array based on looping nama tangki (ada 4), ada kemungkinan double
+        let arr_raw_all:any = [];
+
         // LOOPING NAMA TANGKI (KEY PERTAMA)
         let obj_keys_last:any = Object.keys(arr_json_tangki_last);
+
+        // panjang tangki obj_keys_last
+        let obj_keys_last_length:any = obj_keys_last.length;
+        let obj_keys_last_onprogress:any = 0;
+
         obj_keys_last.forEach((ele_name, idx_rec)=>{
 
             let time_tank:any;
@@ -1978,6 +1991,10 @@ class DashboardTangki extends React.Component {
               time_tank = null
             }
             
+            // FOR TEST
+            // 23 feb '23 jam 7:30
+            time_tank = new Date(2023,1,23, 7,30,0)
+
             if (time_tank != null){
                 // jika tanggal, maka di proses
                 // let ten_fold_prior:any = 1000 * 60 * 
@@ -1992,28 +2009,139 @@ class DashboardTangki extends React.Component {
                 let time_tank_setmin_dispute:any;
 
                 if (time_tank_dispute == time_tank_getMinutes){
-                  // jika menit nya sama, maka kurangi 19 menit
+                  // jika menit nya sama, maka kurangi 19 menit (00:00, 10:00, 20:00, 30:00)
                   // jika tidak, maka kurangi 9 menit
                     time_tank_substract_minutes = 19 * 60 * 1000    // 19 menit
                 }
                 else{
                     time_tank_substract_minutes = 9 * 60 * 1000     // 9 menit
 
-                    time_tank_setmin_new = time_tank   // ambil master 07:41
-                    time_tank_setmin_new = new Date(time_tank_setmin_new).setMinutes(time_tank_dispute)    // set ke 07:40
-
-                    time_tank_time_begin = new Date(time_tank - time_tank_substract_minutes);
-                    alert(new Date(time_tank_setmin_new))
                     // time_tank_time_begin = new Date(time_tank_time_begin.setSeconds(0));
                 }
 
+                  time_tank_setmin_new = time_tank   // ambil master 07:41
+                  time_tank_setmin_new = new Date(time_tank_setmin_new).setMinutes(time_tank_dispute)    // set ke 07:40
 
+                  // time START *
+                  // misal tgl 25 feb 2023 00:05:00, 
+                  //  maka time begin nya harusnya menjadi 24 feb 2023 23:51
+                  time_tank_time_begin = new Date(time_tank_setmin_new - time_tank_substract_minutes);    // 07:40 kurang 9 menit atau 07:00 kurang 19 menit
+                  time_tank_time_begin = new Date(time_tank_time_begin.setSeconds(0));
+
+                  // time END * (ditambah 9 menit dari time start)
+                  let time_minutes_add_9:any = 9 * 60 * 1000; 
+                  let time_minutes_add_8:any = 8 * 60 * 1000;   // tambah 8 menit
+                  // jika setelah ditambah 9 menit menjadi 00 (pindah tanggal berikutnya), maka di tambah 8 menit saja
+                  // misal tgl 25 feb 2023 00:05:00, 
+                  //  maka time last nya harusnya menjadi 24 feb 2023 23:59
+
+                  let time_tank_begin_plus_9 = new Date(parseFloat(time_tank_time_begin.getTime()) + parseFloat(time_minutes_add_9));
+                  if (time_tank_begin_plus_9.getMinutes() == 0){
+                      time_tank_time_last = new Date(parseFloat(time_tank_time_begin.getTime()) + parseFloat(time_minutes_add_8));
+                  }
+                  else{
+                      time_tank_time_last = new Date(parseFloat(time_tank_time_begin.getTime()) + parseFloat(time_minutes_add_9));
+                  }
+                  // set sampai detik 59
+                  time_tank_time_last = new Date(time_tank_time_last.setSeconds(59));
+
+                  // time_tank_time_last.setMinutes(59);
+                  // alert(time_tank_time_last
+                  
+                  let datebegin:any = formatDate(time_tank_time_begin,'YYYY-MM-DD');
+
+                  if (time_tank_time_begin.getMinutes() == 1){
+                      time_tank_time_begin = new Date(time_tank_time_begin.setMinutes(0));
+                  }
+
+                  let hourbegin = formatDate(time_tank_time_begin,'HH:mm');
+                  let hourlast = formatDate(time_tank_time_last,'HH:mm');
+
+                  // alert(hourbegin + '\n' + hourlast)
+
+                  console.error('Time Master : ' + time_tank + 
+                        '\nTime Start : ' + time_tank_time_begin + 
+                        '\nTime End : ' + time_tank_time_last)
+
+                  this.getDataHour_Await(datebegin, hourbegin, hourlast, (res_data)=>{
+                      // console.error("SELESAI AWAIT POST API " + ele_name)
+                      // console.error("getDataHour_Await Data:")
+                      // console.error(res_data)
+
+                      // console.log(res_data?.['data'])
+
+                      arr_raw_all = [
+                          ...arr_raw_all,
+                          ...res_data?.['data']
+                      ]
+                      obj_keys_last_onprogress++;
+                      console.error(obj_keys_last_onprogress)
+                      
+                    });
 
                 // alert(time_tank_getMinutes + ' -> ' + mod_ten + ' -> ' +
                 //       time_tank_dispute + ' -> \n Time Begin : ' + time_tank_time_begin + 
                 //       '\nTime Master : ' + new Date(time_tank))
             }
         })
+
+        let intOnProgress = setInterval(()=>{
+            
+            if (obj_keys_last_onprogress == obj_keys_last_length){
+              console.error(' ==== ARR RAW ALL ====')
+              console.error(arr_raw_all)
+              clearInterval(intOnProgress)
+            }
+        })
+
+    }
+
+    funcSeparateTank(arr_data:any){
+        // function untuk memisahkan tangki ke masing-masing key
+        // obj = {tangki_1: {'volume isi tank 1':'...', 'Jarak Sensor dengan permukaan Tank 1' : '774.91', 'id_device':"BESTAGRO_002_NEW"}}
+        //       ,{tangki_2: {'volume isi tank 2':'...', 'Jarak Sensor dengan permukaan Tank 2' : '203.77', 'id_device':"BESTAGRO_002_NEW"}}
+        //       ,{tangki_3: {'volume isi tank 3':'...', 'Jarak Sensor dengan permukaan Tank 3' : '1033.42', 'id_device':"BESTAGRO_001"}}
+        //       ,{tangki_4: {'volume isi tank 4':'...', 'Jarak Sensor dengan permukaan Tank 4' : '617.36', 'id_device':"BESTAGRO_001"}}
+
+    }
+
+    getDataHour_Await(datebegin, hourbegin, hourlast, callback){
+
+        let data_temp:any = [];
+        postApiSync("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,'1',
+          {
+            "date":formatDate(new Date(datebegin),'YYYY-MM-DD'),
+            // // === BALIKKIN LAGI ===
+            // "hourBegin": typeof hourbegin == 'undefined' || hourbegin == null ? '00:00' : hourbegin,
+            "hourBegin": typeof hourbegin == 'undefined' || hourbegin == null ? '06:00' : hourbegin,
+            // "hourLast": typeof hourlast == 'undefined' || hourlast == null ? '23:59' : hourlast,
+            "hourLast": typeof hourlast == 'undefined' || hourlast == null ? '06:30' : hourlast,
+            "minutes":true
+          }
+        )
+        .then(result=>{
+            // console.log("MULAI")
+            data_temp = JSON.parse(JSON.stringify(result))
+            // console.log(data_temp)
+            callback(data_temp)
+        })
+      
+      // (res:any)=>{
+
+      //     if (res?.['responseCode'] == "404"
+      //       || 
+      //       (res?.['responseCode'] == "200" && res?.['data'].length == 0))
+      //     {
+      //       // jika data kosong, maka nanti munculkan icon no data found
+      //       // notify("error", res?.['responseDesc']);
+      //     }
+
+      //     if (res?.['responseCode'] == "200"){
+      //       let res_data:any = res?.['data'];
+      //       // console.error("await post api ")
+      //       callback(res_data)
+      //     }
+      // })
     }
 
     getDateMax_From_TangkiLast(){
@@ -2152,8 +2280,14 @@ class DashboardTangki extends React.Component {
         console.log("post api await per jam")
         console.log(res)
 
-        if (res?.['responseCode'] == "404"){
-            notify("error", res?.['responseDesc']);
+        if (res?.['responseCode'] == "404"
+            || 
+            (res?.['responseCode'] == "200" && res?.['data'].length == 0)){
+            
+            if (res?.['responseCode'] == "404"){
+                notify("error", res?.['responseDesc']);
+            }
+
             this.setChartJarakSensorJam = {
               ...this.setChartJarakSensorJam,
               statusFound: false

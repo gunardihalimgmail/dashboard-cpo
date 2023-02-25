@@ -115,6 +115,47 @@ export const postApi = async (url?:any, param?:any, isAwait?:boolean, token_code
   return
 }
 
+
+export const postApiSync = async (url?:any, param?:any, token_code?:any, body?:any, callback?:any) =>
+{
+  let obj_token_key:any = {
+    "1":'$2a$04$1t8/RrKuG1aCdc820GzGWOptHHy67BPS9jjHfWQpdHKyIzkuNmPRW', // akun bestagro
+    "2":"811aea285d3c31db515c56520ae369aded18a623"
+  }
+
+  let token_final:any = obj_token_key?.[token_code];
+  
+  const requestOptions = {
+    method:"POST",
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(
+        {
+          ...body,
+          token_key: token_final
+        }
+    )
+  };
+
+    // alert(isAwait)
+    let response = await fetch(url, requestOptions).catch((err)=>{return err});
+    
+    // jika error maka callback error
+    if (response.toString().indexOf("TypeError") != -1){
+      return {
+        statusCode:"400",
+        msg:response.toString()
+      }
+    }
+
+    let result = await response.json();
+    return result
+    // await fetch(url,requestOptions)
+    //   .then(response => response.json())
+    //   .then(data =>  console.log(data))
+    //   .catch(err => alert(err))
+  return
+}
+
 export const notify = (type:'info'|'error'|'success'|'warning', msg?:any) => {
   // React-toastify
   const obj_toastify:any = {
