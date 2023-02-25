@@ -1969,6 +1969,7 @@ class DashboardTangki extends React.Component {
         // LOOPING NAMA TANGKI (KEY PERTAMA)
         let obj_keys_last:any = Object.keys(arr_json_tangki_last);
         obj_keys_last.forEach((ele_name, idx_rec)=>{
+
             let time_tank:any;
 
             try {
@@ -1984,18 +1985,33 @@ class DashboardTangki extends React.Component {
                 let mod_ten:any = time_tank_getMinutes % 10;        //mod : 1
                 let time_tank_dispute:any = time_tank_getMinutes - mod_ten; // 41-1=40
 
-                let time_tank_final:any;
+                let time_tank_substract_minutes:any;
+                let time_tank_time_begin:any, time_tank_time_last:any;  // tanggal yg di filter sudah fix begin dan last
+
+                let time_tank_setmin_new:any;   // set minute
+                let time_tank_setmin_dispute:any;
 
                 if (time_tank_dispute == time_tank_getMinutes){
                   // jika menit nya sama, maka kurangi 19 menit
                   // jika tidak, maka kurangi 9 menit
+                    time_tank_substract_minutes = 19 * 60 * 1000    // 19 menit
                 }
                 else{
-                  time_tank_final = time_tank_dispute - 9
+                    time_tank_substract_minutes = 9 * 60 * 1000     // 9 menit
+
+                    time_tank_setmin_new = time_tank   // ambil master 07:41
+                    time_tank_setmin_new = new Date(time_tank_setmin_new).setMinutes(time_tank_dispute)    // set ke 07:40
+
+                    time_tank_time_begin = new Date(time_tank - time_tank_substract_minutes);
+                    alert(new Date(time_tank_setmin_new))
+                    // time_tank_time_begin = new Date(time_tank_time_begin.setSeconds(0));
                 }
 
-                alert(time_tank_getMinutes + ' -> ' + mod_ten + ' -> ' +
-                      time_tank_dispute + ' -> ' + time_tank_final)
+
+
+                // alert(time_tank_getMinutes + ' -> ' + mod_ten + ' -> ' +
+                //       time_tank_dispute + ' -> \n Time Begin : ' + time_tank_time_begin + 
+                //       '\nTime Master : ' + new Date(time_tank))
             }
         })
     }
@@ -2120,8 +2136,8 @@ class DashboardTangki extends React.Component {
       // "dateLast":formatDate(new Date(datelast),'YYYY-MM-DD')
 
       // LAGI FIXING PAK BAYU getDataHour banyak yg NaN
-      await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
-      // await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
+      // await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
+      await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
         {
           "date":formatDate(new Date(datebegin),'YYYY-MM-DD'),
           // // === BALIKKIN LAGI ===
