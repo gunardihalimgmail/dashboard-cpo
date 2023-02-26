@@ -2527,6 +2527,7 @@ class DashboardTangki extends React.Component {
                     ]
                 }
             })
+            // ... end obj_store_temp
 
             
 
