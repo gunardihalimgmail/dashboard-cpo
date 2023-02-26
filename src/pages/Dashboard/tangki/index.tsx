@@ -1885,7 +1885,6 @@ class DashboardTangki extends React.Component {
                           this.update_to_arr_json_tangki_last(data_arr, ele, mst_list_tangki?.['name'], mst_list_tangki?.['api']);
                       }
 
-
                       if (Object.keys(this.arr_json_tangki_last).length == length_mst_list_tangki){
                           return
                       }
@@ -2075,7 +2074,7 @@ class DashboardTangki extends React.Component {
                           ...res_data?.['data']
                       ]
                       obj_keys_last_onprogress++;
-                      console.error(obj_keys_last_onprogress)
+                      // console.error(obj_keys_last_onprogress)
                       
                     });
 
@@ -2088,20 +2087,459 @@ class DashboardTangki extends React.Component {
         let intOnProgress = setInterval(()=>{
             
             if (obj_keys_last_onprogress == obj_keys_last_length){
-              console.error(' ==== ARR RAW ALL ====')
-              console.error(arr_raw_all)
+              // console.error(' ==== ARR RAW ALL ====')
+              // console.error(arr_raw_all)
+
+              let arr_raw_reduce:any = this.grouping_Data_Raw(arr_raw_all);
+
+              this.funcSeparateTank(arr_raw_reduce);
+
               clearInterval(intOnProgress)
             }
         })
-
     }
 
-    funcSeparateTank(arr_data:any){
+    grouping_Data_Raw(arr_raw_all:any){
+        // HILANGKAN DATA DOUBLE
+        let arr_raw_all_reduce:any = [];
+
+        if (Array.isArray(arr_raw_all)){
+          if (arr_raw_all.length > 0){
+
+              arr_raw_all_reduce = arr_raw_all.reduce((arr_tmp, new_obj)=>{
+
+                  let findItem = arr_tmp.find((ele)=>{
+                      if (ele?.['time'] == new_obj?.['time'] &&
+                          ele?.['id_device'] == new_obj?.['id_device'])
+                      {
+                          return true
+                      }
+                  })
+                  if (!findItem){
+                      return [...arr_tmp, {...new_obj}]
+                  }else{
+                    return [...arr_tmp]
+                  }
+
+              }, [])
+
+          }
+        }
+        // console.error("ARR RAW ALL REDUCE (FINAL)")
+        // console.error(arr_raw_all_reduce)
+
+        return arr_raw_all_reduce
+    }
+
+    funcSeparateTank(arr_raw_alls:any){
+        let obj_tank:any = {};
+
         // function untuk memisahkan tangki ke masing-masing key
         // obj = {tangki_1: {'volume isi tank 1':'...', 'Jarak Sensor dengan permukaan Tank 1' : '774.91', 'id_device':"BESTAGRO_002_NEW"}}
         //       ,{tangki_2: {'volume isi tank 2':'...', 'Jarak Sensor dengan permukaan Tank 2' : '203.77', 'id_device':"BESTAGRO_002_NEW"}}
         //       ,{tangki_3: {'volume isi tank 3':'...', 'Jarak Sensor dengan permukaan Tank 3' : '1033.42', 'id_device':"BESTAGRO_001"}}
         //       ,{tangki_4: {'volume isi tank 4':'...', 'Jarak Sensor dengan permukaan Tank 4' : '617.36', 'id_device':"BESTAGRO_001"}}
+        
+        console.error("ARR RAW ALL REDUCE (FINAL)")
+        
+        for (let [i, v] of arr_raw_alls.entries()){
+              // index (i), values (v)
+
+            console.error(i, v)
+            let data_arr:any = v?.['data']?.[0];
+
+            let time:any = v?.['time'] ?? '';
+            let id_device:any = v?.['id_device'] ?? '';
+            let rawData:any = v?.['rawData'];
+            console.error(data_arr)
+
+            // ambil dan simpan masing-masing tangki
+            // looping dalam object data_arr
+
+            let obj_store_temp:any = {};
+            let obj_store_suhu_temp:any = {};
+
+
+            Object.keys(data_arr).forEach((ele_attr:any)=>{
+
+                let patt_tank = new RegExp(/(Tank [0-9]+)/,'gi');
+                let patt_tank_exec = patt_tank.exec(ele_attr);
+                if (patt_tank_exec != null){
+
+                  let data_tank:any = patt_tank_exec[0];
+
+                  let find_mst_list:any = this.mst_list_tangki.find(ele_list=>ele_list.api.toLowerCase() == data_tank.toLowerCase());
+                  if (find_mst_list){
+                      // nama tangki harus ada dalam list master, baru dapat disimpan
+                        let nama_tangki:any = find_mst_list?.['name'] ?? '';
+                        let title_tangki:any = find_mst_list?.['title'] ?? '';
+
+
+                      // ** HITUNG TINGGI CPO / PKO **
+
+                        let patt_tinggi = new RegExp(/(Jarak Sensor dengan permukaan Tank [0-9]+)/,'gi')
+                        let patt_tinggi_exec = patt_tinggi.exec(ele_attr);
+                        
+                        let tangki_jarak_sensor:any;
+                        let tinggi_hitung:any   // tinggi cpo / pko
+
+                        // console.error("patt_tinggi_exec")
+                        // console.error(patt_tinggi_exec)
+
+                        if (patt_tinggi_exec != null){
+
+                            let data_jarak_sensor:any = patt_tinggi_exec['input'];
+
+                             tangki_jarak_sensor =  data_arr?.[data_jarak_sensor];
+
+                             if (typeof tangki_jarak_sensor != 'undefined' && tangki_jarak_sensor != null){
+                                if (typeof tangki_jarak_sensor == 'string'){
+                                  tangki_jarak_sensor = (parseFloat(tangki_jarak_sensor) / 100);
+                                  // tangki_jarak_sensor = (parseFloat(tangki_jarak_sensor) / 100).toFixed(2);
+                                }else{
+                                  // tangki_jarak_sensor = (tangki_jarak_sensor / 100).toFixed(2);
+                                  tangki_jarak_sensor = (tangki_jarak_sensor / 100);
+                                }
+                            }else{tangki_jarak_sensor = 0}
+
+
+                            let ruang_kosong:any = (tangki_jarak_sensor - this.mst_avg_t_segitiga?.[nama_tangki]);
+                            tinggi_hitung = Math.round((this.mst_t_tangki?.[nama_tangki] - ruang_kosong) * 1000) / 1000;
+
+                            if (tinggi_hitung < 0){
+                              tinggi_hitung = 0;
+                            }
+
+                        }
+
+                      // ... ** end TINGGI CPO / PKO
+
+                      // ** SET SUHU TINGGI **
+                        let patt_tank_tinggi_num_exec_final:any;
+                        let data_temperature:any;
+
+                        let patt_suhu = new RegExp(/(Temperature Tank [0-9]+)/,'gi')
+                        let patt_suhu_exec = patt_suhu.exec(ele_attr);
+                        if (patt_suhu_exec != null){
+                            data_temperature = patt_suhu_exec['input'];
+
+                            let patt_tank_number = new RegExp(/(tinggi [0-9]+.?M)/,'gi')
+                            let patt_tank_number_exec = patt_tank_number.exec(ele_attr) ?? -1
+
+                            patt_tank_tinggi_num_exec_final = patt_tank_number_exec != null 
+                                          ? parseFloat(patt_tank_number_exec[0].replace(/(tinggi|M)/gi,'').trim())
+                                          : null
+                            
+                            // SET SUHU SEMENTARA DI obj_store_suhu_temp per SATU DATA ARR object
+                            if (typeof obj_store_suhu_temp?.[nama_tangki] == 'undefined' ||
+                                obj_store_suhu_temp?.[nama_tangki] == null)
+                            {
+                                obj_store_suhu_temp[nama_tangki] = 
+                                {
+                                    data_suhu: [data_arr?.[data_temperature]],
+                                    data_suhu_tank_num: [patt_tank_tinggi_num_exec_final]
+                                }
+                            }
+                            else{
+                                obj_store_suhu_temp[nama_tangki] = 
+                                {
+                                  ...obj_store_suhu_temp[nama_tangki],
+                                  data_suhu: [...obj_store_suhu_temp[nama_tangki]['data_suhu'], 
+                                                data_arr?.[data_temperature]
+                                            ],
+                                  data_suhu_tank_num: [...obj_store_suhu_temp[nama_tangki]['data_suhu_tank_num'], 
+                                                          patt_tank_tinggi_num_exec_final
+                                                      ],
+                                }
+                            }
+                        }
+                      // ... ** end SET SUHU TINGGI **
+
+
+
+                      if (typeof obj_store_temp?.[nama_tangki] == 'undefined' ||
+                            obj_store_temp?.[nama_tangki] == null)
+                      {
+                          // jika tidak ada key tangki nya
+                          obj_store_temp[nama_tangki] = 
+                            {
+                              [ele_attr]: data_arr[ele_attr],
+                              data_suhu: obj_store_suhu_temp[nama_tangki]['data_suhu'],
+                              data_suhu_tank_num: obj_store_suhu_temp[nama_tangki]['data_suhu_tank_num'],
+                              time,
+                              id_device,
+                              rawData
+                            }
+
+                          // ** HITUNG TINGGI CPO / PKO
+                          if (typeof tangki_jarak_sensor != 'undefined'){
+                              obj_store_temp[nama_tangki]['tinggi_minyak'] = tinggi_hitung;
+                          }
+                          // ... end ** HITUNG TINGGI CPO / PKO
+                          
+                      }
+                      else{
+                          // jika ada key tangki nya
+                          obj_store_temp[nama_tangki] = 
+                              {
+                                ...obj_store_temp[nama_tangki],
+                                [ele_attr]: data_arr[ele_attr],
+                                data_suhu: obj_store_suhu_temp[nama_tangki]['data_suhu'],
+                                data_suhu_tank_num: obj_store_suhu_temp[nama_tangki]['data_suhu_tank_num'],
+                                time,
+                                id_device,
+                                rawData
+                              }
+
+                          // ** HITUNG TINGGI CPO / PKO
+                          if (typeof tangki_jarak_sensor != 'undefined'){
+                              obj_store_temp[nama_tangki]['tinggi_minyak'] = tinggi_hitung;
+                          }
+                          // ... end ** HITUNG TINGGI CPO / PKO
+
+                      }
+                      
+                  }
+                }
+            })
+            // ... end looping dalam object data_arr key
+
+
+            // simpan hasil kumpulan key ke obj_tank (final)
+            Object.keys(obj_store_temp).forEach((ele_nama_tangki,idx_store)=>{
+
+                let arr_tinggi_suhu_tmp:any = [];
+                let arr_tinggi_suhu_val_tmp:any = [];
+
+                let volume_tbl:any = 0;
+                let volume_prev:any;
+                let volume_tbl_plus_beda_liter:any;
+                let faktor_koreksi_temp:any;
+                let find_berat_jenis:any
+
+                let arr_obj_tmp_tank_data:any = obj_store_suhu_temp[ele_nama_tangki]['data_suhu'];
+
+                // REVISI KETINGGIAN SUHU yang KE CELUP  20 feb '23
+                let obj_tmp_tank_tinggi_minyak:any = parseFloat(obj_store_temp[ele_nama_tangki]['tinggi_minyak']);
+                if (obj_tmp_tank_tinggi_minyak >= 1){
+
+                  if (arr_obj_tmp_tank_data.length > 0){
+                      arr_obj_tmp_tank_data.forEach((ele_suhu_num,idx)=>{
+                          // [1, 3, 5, 7, 10]
+                          let data_suhu_tank_num_idx:any = obj_store_temp[ele_nama_tangki]['data_suhu_tank_num'][idx];
+                          if (obj_tmp_tank_tinggi_minyak < 4)
+                          {
+                              // jika tinggi di bawah 4 m, maka ambil ketinggian suhu [1]
+                              if (data_suhu_tank_num_idx == 1){
+                                  arr_tinggi_suhu_tmp.push(obj_store_temp[ele_nama_tangki]['data_suhu_tank_num'][idx]);
+                                  arr_tinggi_suhu_val_tmp.push(arr_obj_tmp_tank_data[idx]);
+                              }
+                          }
+                          else
+                          if (obj_tmp_tank_tinggi_minyak >= 4 && obj_tmp_tank_tinggi_minyak < 6){
+                              // jika tinggi di bawah 4 m s/d 5.99, maka ambil ketinggian suhu [1,3]
+                              if (data_suhu_tank_num_idx <= 3){    // ambil [1,3]
+                                  arr_tinggi_suhu_tmp.push(obj_store_temp[ele_nama_tangki]['data_suhu_tank_num'][idx]);
+                                  arr_tinggi_suhu_val_tmp.push(arr_obj_tmp_tank_data[idx]);
+                              }
+                          }
+                          else
+                          if (obj_tmp_tank_tinggi_minyak >= 6 && obj_tmp_tank_tinggi_minyak < 8){
+                              // jika tinggi di bawah 6 m s/d 7.99, maka ambil ketinggian suhu [1,3,5]
+                              if (data_suhu_tank_num_idx <= 5){    // ambil [1,3,5]
+                                  arr_tinggi_suhu_tmp.push(obj_store_temp[ele_nama_tangki]['data_suhu_tank_num'][idx]);
+                                  arr_tinggi_suhu_val_tmp.push(arr_obj_tmp_tank_data[idx]);
+                              }
+                          }
+                          else
+                          if (obj_tmp_tank_tinggi_minyak >= 8 && obj_tmp_tank_tinggi_minyak < 10){
+                              // jika tinggi di bawah 8 m s/d 9.99, maka ambil ketinggian suhu [1,3,5,7]
+                              if (data_suhu_tank_num_idx <= 7){    // ambil [1,3,5,7]
+                                  arr_tinggi_suhu_tmp.push(obj_store_temp[ele_nama_tangki]['data_suhu_tank_num'][idx]);
+                                  arr_tinggi_suhu_val_tmp.push(arr_obj_tmp_tank_data[idx]);
+                              }
+                          }
+                          else
+                          if (obj_tmp_tank_tinggi_minyak >= 10){
+                              // jika tinggi di bawah 10 m, maka ambil ketinggian suhu [1,3,5,7,10]
+                              if (data_suhu_tank_num_idx <= 10){    // ambil [1,3,5,7,10]
+                                  arr_tinggi_suhu_tmp.push(obj_store_temp[ele_nama_tangki]['data_suhu_tank_num'][idx]);
+                                  arr_tinggi_suhu_val_tmp.push(arr_obj_tmp_tank_data[idx]);
+                              }
+                          }
+
+                      })
+                  }
+                }
+                else{
+                  // JIKA MINUS, MAKA INJECT KETINGGIAN 1 M
+                  if (obj_tmp_tank_tinggi_minyak < 1){
+
+                    let arr_obj_tmp_tank_data:any = obj_store_suhu_temp[ele_nama_tangki]['data_suhu_tank_num'];
+                    let findIdx = arr_obj_tmp_tank_data.findIndex(ele=>ele == 1);
+                    if (findIdx != -1){
+                        arr_tinggi_suhu_tmp.push(1);
+                        arr_tinggi_suhu_val_tmp.push(obj_store_suhu_temp[ele_nama_tangki]['data_suhu'][findIdx]);
+                    }
+                  }
+                    // arr_tinggi_suhu_val_tmp.push(arr_obj_tmp_tank_data[1]);
+                }
+                // ... <end REVISI KETINGGIAN>
+
+                // let total:any = obj_temp_tank[ele_tank_name]['data'].reduce((tmp:any, val:any)=>{
+                let total:any = arr_tinggi_suhu_val_tmp.reduce((tmp:any, val:any)=>{
+                  return tmp + parseFloat(val);
+                },0)
+
+                // average / rata-rata per tangki
+                let avg_tank:any = (total / arr_tinggi_suhu_val_tmp.length).toFixed(3);
+                // ... end average / rata-rata per tangki
+
+                // VOLUME TANGKI
+                let tinggi_tmp:any = parseFloat(obj_store_temp[ele_nama_tangki]['tinggi_minyak']).toFixed(3);
+                let avg_tmp:any = parseFloat(avg_tank);
+                
+                if (tinggi_tmp != null){
+
+                    // REVISI VOLUME BEDA LITER
+                    let tinggi_tmp_floor:any = Math.floor(parseFloat(tinggi_tmp) * 100); // angka floor ( 1010 )
+                    let tinggi_tmp_all:any = parseFloat((parseFloat(tinggi_tmp) * 100).toFixed(3));   // angka plus decimal ( 1010,7 )
+                    let tinggi_tmp_dec:any = (Math.round((tinggi_tmp_all - tinggi_tmp_floor) * 1000)) / 1000;   // (1010,7777 - 1010 = 0,778)
+                    // ... end <REVISI VOLUME BEDA LITER>
+                    
+                    // panggil array json tabel volume tangki yang sesuai
+                    let arr_volume:any = this.json_arr_volume_tangki(ele_nama_tangki);
+
+                    let findItem:any = arr_volume.find(res=>
+                          // parseInt(res.tinggi) == Math.round(tinggi_tmp.toFixed(2) * 100)
+                          // in chrome toFixed not rounding (.5) => misal: 5.335 -> 5.33; 5.336 -> 5.34
+                          // parseInt(res.tinggi) == Math.round(parseFloat(parseFloat(tinggi_tmp).toFixed(2))*100)
+                          // parseInt(res.tinggi) == Math.round(parseFloat(tinggi_tmp)*100)
+                          parseInt(res.tinggi) == tinggi_tmp_floor
+                    )
+
+                    let tanggal_tangki:any = new Date(obj_store_temp[ele_nama_tangki]['time']);
+                    let jenis:any = '';
+                    let findCpoPko = this.arr_cpo_pko.find(res=>
+                            res.name == ele_nama_tangki &&
+                            (
+                              (new Date(res.datebegin) <= tanggal_tangki
+                                  && (res.datelast != '' && res.datelast != null && new Date(res.datelast) >= tanggal_tangki)
+                              )
+                              ||
+                              (
+                                (new Date(res.datebegin) <= tanggal_tangki)
+                                  && (res.datelast == '' || res.datelast == null)
+                              )
+                            ) 
+                            // && 
+                            // (res.datelast == null || res.datelast == '' || new Date(res.datelast) >= tanggal_tangki)
+                    )
+                    if (findCpoPko){
+                        jenis = findCpoPko?.['jenis'];
+                    }
+
+                    if (findItem){
+                  
+                      let beda_liter_mst:any = 0;
+                      let beda_liter_hitung:any = 0;
+
+                      // VOLUME LITER ATAU KG tangki
+                      volume_tbl = parseFloat(findItem.volume);
+                      beda_liter_mst = parseFloat(findItem.beda_liter);
+
+
+                      beda_liter_hitung = Math.round((beda_liter_mst * tinggi_tmp_dec) * 1000) / 1000; // cth : (dari 1010,7) 0.7 * 4613 => 3229,1 
+                      
+
+                      volume_prev = volume_tbl;
+
+                      if (typeof findItem?.['volume'] != 'undefined' &&
+                            findItem?.['volume'] != null)
+                      {
+                          volume_tbl_plus_beda_liter = volume_tbl + beda_liter_hitung;
+                      }
+
+                      volume_tbl = volume_tbl_plus_beda_liter;
+
+
+                      if (jenis != '' && jenis != null){
+                          let arr_berat_jenis:any = this.json_arr_berat_jenis_tangki(jenis);
+
+                          find_berat_jenis = arr_berat_jenis.find(res=>
+                              Math.round(parseFloat(res.temperature)) == Math.round(avg_tmp)
+                          );
+                          if (find_berat_jenis){
+                              volume_tbl = volume_tbl * find_berat_jenis?.['berat_jenis'];
+                              // volume_prev = volume_tbl;   // just info volume sebelumnya
+                          }
+
+                          faktor_koreksi_temp = this.faktor_koreksi(volume_tbl, Math.round(parseFloat(avg_tmp)));
+                          if (faktor_koreksi_temp != null){
+                              // console.error('volume tbl ',volume_tbl)
+                              // console.log(tangki_name)
+                              // console.error('faktor koreksi : ',faktor_koreksi_temp)
+                              // console.error('volume tbl :  ',volume_tbl)
+                              volume_tbl *= faktor_koreksi_temp;
+                              // console.error('volume tbl (final) :  ',volume_tbl)
+
+                              // console.error(find_berat_jenis?.['berat_jenis'])
+                          }
+
+
+                      }
+
+
+                    }
+
+                }
+                // ... END VOLUME TANGKI
+
+                if (typeof obj_tank?.[ele_nama_tangki] == 'undefined' ||
+                    obj_tank?.[ele_nama_tangki] == null)
+                {
+                    obj_tank[ele_nama_tangki] = [
+                        {...obj_store_temp[ele_nama_tangki],
+                          avg: avg_tank,
+                          avg_tinggi_suhu: [...arr_tinggi_suhu_tmp],
+                          avg_tinggi_suhu_val: [...arr_tinggi_suhu_val_tmp],
+                          volume_prev,    // volume master
+                          volume_tbl_plus_beda_liter,
+                          volume: volume_tbl,
+                          volume_faktor_koreksi: faktor_koreksi_temp,
+                          volume_berat_jenis: find_berat_jenis?.['berat_jenis']
+                        }
+                    ]
+                }
+                else{
+                    obj_tank[ele_nama_tangki] = [
+                        ...obj_tank[ele_nama_tangki],
+                        {...obj_store_temp[ele_nama_tangki],
+                          avg: avg_tank,
+                          avg_tinggi_suhu: [...arr_tinggi_suhu_tmp],
+                          avg_tinggi_suhu_val: [...arr_tinggi_suhu_val_tmp],
+                          volume_prev,    // volume master
+                          volume_tbl_plus_beda_liter,
+                          volume: volume_tbl,
+                          volume_faktor_koreksi: faktor_koreksi_temp,
+                          volume_berat_jenis: find_berat_jenis?.['berat_jenis']
+                        }
+                    ]
+                }
+            })
+
+            
+
+            // ... end looping dalam object data_arr
+
+            // console.error("obj_tank")
+            // console.error(obj_tank)
+
+        }
+        // ... end arr_raw_alls
+
+        console.error("obj_tank")
+        console.error(obj_tank)
 
     }
 
@@ -2708,7 +3146,7 @@ class DashboardTangki extends React.Component {
                   // console.log(obj_temp_tank)
 
                   
-                  // === BALIKKIN LAGI (JARAK SENSOR) ===
+                  // === BALIKKIN LAGI (VOLUME TANGKI) ===
                   let arr_obj_keys_vol = Object.keys(obj_temp_tank);
 
                   arr_obj_keys_vol.forEach((tangki_name:any)=>{
@@ -2813,8 +3251,6 @@ class DashboardTangki extends React.Component {
                               if (jenis != '' && jenis != null){
 
                                   let arr_berat_jenis:any = this.json_arr_berat_jenis_tangki(jenis);
-
-                                  // sini update
 
                                   let find_berat_jenis:any = arr_berat_jenis.find(res=>
                                         Math.round(parseFloat(res.temperature)) == Math.round(avg_tmp)
@@ -5068,9 +5504,9 @@ class DashboardTangki extends React.Component {
                                                         wrapperClass=""
                                                         visible={this.state.loader.tinggi_isi}
                                                         ariaLabel="three-circles-rotating"
-                                                        outerCircleColor=""
-                                                        innerCircleColor=""
-                                                        middleCircleColor=""
+                                                        outerCircleColor="#008ffb"
+                                                        innerCircleColor="#00e396"
+                                                        middleCircleColor="#feb019"
                                                       />
 
                                                     {/* <Dna
@@ -5113,9 +5549,9 @@ class DashboardTangki extends React.Component {
                                                               wrapperClass=""
                                                               visible={this.state.loader.suhu_tangki}
                                                               ariaLabel="three-circles-rotating"
-                                                              outerCircleColor=""
-                                                              innerCircleColor=""
-                                                              middleCircleColor=""
+                                                              outerCircleColor="#008ffb"
+                                                              innerCircleColor="#00e396"
+                                                              middleCircleColor="#feb019"
                                                         />
                                                       </Col>
                                                   </div>
@@ -5351,12 +5787,12 @@ class DashboardTangki extends React.Component {
                                                                     width="100"
                                                                     color="#4fa94d"
                                                                     wrapperStyle={{}}
-                                                                    wrapperClass=""
+                                                                    wrapperClass="mb-3"
                                                                     visible={this.state.loader.tinggi_isi_jam}
                                                                     ariaLabel="three-circles-rotating"
-                                                                    outerCircleColor=""
-                                                                    innerCircleColor=""
-                                                                    middleCircleColor=""
+                                                                    outerCircleColor="#008ffb"
+                                                                    innerCircleColor="#00e396"
+                                                                    middleCircleColor="#feb019"
                                                                 />
 
                                                                 { 
@@ -5438,9 +5874,9 @@ class DashboardTangki extends React.Component {
                                                                     wrapperClass=""
                                                                     visible={this.state.loader.tinggi_isi_jam}
                                                                     ariaLabel="three-circles-rotating"
-                                                                    outerCircleColor=""
-                                                                    innerCircleColor=""
-                                                                    middleCircleColor=""
+                                                                    outerCircleColor="#008ffb"
+                                                                    innerCircleColor="#00e396"
+                                                                    middleCircleColor="#feb019"
                                                                 />
 
                                                                 { 
@@ -5523,9 +5959,9 @@ class DashboardTangki extends React.Component {
                                                             wrapperClass=""
                                                             visible={this.state.loader.jarak_sensor_jam}
                                                             ariaLabel="three-circles-rotating"
-                                                            outerCircleColor=""
-                                                            innerCircleColor=""
-                                                            middleCircleColor=""
+                                                            outerCircleColor="#008ffb"
+                                                            innerCircleColor="#00e396"
+                                                            middleCircleColor="#feb019"
                                                         />
 
                                                         {
@@ -5604,9 +6040,9 @@ class DashboardTangki extends React.Component {
                                                             wrapperClass=""
                                                             visible={this.state.loader.tinggi_isi_jam}
                                                             ariaLabel="three-circles-rotating"
-                                                            outerCircleColor=""
-                                                            innerCircleColor=""
-                                                            middleCircleColor=""
+                                                            outerCircleColor="#008ffb"
+                                                            innerCircleColor="#00e396"
+                                                            middleCircleColor="#feb019"
                                                         />
 
                                                         { 
@@ -5674,9 +6110,9 @@ class DashboardTangki extends React.Component {
                                                             wrapperClass=""
                                                             visible={this.state.loader.suhu_tangki_jam}
                                                             ariaLabel="three-circles-rotating"
-                                                            outerCircleColor=""
-                                                            innerCircleColor=""
-                                                            middleCircleColor=""
+                                                            outerCircleColor="#008ffb"
+                                                            innerCircleColor="#00e396"
+                                                            middleCircleColor="#feb019"
                                                         />
 
                                                         { 
@@ -5761,9 +6197,9 @@ class DashboardTangki extends React.Component {
                                                             wrapperClass=""
                                                             visible={this.state.loader.suhu_tinggi_tangki_jam}
                                                             ariaLabel="three-circles-rotating"
-                                                            outerCircleColor=""
-                                                            innerCircleColor=""
-                                                            middleCircleColor=""
+                                                            outerCircleColor="#008ffb"
+                                                            innerCircleColor="#00e396"
+                                                            middleCircleColor="#feb019"
                                                         />
 
                                                         { 
@@ -5824,9 +6260,9 @@ class DashboardTangki extends React.Component {
                                                               wrapperClass=""
                                                               visible={this.state.loader.volume_tangki_jam}
                                                               ariaLabel="three-circles-rotating"
-                                                              outerCircleColor=""
-                                                              innerCircleColor=""
-                                                              middleCircleColor=""
+                                                              outerCircleColor="#008ffb"
+                                                              innerCircleColor="#00e396"
+                                                              middleCircleColor="#feb019"
                                                         />
 
                                                         { 
