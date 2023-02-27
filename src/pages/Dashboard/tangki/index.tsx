@@ -2145,13 +2145,14 @@ class DashboardTangki extends React.Component {
         for (let [i, v] of arr_raw_alls.entries()){
               // index (i), values (v)
 
-            console.error(i, v)
+            // console.error(i, v)
             let data_arr:any = v?.['data']?.[0];
 
             let time:any = v?.['time'] ?? '';
+            let time_getTime:any = v?.['time'] != null ? new Date(v?.['time']).getTime() : 0;
             let id_device:any = v?.['id_device'] ?? '';
             let rawData:any = v?.['rawData'];
-            console.error(data_arr)
+            // console.error(data_arr)
 
             // ambil dan simpan masing-masing tangki
             // looping dalam object data_arr
@@ -2267,6 +2268,7 @@ class DashboardTangki extends React.Component {
                               data_suhu: obj_store_suhu_temp[nama_tangki]['data_suhu'],
                               data_suhu_tank_num: obj_store_suhu_temp[nama_tangki]['data_suhu_tank_num'],
                               time,
+                              time_getTime,
                               id_device,
                               rawData
                             }
@@ -2287,6 +2289,7 @@ class DashboardTangki extends React.Component {
                                 data_suhu: obj_store_suhu_temp[nama_tangki]['data_suhu'],
                                 data_suhu_tank_num: obj_store_suhu_temp[nama_tangki]['data_suhu_tank_num'],
                                 time,
+                                time_getTime,
                                 id_device,
                                 rawData
                               }
@@ -2541,6 +2544,255 @@ class DashboardTangki extends React.Component {
 
         console.error("obj_tank")
         console.error(obj_tank)
+
+        // AMBIL MODUS (TINGGI TERBANYAK) masing-masing tangki
+        let obj_tank_modus:any = {};
+        let obj_temp_tinggi_map:any = [];
+        let obj_tinggi_map:any = {};
+        let obj_tinggi_modus:any = {};
+        let obj_tinggi_modus_filter:any = {};
+        let obj_tinggi_tank_modus_filter_single:any = {};
+
+        Object.keys(obj_tank).forEach((ele_nama_tangki, idx_obj_tank)=>{
+
+            // [11.16, 11.10, 11.16, 11.16]
+            obj_temp_tinggi_map = obj_tank?.[ele_nama_tangki].map((ele_key, idx_key)=>{
+              return ele_key?.['tinggi_minyak']
+            })
+            // ... end []
+
+            if (typeof obj_tinggi_map?.[ele_nama_tangki] == 'undefined'){
+                // console.error(ele_nama_tangki)
+                // console.error(obj_temp_tinggi_map)
+                // console.error(obj_tinggi_map?.[ele_nama_tangki])
+
+                // {'tangki_1' : [11.16, 11.10, 11.16, 11.16]}
+                obj_tinggi_map = {
+                  ...obj_tinggi_map,
+                  [ele_nama_tangki]: [...obj_temp_tinggi_map]
+                }
+                // ... end {}
+
+                if (typeof obj_tinggi_modus?.[ele_nama_tangki] == 'undefined')
+                {
+
+                    // single data yang sering keluar
+                    let getFrequentItem:any = _(obj_temp_tinggi_map)
+                          .countBy()
+                          .entries()
+                          .maxBy(_.last)
+
+                    // hanya sebagai referensi master countBy
+                    let obj_temp_tinggi_map_countBy = _.countBy(obj_temp_tinggi_map);
+
+                    if (getFrequentItem.length >= 1){
+
+                        let arr_val_y_countBy_entries = Object.entries(obj_temp_tinggi_map_countBy);
+
+                        // filter yang memiliki kemunculan angka yang sama (misal, [[12.34, 2], [9.56, 2]]) => [2] == [2]
+                        let filter_val_y_countBy_entries = arr_val_y_countBy_entries.filter(elefil => elefil[1] == getFrequentItem[1]);
+
+                        let arr_getMax_Values = filter_val_y_countBy_entries.map((ele_max,idx_max)=>{
+                            return parseFloat(ele_max[0])
+                        })
+
+                        // ambil angka tinggi yang paling maksimal (misal : 12.34)
+                        let getMax_Value:any = Math.max.apply(null, arr_getMax_Values)
+
+                        // console.error("obj_temp_tinggi_map_countBy")
+                        // console.error(obj_temp_tinggi_map_countBy)
+                        // console.error("getFrequentItem")
+                        // console.error(getFrequentItem)
+                        getFrequentItem = [[getMax_Value, getFrequentItem[1]]]
+                        // console.error("getFrequentItem")
+                        // console.error(getFrequentItem)
+                    }
+                    
+                    // {tangki_1: ['3.853',8],
+                    // tangki_2: ['11.146',8],
+                    // tangki_3: ['0',9],
+                    // tangki_3: ['1.621',7]}
+
+                    obj_tinggi_modus = {
+                      ...obj_tinggi_modus,
+                      [ele_nama_tangki]: getFrequentItem
+                    }
+                    // console.error("obj_tinggi_modus")
+                    // console.error(obj_tinggi_modus)
+
+                    // filter yang ter banyak dari obj_tinggi_modus
+                    if (typeof obj_tinggi_modus_filter?.[ele_nama_tangki] == 'undefined')
+                    {
+                        // console.error("PARSE FLOAT getFrequentItem")
+                        // console.error(parseFloat(getFrequentItem[0])) // [1.621, 7] => 1.621
+
+                        let arr_filter_temp = obj_tank?.[ele_nama_tangki].filter((ele,idx)=>{
+                          return parseFloat(ele?.['tinggi_minyak']) == parseFloat(getFrequentItem[0])
+                        })
+
+                        // multi data yang terbanyak (beda jam dengan satu ketinggian)
+                        obj_tinggi_modus_filter = {
+                          ...obj_tinggi_modus_filter,
+                          [ele_nama_tangki]: [...arr_filter_temp]
+                        }
+
+                        // single data (cari time yang paling max)
+                        let arr_map_time_data:any = arr_filter_temp.map((ele,idx)=>{
+                            return ele?.['time_getTime']
+                        })
+
+                        let arr_map_time_data_max:any = Math.max.apply(null, arr_map_time_data);
+                        // ... end tanggal max
+
+                        // console.log("arr_map_time_data MAX")
+                        // console.log(arr_map_time_data_max)
+
+                        // cari yang last update (tanggal ter-update)
+                        let filter_single_modus:any = obj_tinggi_modus_filter[ele_nama_tangki].filter((ele,idx)=>{
+                            return ele?.['time_getTime'] == arr_map_time_data_max
+                        })
+                        if (filter_single_modus.length > 0)
+                        {
+
+                            if (typeof obj_tinggi_tank_modus_filter_single?.[ele_nama_tangki] == 'undefined')
+                            {
+
+                              // hanya menampung satu data tanggal terakhir per tangki
+                                obj_tinggi_tank_modus_filter_single = {
+                                    ...obj_tinggi_tank_modus_filter_single,
+                                    [ele_nama_tangki]: filter_single_modus?.[0]
+                                }
+                            }
+                        }
+                        
+                        // ... end cari last update
+
+                        console.log("arr_map_time_data")
+                        console.log(arr_map_time_data)
+                        console.log("obj_tinggi_tank_modus_filter_single")
+                        console.log(obj_tinggi_tank_modus_filter_single)
+
+                    }
+                }
+
+            }
+        })
+        // ... end obj_tank (per tangki_name)
+
+        // UPDATE KE REALTIME
+        let temp_updatedState_global:any = {};
+
+        // inject dulu data dari this.state 
+        temp_updatedState_global['realtime'] = {
+            ...this.state['realtime']
+        }
+
+        let arr_tangki_name:any = [];
+        let arr_tangki_tinggi:any = [];
+
+        let arr_tangki_temp:any = [];
+
+        // LOOPING obj_tinggi_tank_modus_filter_single
+        Object.keys(obj_tinggi_tank_modus_filter_single).forEach((ele_tank_name,idx_tank_name)=>{
+
+            // taruh di temp dahulu, baru di store ke setState (karena setState tidak bisa update di looping multi data)
+            temp_updatedState_global['realtime'] = {
+
+                ...temp_updatedState_global['realtime'],
+                [ele_tank_name]: {
+                    ...this.state.realtime[ele_tank_name],
+                    tinggi: parseFloat(obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['tinggi_minyak']),
+                    suhu: obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['avg'],
+                    suhu_tank_num: obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['data_suhu'],
+                    suhu_tank_num_raw: obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['data_suhu_tank_num'],
+                    avg_tinggi_suhu: [...obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['avg_tinggi_suhu']],
+                    avg_tinggi_suhu_val: [...obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['avg_tinggi_suhu_val']],
+                    volume: Math.round(parseFloat(obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['volume']) * 100) / 100,
+                    volume_prev: obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['volume_prev'],
+                    volume_tbl_plus_beda_liter: obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['volume_tbl_plus_beda_liter'],
+                    volume_berat_jenis: obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['volume_berat_jenis'],
+                    volume_faktor_koreksi: obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['volume_faktor_koreksi'],
+                    tanggal: formatDate(new Date(obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['time']), 'DD MMMM YYYY'),
+                    tanggal_jam: formatDate(new Date(obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['time']), 'DD MMMM YYYY HH:mm:ss')
+                }
+            }
+
+            // TITLE TINGGI ISI TANGKI (m)
+            let find_tangki_title:any = this.mst_list_tangki.find(res_tank=>res_tank.name == ele_tank_name);
+            if (find_tangki_title){
+              arr_tangki_name.push(
+                  // [find_tangki_title['title'], tanggal, jam]
+                  find_tangki_title['title']
+              );
+            }
+            arr_tangki_tinggi.push(parseFloat(obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['tinggi_minyak']));
+        })
+        // ... end LOOPING obj_tinggi_tank_modus_filter_single
+
+        arr_tangki_name.forEach((ele, idx)=>{
+
+            let patt = new RegExp(/([0-9]+)/,'gi');
+            let match:any = patt.exec(ele);
+            let angka_temp:any = 0;
+            if (match){
+              angka_temp = match[0];
+            }
+
+            arr_tangki_temp.push(
+              {x: ele, y: arr_tangki_tinggi[idx], 
+                tangki_num: parseFloat(angka_temp)}
+            )
+        })
+
+        // sort
+        if (arr_tangki_temp){
+          arr_tangki_temp.sort((a,b)=>{
+            return a['tangki_num'] - b['tangki_num']
+          })
+        }
+        // ... end sort
+
+        
+        this.setState({
+          ...this.state,
+          loader:{
+              ...this.state.loader,
+              tinggi_isi:false,
+              suhu_tangki: false,
+              suhu_tangki_modus_jam: false
+          },
+          chartTinggi:{
+              ...this.state.chartTinggi,
+              options:{
+                  ...this.state.chartTinggi.options,
+                  xaxis:{
+                    ...this.state.chartTinggi.options.xaxis,
+                    // categories: [...arr_tangki_name]    // ["Tangki 1","Tangki 2","Tangki 3","Tangki 4"]
+                  }
+              },
+              series: [
+                {
+                  // data:[...arr_tangki_tinggi],  // [4.55, 8.81, ...]
+                  data:[...arr_tangki_temp], 
+                  name: "Tinggi Isi Tangki"}
+              ]
+          },
+          ...temp_updatedState_global
+        })
+
+
+
+        // ... end UPDATE KE REALTIME
+
+          // console.error("obj_tinggi_map")
+          // console.error(obj_tinggi_map)
+          // console.error(obj_tinggi_modus)
+          // console.error("obj_tinggi_modus_filter")
+          // console.error(obj_tinggi_modus_filter)
+
+
+
+        // ... END END MODUS
 
     }
 
@@ -3309,7 +3561,8 @@ class DashboardTangki extends React.Component {
                                       tinggi_tmp_dec,
                                       beda_liter_mst,
                                       beda_liter_hitung,
-                                      volume: volume_tbl.toFixed(2),
+                                      // volume: volume_tbl.toFixed(2),
+                                      volume: Math.round(parseFloat(volume_tbl) * 100) / 100,
                                       jenis
                                   }
 
@@ -5333,9 +5586,11 @@ class DashboardTangki extends React.Component {
                                                                       }
                                                                   </div>
 
-                                                                  <h4 className='text-white'>Tinggi : {this.state.realtime?.[ele.name].tinggi} M</h4>
-                                                                  <h4 className='text-white'>Suhu : {this.state.realtime?.[ele.name].suhu} °C</h4>
-                                                                  <h4 className='text-white'>Volume : { this.state.realtime?.[ele.name].volume != "-" ? new Number(this.state.realtime?.[ele.name].volume).toLocaleString('en-us') : '-'} kg</h4>
+                                                                  <div style={{position:'relative', zIndex:2}}>
+                                                                    <h4 className='text-white'>Tinggi : {this.state.realtime?.[ele.name].tinggi} M</h4>
+                                                                    <h4 className='text-white'>Suhu : {this.state.realtime?.[ele.name].suhu} °C</h4>
+                                                                    <h4 className='text-white'>Volume : { this.state.realtime?.[ele.name].volume != "-" ? new Number(this.state.realtime?.[ele.name].volume).toLocaleString('en-us') : '-'} kg</h4>
+                                                                  </div>
 
                                                               </Card.Body>
                                                           </Card>
@@ -5580,7 +5835,7 @@ class DashboardTangki extends React.Component {
                                                                   } 
                                                                   subcaption2={this.state.realtime?.[ele.name]?.['tanggal_jam']}
                                                                   subcaption={this.state.realtime?.[ele.name]?.['tanggal']} 
-                                                                  value={this.state.realtime?.[ele.name]?.['suhu']}/>
+                                                                  value={parseFloat(this.state.realtime?.[ele.name]?.['suhu'])}/>
                                                           </div>
                                                         )
                                                       })

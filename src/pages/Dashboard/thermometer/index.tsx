@@ -18,14 +18,14 @@ const ThermometerFC = ({caption="", value=0, subcaption="", subcaption2=""}) => 
                 ele.textContent = "";
             }
         })
-    },500)
+    },500)  
 
     let dataSource_Suhu = {
         chart: {
           caption: `${caption}`,
           subcaption: formatDate(new Date(subcaption),'DD MMMM YYYY') + '\n' + formatDate(new Date(subcaption2),'HH:mm'),
           lowerlimit: "0",
-          upperlimit: "100",
+          upperlimit: "70",
           numbersuffix: "°C",
           thmfillcolor: "#008ee4",
           showgaugeborder: "1",

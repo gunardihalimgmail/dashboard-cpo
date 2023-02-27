@@ -67,6 +67,8 @@ span.dashtangki-mdi-span {
 h4.dashtangki-cardbody-ontop{
     // font-size:20px !important
     font-weight: 400 !important;
+    position: relative;     // agar z-index dapat berfungsi
+    z-index: 2;
 }
 
 .dashtangki-image-circle {
@@ -74,6 +76,7 @@ h4.dashtangki-cardbody-ontop{
     top:0;
     right:0;
     height:100%;
+    z-index: 1;
     // color:#f0f8ff
 }
 
@@ -90,6 +93,7 @@ h4.dashtangki-cardbody-ontop{
     font-weight: 500;
     top:-5px;
     position: relative;
+    z-index: 2;
 }
 
 .customclass-snap{
