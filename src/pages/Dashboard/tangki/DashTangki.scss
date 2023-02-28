@@ -179,10 +179,21 @@ h4.dashtangki-cardbody-ontop{
     padding-right: 10px;
 }
 
+// lebar chart tinggi (ukuran desktop)
+.width-tinggi-isi {
+    width: 50%;
+}
+
+// lebar chart suhu (ukuran desktop)
+.width-suhu-tangki {
+    width: 50%;
+}
+
 @media(max-width:767px){
     .mediaClassFilter {
         width:100%
     }
+    
     .filter-css-title {
         font-weight: bold;
         font-size:20px;
@@ -198,6 +209,14 @@ h4.dashtangki-cardbody-ontop{
 
     .modus-flex {
         flex:0 0 270px; 
+    }
+
+    .width-tinggi-isi {
+        width: 100%;
+    }
+
+    .width-suhu-tangki {
+        width: 100%;
     }
 }
 
@@ -255,3 +274,7 @@ h4.dashtangki-cardbody-ontop{
 //     position: relative;
 //     border:1px solid red;
 // }
+
+.classTinggiIsi {
+    position: absolute;
+}

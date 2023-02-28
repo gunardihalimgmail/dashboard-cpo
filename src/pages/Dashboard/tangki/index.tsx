@@ -1,7 +1,18 @@
-import React, { useRef, useState } from 'react';
+import React, { createRef, useRef, useState } from 'react';
 import ReactToPrint from 'react-to-print'
 
 import _ from 'lodash'
+
+// amCharts
+import * as am5 from "@amcharts/amcharts5";
+import * as am5xy  from "@amcharts/amcharts5/xy";
+import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
+
+import * as am4core from "@amcharts/amcharts4/core";
+import * as am4charts from "@amcharts/amcharts4/charts";
+import am4themes_animated from "@amcharts/amcharts4/themes/animated";
+
+// ... end amCharts
 
 // import FusionCharts from 'fusioncharts';
 // import Charts from 'fusioncharts/fusioncharts.charts';
@@ -52,6 +63,7 @@ import tangki_4_json from '../../../data/volume_tangki/tangki_4.json'
 import berat_jenis_cpo_json from '../../../data/volume_tangki/berat_jenis_cpo.json'
 import berat_jenis_pko_json from '../../../data/volume_tangki/berat_jenis_pko.json'
 import { toast, ToastContainer } from 'react-toastify';
+import { FALSE } from 'sass';
 // import tesaja from '../../../data/tes.json'
 
 // ReactFC.fcRoot(FusionCharts, PowerCharts, FusionTheme)
@@ -133,6 +145,11 @@ class PanggilToast extends React.Component {
 class DashboardTangki extends React.Component {
 
     componentRef:any;
+  
+    chart:any; // untuk Chart Tinggi isi (AM Chart)
+
+    root:any;
+    chart_amColumn3d:any;
 
     getFirstTangki_Default:any = {};
 
@@ -1828,6 +1845,277 @@ class DashboardTangki extends React.Component {
         }
     }
 
+    componentWillUnmount(): void {
+      // amcharts
+      if (this.root){
+        this.root.dispose();
+      }
+    }
+
+    generateAMChart(){
+        // amCharts
+        const root = am5.Root.new("chartdiv");
+
+        this.root = root;
+
+        root.setThemes([
+          am5themes_Animated.new(root)
+        ]);
+    
+        let chart = root.container.children.push( 
+          am5xy.XYChart.new(root, {
+            panY: false,
+            layout: root.verticalLayout
+          }) 
+        );
+
+        // Define data
+        let data = [{
+          category: "Research",
+          value1: 1000,
+          value2: 588
+        }, {
+          category: "Marketing",
+          value1: 1200,
+          value2: 1800
+        }, {
+          category: "Sales",
+          value1: 850,
+          value2: 1230
+        }];
+
+         // Create Y-axis
+        let yAxis = chart.yAxes.push(
+          am5xy.ValueAxis.new(root, {
+            renderer: am5xy.AxisRendererY.new(root, {})
+          })
+        );
+
+        // Create X-Axis
+        let xAxis = chart.xAxes.push(
+          am5xy.CategoryAxis.new(root, {
+          renderer: am5xy.AxisRendererX.new(root, {}),
+            categoryField: "category"
+          })
+        );
+        xAxis.data.setAll(data);
+
+         // Create series
+        let series1 = chart.series.push(
+          am5xy.ColumnSeries.new(root, {
+            name: "Series",
+            xAxis: xAxis,
+            yAxis: yAxis,
+            valueYField: "value1",
+            categoryXField: "category"
+          })
+        );
+        series1.data.setAll(data);
+
+        let series2 = chart.series.push(
+          am5xy.ColumnSeries.new(root, {
+            name: "Series",
+            xAxis: xAxis,
+            yAxis: yAxis,
+            valueYField: "value2",
+            categoryXField: "category"
+          })
+        );
+        series2.data.setAll(data);
+
+         // Add legend
+        let legend = chart.children.push(am5.Legend.new(root, {}));
+        legend.data.setAll(chart.series.values);
+
+          // Add cursor
+          chart.set("cursor", am5xy.XYCursor.new(root, {}));
+
+          this.root = root;
+    }
+
+    generateAMChart_Column3D(data:any){
+      
+      am4core.useTheme(am4themes_animated);
+      let chart = am4core.create("chartdiv", am4charts.XYChart3D);
+
+      chart.paddingBottom = 70;
+      chart.angle = 70
+
+      // chart.cursor.behavior = "none";
+
+      // Add data
+      // data = [{
+      //   "country":"USA",
+      //   "visits":4025
+      // }
+      // ,{
+      //   "country": "China",
+      //   "visits": 1882
+      // }, {
+      //   "country": "Japan",
+      //   "visits": 1809
+      // }, {
+      //   "country": "Germany",
+      //   "visits": 1322
+      // }
+      // ]
+      chart.data = [...data];
+
+      // chart.data = [{
+      //   "country": "USA",
+      //   "visits": 4025
+      // }, {
+      //   "country": "China",
+      //   "visits": 1882
+      // }, {
+      //   "country": "Japan",
+      //   "visits": 1809
+      // }, {
+      //   "country": "Germany",
+      //   "visits": 1322
+      // }
+      // // , {
+      // //   "country": "UK",
+      // //   "visits": 1122
+      // // }, {
+      // //   "country": "France",
+      // //   "visits": 1114
+      // // }, {
+      // //   "country": "India",
+      // //   "visits": 984
+      // // }, {
+      // //   "country": "Spain",
+      // //   "visits": 711
+      // // }, {
+      // //   "country": "Netherlands",
+      // //   "visits": 665
+      // // }, {
+      // //   "country": "Russia",
+      // //   "visits": 580
+      // // }, {
+      // //   "country": "South Korea",
+      // //   "visits": 443
+      // // }, {
+      // //   "country": "Canada",
+      // //   "visits": 441
+      // // }, {
+      // //   "country": "Brazil",
+      // //   "visits": 395
+      // // }, {
+      // //   "country": "Italy",
+      // //   "visits": 386
+      // // }, {
+      // //   "country": "Australia",
+      // //   "visits": 384
+      // // }, {
+      // //   "country": "Taiwan",
+      // //   "visits": 338
+      // // }, {
+      // //   "country": "Poland",
+      // //   "visits": 328
+      // // }
+      // ];
+
+      // Create axes
+      let categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+      categoryAxis.dataFields.category = "country";
+      categoryAxis.renderer.labels.template.rotation = 270;
+      categoryAxis.renderer.labels.template.hideOversized = false;
+      categoryAxis.renderer.labels.template.horizontalCenter = "left";
+      categoryAxis.renderer.labels.template.verticalCenter = "middle";
+      categoryAxis.renderer.labels.template.inside = false;
+      categoryAxis.renderer.minGridDistance = 20;
+      categoryAxis.renderer.inside = true;
+      categoryAxis.renderer.grid.template.disabled = true;
+      
+      categoryAxis!.tooltip!.label!.rotation = 270;
+      categoryAxis!.tooltip!.label!.horizontalCenter = "right";
+      categoryAxis!.tooltip!.label!.verticalCenter = "middle";
+      
+
+      // let labelTemplate = categoryAxis.renderer.labels.template;
+      // labelTemplate.rotation = 270;
+      // labelTemplate.hideOversized  = false;
+      // labelTemplate.horizontalCenter = "right";
+      // labelTemplate.verticalCenter = "middle";
+      // labelTemplate.dy = 10; // moves it a bit down;
+      // labelTemplate.inside = false; 
+
+      let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+      valueAxis.renderer.grid.template.disabled = false;
+
+      // categoryAxis.renderer.labels.template.rotation = -90;
+      // categoryAxis.renderer.grid.template.location = 0;
+      // // categoryAxis.renderer.labels.template.hideOversized = false;
+      // categoryAxis.renderer.minGridDistance = 20;
+      // categoryAxis.renderer.labels.template.horizontalCenter = "left";
+      // categoryAxis.renderer.labels.template.verticalCenter = "middle";
+      // categoryAxis.renderer.labels.template.dy = 10;
+      // categoryAxis.renderer.inside = false;
+
+      // categoryAxis.tooltip.label.rotation = 270;
+      // categoryAxis.tooltip.label.horizontalCenter = "right";
+      // categoryAxis.tooltip.label.verticalCenter = "middle";
+
+      // let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+      // valueAxis.title.text = "Meter";
+      // valueAxis.title.fontWeight = "bold";
+      // valueAxis.renderer.grid.template.disabled = false;
+
+      // Create series
+      let series = chart.series.push(new am4charts.ConeSeries());
+      series.dataFields.valueY = "visits";
+      series.dataFields.categoryX = "country";
+      series.name = "Tank";
+      series.tooltipText = "{categoryX}: [bold]{valueY}[/]";
+      series.columns.template.fillOpacity = 1;    // opacity bar column
+
+      let columnTemplate = series.columns.template;
+      columnTemplate.strokeWidth = 2;
+      columnTemplate.strokeOpacity = 0;
+      columnTemplate.stroke = am4core.color("#FFFFFF");
+
+      columnTemplate.adapter.add("fill", function(fill, target) {
+        return chart.colors.getIndex(target!.dataItem!.index);
+      })
+
+      columnTemplate.adapter.add("stroke", function(stroke, target:any) {
+        return chart.colors.getIndex(target!.dataItem!.index);
+      })
+
+//       let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+// valueAxis.renderer.grid.template.disabled = true;
+
+
+      chart.cursor = new am4charts.XYCursor();
+      chart.cursor.lineX.strokeOpacity = 0;
+      chart.cursor.lineY.strokeOpacity = 1;
+
+      chart.cursor.xAxis = categoryAxis;
+      // chart.cursor.fullWidthLineX = true;
+      // chart.cursor.lineX.strokeWidth = 0;
+      // chart.cursor.lineX.fill = am4core.color("#8F3985");
+      // chart.cursor.lineX.fillOpacity = 0;
+
+      // disable zoom in
+      chart.cursor.behavior = "none";
+      // chart.colors.list = [
+      //   am4core.color("#fe7096"),
+      //   am4core.color("#90caf9"),
+      //   am4core.color("#84d9d2"),
+      //   am4core.color("#b9dd77"),
+        // am4core.color("#845EC2"),
+        // am4core.color("#D65DB1"),
+        // am4core.color("#FF6F91"),
+        // am4core.color("#FF9671"),
+        // am4core.color("#FFC75F"),
+        // am4core.color("#F9F871")
+      // ];
+      
+    
+      this.chart_amColumn3d = chart;
+    }
+
     async componentDidMount() {
         // this.setState({ 
         //   waktu:{
@@ -1836,13 +2124,25 @@ class DashboardTangki extends React.Component {
         //   }
         // })
 
+        this.generateAMChart_Column3D(
+          [
+            {
+              "country": "USA",
+              "visits": 4025
+            }, {
+              "country": "China",
+              "visits": 1882
+            }
+          ]
+        )
+        
+
         let length_mst_list_tangki:any = this.mst_list_tangki.length;
 
         // hit api yang getAllData
-        await postApi("https://platform.iotsolution.id:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
+        // await postApi("https://platform.iotsolution.id:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
 
-
-        // await postApi("http://192.168.1.120:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
+        await postApi("http://192.168.1.120:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
           
           if (res?.['responseCode'] == "200"){
               let res_data:any = res?.['data'];
@@ -1903,40 +2203,75 @@ class DashboardTangki extends React.Component {
               // AMBIL KELIPATAN 10 MENIT TERAKHIR
               // MISAL : WAKTU 07:26, AMBIL 07:11 - 07:20
               // MISAL : WAKTU 07:00, AMBIL 06:41 - 06:50
-              this.processPreviousMinTank_fromLast(this.arr_json_tangki_last);
+              this.processPreviousMinTank_fromLast(this.arr_json_tangki_last)
+
+              // HILANGKAN LOGO AM CHARTS KIRI BAWAH
+              setTimeout(()=>{
+                  let am_logo = document.querySelectorAll('#chartdiv svg g[aria-labelledby]')
+                  let g_idx_length:number = am_logo.length-1;
+
+                  console.log("am_logo[g_idx_length-1]")
+                  console.log(am_logo[g_idx_length])
+                
+                  if (am_logo?.[g_idx_length] != null){
+                    // document.getElementById('#chartdiv')!.style .display = "none"
+
+                    am_logo.forEach((ele,idx)=>{
+                        if (idx == g_idx_length){
+                          // SET ID DAHULU, agar bisa dihapus
+                             ele.setAttribute("id", "amchart-custom-" + idx.toString())
+                        }
+                    })
+
+                    // am_logo[g_idx_length].style.display = "none";
+                  }
+
+                  let am_logos = document.querySelectorAll('#chartdiv svg g[aria-labelledby]')
+                  am_logos.forEach((ele,idx)=>{
+                      if (idx == g_idx_length){
+                          // console.error("ini")
+                          // console.error(ele.id);
+                          document.getElementById(ele.id)!.style.display = "none";
+                      }
+                  })
+
+                  // am_logo.forEach((ele)=>{
+                  //   console.log(ele)
+                  // })
+              },10)
               
-              return
+              // return
               // ===== <END MODUS DATA> =====
 
               
               // ISI DATA arr_json_tangki_last (di proses pada kalkulasi tinggi)
               // 
-              this.kalkulasi_tinggi_tangki(()=>{
-                this.kalkulasi_suhu_tangki(()=>{
-                  this.kalkulasi_set_others_tangki(()=>{
-                    this.kalkulasi_volume_tangki(()=>{
+              // this.kalkulasi_tinggi_tangki(()=>{
+              //   this.kalkulasi_suhu_tangki(()=>{
+              //     this.kalkulasi_set_others_tangki(()=>{
+              //       this.kalkulasi_volume_tangki(()=>{
 
-                        let getFirstTangkiList = this.mst_list_tangki.length > 0 ? {...this.mst_list_tangki[0]} : {}
-                        this.getFirstTangki_Default = {...getFirstTangkiList}
+              //           let getFirstTangkiList = this.mst_list_tangki.length > 0 ? {...this.mst_list_tangki[0]} : {}
+              //           this.getFirstTangki_Default = {...getFirstTangkiList}
                 
-                        this.setState({
-                          ...this.state,
-                          chartSuhuTinggiJam: {
-                                ...this.state.chartSuhuTinggiJam,
-                                suhuTinggiSelected: {...getFirstTangkiList}
-                          }
-                        })
+              //           this.setState({
+              //             ...this.state,
+              //             chartSuhuTinggiJam: {
+              //                   ...this.state.chartSuhuTinggiJam,
+              //                   suhuTinggiSelected: {...getFirstTangkiList}
+              //             }
+              //           })
 
-                        this.getDateMax_From_TangkiLast();
+              //           this.getDateMax_From_TangkiLast();
 
-                        setTimeout(()=>{
-                          this.getAllData(this.tanggal_max_tangki_last, this.tanggal_max_tangki_last);
-                        },100)
+              //           setTimeout(()=>{
+              //             this.getAllData(this.tanggal_max_tangki_last, this.tanggal_max_tangki_last);
+              //           },100)
 
-                    })
-                  });
-                });
-              });
+              //       })
+              //     });
+              //   });
+              // });
           }
           else if (res?.['statusCode'] == '400'){
             notify('error',res?.['msg'])
@@ -1992,7 +2327,7 @@ class DashboardTangki extends React.Component {
             
             // FOR TEST
             // 23 feb '23 jam 7:30
-            time_tank = new Date(2023,1,23, 7,30,0)
+            // time_tank = new Date(2023,1,23, 7,30,0)
 
             if (time_tank != null){
                 // jika tanggal, maka di proses
@@ -2092,7 +2427,26 @@ class DashboardTangki extends React.Component {
 
               let arr_raw_reduce:any = this.grouping_Data_Raw(arr_raw_all);
 
-              this.funcSeparateTank(arr_raw_reduce);
+              this.funcSeparateTank(arr_raw_reduce, ()=>{
+
+                    let getFirstTangkiList = this.mst_list_tangki.length > 0 ? {...this.mst_list_tangki[0]} : {}
+                    this.getFirstTangki_Default = {...getFirstTangkiList}
+        
+                    this.setState({
+                      ...this.state,
+                      chartSuhuTinggiJam: {
+                            ...this.state.chartSuhuTinggiJam,
+                            suhuTinggiSelected: {...getFirstTangkiList}
+                      }
+                    })
+
+                    this.getDateMax_From_TangkiLast();
+
+                    setTimeout(()=>{
+                      this.getAllData(this.tanggal_max_tangki_last, this.tanggal_max_tangki_last);
+                    },100)
+              });
+
 
               clearInterval(intOnProgress)
             }
@@ -2131,7 +2485,7 @@ class DashboardTangki extends React.Component {
         return arr_raw_all_reduce
     }
 
-    funcSeparateTank(arr_raw_alls:any){
+    funcSeparateTank(arr_raw_alls:any, callback){
         let obj_tank:any = {};
 
         // function untuk memisahkan tangki ke masing-masing key
@@ -2780,7 +3134,25 @@ class DashboardTangki extends React.Component {
           ...temp_updatedState_global
         })
 
+        let obj_tinggi_isi_amchart:any = [];
 
+        Object.keys(temp_updatedState_global?.['realtime']).forEach((ele_tank_name,idx_tank)=>{
+            obj_tinggi_isi_amchart = [
+              ...obj_tinggi_isi_amchart,
+              {
+                country: ele_tank_name,
+                visits: temp_updatedState_global?.['realtime']?.[ele_tank_name]?.['tinggi']
+              }
+            ]
+        })
+
+        // console.log("obj_tinggi_isi_amchart")
+        // console.log(obj_tinggi_isi_amchart)
+        
+        setTimeout(()=>{
+          this.generateAMChart_Column3D(obj_tinggi_isi_amchart)
+          callback()
+        })
 
         // ... end UPDATE KE REALTIME
 
@@ -2799,7 +3171,10 @@ class DashboardTangki extends React.Component {
     getDataHour_Await(datebegin, hourbegin, hourlast, callback){
 
         let data_temp:any = [];
-        postApiSync("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,'1',
+
+        // postApiSync("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,'1',
+
+        postApiSync("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,'2',
           {
             "date":formatDate(new Date(datebegin),'YYYY-MM-DD'),
             // // === BALIKKIN LAGI ===
@@ -2955,15 +3330,15 @@ class DashboardTangki extends React.Component {
       // "dateLast":formatDate(new Date(datelast),'YYYY-MM-DD')
 
       // LAGI FIXING PAK BAYU getDataHour banyak yg NaN
-      // await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
-      await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
+      await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
+      // await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
         {
           "date":formatDate(new Date(datebegin),'YYYY-MM-DD'),
           // // === BALIKKIN LAGI ===
           // "hourBegin": typeof hourbegin == 'undefined' || hourbegin == null ? '00:00' : hourbegin,
           "hourBegin": typeof hourbegin == 'undefined' || hourbegin == null ? '06:00' : hourbegin,
           // "hourLast": typeof hourlast == 'undefined' || hourlast == null ? '23:59' : hourlast,
-          "hourLast": typeof hourlast == 'undefined' || hourlast == null ? '06:30' : hourlast,
+          "hourLast": typeof hourlast == 'undefined' || hourlast == null ? '08:30' : hourlast,
           "minutes":true
         },
       (res:any)=>{
@@ -5729,117 +6104,133 @@ class DashboardTangki extends React.Component {
                                         </Row> */}
 
                                         <Row className='mt-5'>
-                                            <h5 className='dashtangki-title'>Tinggi Isi Tangki ( m )</h5>
-                                            {/* <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal_jam})</span></div> */}
-                                            <Col>
-                                                <div id="chart" className='d-flex justify-content-center align-items-center'>
+                                            <div className='d-flex flex-column flex-md-row '>
 
-                                                    {/* <ReactFC
-                                                        type="column3d"
-                                                        width="100%"
-                                                        height="30%"
-                                                        dataFormat="JSON"
-                                                        dataSource={dataSource}
-                                                    /> */}
+                                                <div className='width-tinggi-isi'>
+                                                    <h5 className='dashtangki-title'>Tinggi Isi Tangki ( m )</h5>
+                                                    {/* <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal_jam})</span></div> */}
+                                                    <Col>
+                                                        
+                                                        <div id="chart" className='d-flex justify-content-center align-items-center'>
+
+                                                            {/* <ReactFC
+                                                                type="column3d"
+                                                                width="100%"
+                                                                height="30%"
+                                                                dataFormat="JSON"
+                                                                dataSource={dataSource}
+                                                            /> */}
 
 
-                                                    {/* <Audio
-                                                      height="150"
-                                                      width="150"
-                                                      color="red"
-                                                      ariaLabel="audio-loading"
-                                                      wrapperStyle={{}}
-                                                      wrapperClass="wrapper-class"
-                                                      visible={this.state.loader.tinggi_isi}
-                                                    /> */}
-                                                    <ThreeCircles
-                                                        height="100"
-                                                        width="100"
-                                                        color="#4fa94d"
-                                                        wrapperStyle={{}}
-                                                        wrapperClass=""
-                                                        visible={this.state.loader.tinggi_isi}
-                                                        ariaLabel="three-circles-rotating"
-                                                        outerCircleColor="#008ffb"
-                                                        innerCircleColor="#00e396"
-                                                        middleCircleColor="#feb019"
-                                                      />
+                                                            {/* <Audio
+                                                              height="150"
+                                                              width="150"
+                                                              color="red"
+                                                              ariaLabel="audio-loading"
+                                                              wrapperStyle={{}}
+                                                              wrapperClass="wrapper-class"
+                                                              visible={this.state.loader.tinggi_isi}
+                                                            /> */}
+                                                            <ThreeCircles
+                                                                height="100"
+                                                                width="100"
+                                                                color="#4fa94d"
+                                                                wrapperStyle={{}}
+                                                                wrapperClass="classTinggiIsi"
+                                                                visible={this.state.loader.tinggi_isi}
+                                                                ariaLabel="three-circles-rotating"
+                                                                outerCircleColor="#008ffb"
+                                                                innerCircleColor="#00e396"
+                                                                middleCircleColor="#feb019"
+                                                              />
 
-                                                    {/* <Dna
-                                                      height = "200"
-                                                      width = "200"
-                                                      ariaLabel = 'dna-loading'
-                                                      wrapperStyle={{}}
-                                                      wrapperClass="wrapper-class"
-                                                      visible={this.state.loader.tinggi_isi}
-                                                    /> */}
+                                                            {/* <Dna
+                                                              height = "200"
+                                                              width = "200"
+                                                              ariaLabel = 'dna-loading'
+                                                              wrapperStyle={{}}
+                                                              wrapperClass="wrapper-class"
+                                                              visible={this.state.loader.tinggi_isi}
+                                                            /> */}
 
-                                                    { 
-                                                      !this.state.loader.tinggi_isi &&
-                                                        (<div className='w-100'>
-                                                          <ReactApexChart 
-                                                                  options={this.state.chartTinggi.options} 
-                                                                  series={this.state.chartTinggi.series} 
-                                                                  type="bar" height={350}
-                                                          />
-                                                        </div>)
-                                                    }
+                                                            {
+                                                              (<div id = "chartdiv" style={{width:"100%", height:"300px",
+                                                                opacity:!this.state.loader.tinggi_isi ? 1 : 0}}></div>)
+                                                            }
+                                                            {/* { 
+                                                              !this.state.loader.tinggi_isi &&
+                                                                (<div className='w-100 '>
+                                                                  <ReactApexChart 
+                                                                          options={this.state.chartTinggi.options} 
+                                                                          series={this.state.chartTinggi.series} 
+                                                                          type="bar" height={350}
+                                                                  />
+                                                                </div>)
+                                                            } */}
 
+                                                        </div>
+                                                    </Col>
                                                 </div>
-                                            </Col>
+
+                                                <div className='width-suhu-tangki'>
+                                                    <h5 className='dashtangki-title'>Suhu Tangki ( °C )</h5>
+                                                    {/* <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal_jam})</span></div> */}
+                                                    {this.state.loader.suhu_tangki && 
+                                                        (
+                                                          <div>
+                                                              <Col className='d-flex justify-content-center w-100'>
+                                                                <ThreeCircles
+                                                                      height="100"
+                                                                      width="100"
+                                                                      color="#4fa94d"
+                                                                      wrapperStyle={{}}
+                                                                      wrapperClass=""
+                                                                      visible={this.state.loader.suhu_tangki}
+                                                                      ariaLabel="three-circles-rotating"
+                                                                      outerCircleColor="#008ffb"
+                                                                      innerCircleColor="#00e396"
+                                                                      middleCircleColor="#feb019"
+                                                                />
+                                                              </Col>
+                                                          </div>
+                                                        )
+                                                    }
+                                                    <div className='d-flex justify-content-start flex-nowrap customclass-snap'>
+
+                                                        {
+                                                          !this.state.loader.suhu_tangki && 
+                                                              this.mst_list_tangki.map((ele,idx)=>{
+                                                                return (
+                                                                  <div className='snap-col' key = {ele.name}>
+                                                                    <ThermometerFC 
+                                                                          caption = {
+                                                                                ele.title + 
+                                                                                (typeof this.state.realtime?.[ele.name]?.['jenis'] != 'undefined' &&
+                                                                                this.state.realtime?.[ele.name]?.['jenis'] != null 
+                                                                                ? ' (' + this.state.realtime?.[ele.name]?.['jenis'] + ')'
+                                                                                : '')
+                                                                          } 
+                                                                          subcaption2={this.state.realtime?.[ele.name]?.['tanggal_jam']}
+                                                                          subcaption={this.state.realtime?.[ele.name]?.['tanggal']} 
+                                                                          value={parseFloat(this.state.realtime?.[ele.name]?.['suhu'])}/>
+                                                                  </div>
+                                                                )
+                                                              })
+                                                        } 
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </Row>
 
                                         <Row className='mt-3'>
-                                            <h5 className='dashtangki-title'>Suhu Tangki ( °C )</h5>
-                                            {/* <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal_jam})</span></div> */}
-
-                                            {this.state.loader.suhu_tangki && 
-                                                (
-                                                  <div>
-                                                      <Col className='d-flex justify-content-center w-100'>
-                                                        <ThreeCircles
-                                                              height="100"
-                                                              width="100"
-                                                              color="#4fa94d"
-                                                              wrapperStyle={{}}
-                                                              wrapperClass=""
-                                                              visible={this.state.loader.suhu_tangki}
-                                                              ariaLabel="three-circles-rotating"
-                                                              outerCircleColor="#008ffb"
-                                                              innerCircleColor="#00e396"
-                                                              middleCircleColor="#feb019"
-                                                        />
-                                                      </Col>
-                                                  </div>
-                                                )
-                                            }
-
+                                          
                                             <Col className='d-flex justify-content-start flex-nowrap customclass-snap'>
                                                 {/* <ReactFC {...this.chartConfigs_Suhu}/>
                                                 <ReactFC {...this.chartConfigs_Suhu}/>
                                                 <ReactFC {...this.chartConfigs_Suhu}/>
                                                 <ReactFC {...this.chartConfigs_Suhu}/> */}
                                                
-                                                {
-                                                   !this.state.loader.suhu_tangki && 
-                                                      this.mst_list_tangki.map((ele,idx)=>{
-                                                        return (
-                                                          <div className='snap-col' key = {ele.name}>
-                                                            <ThermometerFC 
-                                                                  caption = {
-                                                                        ele.title + 
-                                                                        (typeof this.state.realtime?.[ele.name]?.['jenis'] != 'undefined' &&
-                                                                        this.state.realtime?.[ele.name]?.['jenis'] != null 
-                                                                        ? ' (' + this.state.realtime?.[ele.name]?.['jenis'] + ')'
-                                                                        : '')
-                                                                  } 
-                                                                  subcaption2={this.state.realtime?.[ele.name]?.['tanggal_jam']}
-                                                                  subcaption={this.state.realtime?.[ele.name]?.['tanggal']} 
-                                                                  value={parseFloat(this.state.realtime?.[ele.name]?.['suhu'])}/>
-                                                          </div>
-                                                        )
-                                                      })
-                                                } 
+                                                
 
                                                 {/* <div className='snap-col'>
                                                     <ThermometerFC caption = "Tangki 2" value={50}/>
