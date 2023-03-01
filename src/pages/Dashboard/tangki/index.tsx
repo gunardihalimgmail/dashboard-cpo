@@ -2796,7 +2796,9 @@ class DashboardTangki extends React.Component {
                 // VOLUME TANGKI
                 let tinggi_tmp:any = parseFloat(obj_store_temp[ele_nama_tangki]['tinggi_minyak']).toFixed(3);
                 let avg_tmp:any = parseFloat(avg_tank);
-                
+
+                let jenis:any = ''; // cpo atau pko
+
                 if (tinggi_tmp != null){
 
                     // REVISI VOLUME BEDA LITER
@@ -2817,7 +2819,7 @@ class DashboardTangki extends React.Component {
                     )
 
                     let tanggal_tangki:any = new Date(obj_store_temp[ele_nama_tangki]['time']);
-                    let jenis:any = '';
+                    
                     let findCpoPko = this.arr_cpo_pko.find(res=>
                             res.name == ele_nama_tangki &&
                             (
@@ -2905,7 +2907,8 @@ class DashboardTangki extends React.Component {
                           volume_tbl_plus_beda_liter,
                           volume: volume_tbl,
                           volume_faktor_koreksi: faktor_koreksi_temp,
-                          volume_berat_jenis: find_berat_jenis?.['berat_jenis']
+                          volume_berat_jenis: find_berat_jenis?.['berat_jenis'],
+                          jenis
                         }
                     ]
                 }
@@ -2920,7 +2923,8 @@ class DashboardTangki extends React.Component {
                           volume_tbl_plus_beda_liter,
                           volume: volume_tbl,
                           volume_faktor_koreksi: faktor_koreksi_temp,
-                          volume_berat_jenis: find_berat_jenis?.['berat_jenis']
+                          volume_berat_jenis: find_berat_jenis?.['berat_jenis'],
+                          jenis
                         }
                     ]
                 }
@@ -3108,7 +3112,8 @@ class DashboardTangki extends React.Component {
                     volume_berat_jenis: obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['volume_berat_jenis'],
                     volume_faktor_koreksi: obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['volume_faktor_koreksi'],
                     tanggal: formatDate(new Date(obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['time']), 'DD MMMM YYYY'),
-                    tanggal_jam: formatDate(new Date(obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['time']), 'DD MMMM YYYY HH:mm:ss')
+                    tanggal_jam: formatDate(new Date(obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['time']), 'DD MMMM YYYY HH:mm:ss'),
+                    jenis: obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['jenis']
                 }
             }
 
