@@ -187,6 +187,7 @@ h4.dashtangki-cardbody-ontop{
 // lebar chart suhu (ukuran desktop)
 .width-suhu-tangki {
     width: 50%;
+    padding-left:20px;
 }
 
 @media(max-width:767px){
@@ -217,6 +218,7 @@ h4.dashtangki-cardbody-ontop{
 
     .width-suhu-tangki {
         width: 100%;
+        padding-left:0;
     }
 }
 

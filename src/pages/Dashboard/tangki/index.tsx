@@ -188,6 +188,7 @@ class DashboardTangki extends React.Component {
     // data JSON API
     arr_json_alldata:any = [];
     arr_json_tangki_last:any = {};
+    arr_date_realtime:any = [];
     // ... <end>
 
     props:any;
@@ -2024,6 +2025,10 @@ class DashboardTangki extends React.Component {
       categoryAxis.renderer.labels.template.horizontalCenter = "left";
       categoryAxis.renderer.labels.template.verticalCenter = "middle";
       categoryAxis.renderer.labels.template.inside = false;
+      categoryAxis.renderer.labels.template.fontSize = 12;
+      categoryAxis.renderer.labels.template.fontFamily = "Arial";
+      categoryAxis.renderer.labels.template.fill = am4core.color("#000000");
+
       categoryAxis.renderer.minGridDistance = 20;
       categoryAxis.renderer.inside = true;
       categoryAxis.renderer.grid.template.disabled = true;
@@ -2043,6 +2048,7 @@ class DashboardTangki extends React.Component {
 
       let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
       valueAxis.renderer.grid.template.disabled = false;
+      // valueAxis.title.fontSize = 9;
       // valueAxis.title.text = "Meter";
       // valueAxis.title.fontWeight = "bold";
 
@@ -2119,39 +2125,7 @@ class DashboardTangki extends React.Component {
     }
 
     componentDidUpdate(prevProps: Readonly<{}>, prevState: Readonly<{}>, snapshot?: any): void {
-      setTimeout(()=>{
-          let am_logo = document.querySelectorAll('#chartdiv svg g[aria-labelledby]')
-          let g_idx_length:number = am_logo.length-1;
-
-          console.log("am_logo[g_idx_length-1]")
-          console.log(am_logo[g_idx_length])
-        
-          if (am_logo?.[g_idx_length] != null){
-            // document.getElementById('#chartdiv')!.style .display = "none"
-
-            am_logo.forEach((ele,idx)=>{
-                if (idx == g_idx_length){
-                  // SET ID DAHULU, agar bisa dihapus
-                    ele.setAttribute("id", "amchart-custom-" + idx.toString())
-                }
-            })
-
-            // am_logo[g_idx_length].style.display = "none";
-          }
-
-          let am_logos = document.querySelectorAll('#chartdiv svg g[aria-labelledby]')
-          am_logos.forEach((ele,idx)=>{
-              if (idx == g_idx_length){
-                  // console.error("ini")
-                  // console.error(ele.id);
-                  document.getElementById(ele.id)!.style.display = "none";
-              }
-          })
-
-          // am_logo.forEach((ele)=>{
-          //   console.log(ele)
-          // })
-      },10)
+      this.hide_amlogo();
     }
 
     async componentDidMount() {
@@ -2243,40 +2217,7 @@ class DashboardTangki extends React.Component {
               // MISAL : WAKTU 07:00, AMBIL 06:41 - 06:50
               this.processPreviousMinTank_fromLast(this.arr_json_tangki_last)
 
-              // HILANGKAN LOGO AM CHARTS KIRI BAWAH
-              setTimeout(()=>{
-                  let am_logo = document.querySelectorAll('#chartdiv svg g[aria-labelledby]')
-                  let g_idx_length:number = am_logo.length-1;
-
-                  console.log("am_logo[g_idx_length-1]")
-                  console.log(am_logo[g_idx_length])
-                
-                  if (am_logo?.[g_idx_length] != null){
-                    // document.getElementById('#chartdiv')!.style .display = "none"
-
-                    am_logo.forEach((ele,idx)=>{
-                        if (idx == g_idx_length){
-                          // SET ID DAHULU, agar bisa dihapus
-                             ele.setAttribute("id", "amchart-custom-" + idx.toString())
-                        }
-                    })
-
-                    // am_logo[g_idx_length].style.display = "none";
-                  }
-
-                  let am_logos = document.querySelectorAll('#chartdiv svg g[aria-labelledby]')
-                  am_logos.forEach((ele,idx)=>{
-                      if (idx == g_idx_length){
-                          // console.error("ini")
-                          // console.error(ele.id);
-                          document.getElementById(ele.id)!.style.display = "none";
-                      }
-                  })
-
-                  // am_logo.forEach((ele)=>{
-                  //   console.log(ele)
-                  // })
-              },10)
+              this.hide_amlogo();
               
               // return
               // ===== <END MODUS DATA> =====
@@ -2337,6 +2278,43 @@ class DashboardTangki extends React.Component {
         return
     }
 
+    hide_amlogo(){
+      // HILANGKAN LOGO AM CHARTS KIRI BAWAH
+      setTimeout(()=>{
+          let am_logo = document.querySelectorAll('#chartdiv svg g[aria-labelledby]')
+          let g_idx_length:number = am_logo.length-1;
+
+          console.log("am_logo[g_idx_length-1]")
+          console.log(am_logo[g_idx_length])
+        
+          if (am_logo?.[g_idx_length] != null){
+            // document.getElementById('#chartdiv')!.style .display = "none"
+
+            am_logo.forEach((ele,idx)=>{
+                if (idx == g_idx_length){
+                  // SET ID DAHULU, agar bisa dihapus
+                    ele.setAttribute("id", "amchart-custom-" + idx.toString())
+                }
+            })
+
+            // am_logo[g_idx_length].style.display = "none";
+          }
+
+          let am_logos = document.querySelectorAll('#chartdiv svg g[aria-labelledby]')
+          am_logos.forEach((ele,idx)=>{
+              if (idx == g_idx_length){
+                  // console.error("ini")
+                  // console.error(ele.id);
+                  document.getElementById(ele.id)!.style.display = "none";
+              }
+          })
+
+          // am_logo.forEach((ele)=>{
+          //   console.log(ele)
+          // })
+      },10)
+    }
+
     processPreviousMinTank_fromLast(arr_json_tangki_last:any){
         // array json tangki last (REAL TIME)
         console.error(arr_json_tangki_last)
@@ -2348,6 +2326,8 @@ class DashboardTangki extends React.Component {
 
         // LOOPING NAMA TANGKI (KEY PERTAMA)
         let obj_keys_last:any = Object.keys(arr_json_tangki_last);
+
+        
 
         // panjang tangki obj_keys_last
         let obj_keys_last_length:any = obj_keys_last.length;
@@ -2381,7 +2361,7 @@ class DashboardTangki extends React.Component {
                 let time_tank_setmin_dispute:any;
 
                 if (time_tank_dispute == time_tank_getMinutes){
-                  // jika menit nya sama, maka kurangi 19 menit (00:00, 10:00, 20:00, 30:00)
+                  // jika menit nya sama, maka kurangi 19 menit (00:00, 10:00, 20:00)
                   // jika tidak, maka kurangi 9 menit
                     time_tank_substract_minutes = 19 * 60 * 1000    // 19 menit
                 }
@@ -2428,6 +2408,29 @@ class DashboardTangki extends React.Component {
 
                   let hourbegin = formatDate(time_tank_time_begin,'HH:mm');
                   let hourlast = formatDate(time_tank_time_last,'HH:mm');
+
+                  // simpan data tanggal realtime beserta jam
+                  // [{datebegin:..., datelast:..., hourbegin:..., hourlast:...}]
+                  this.arr_date_realtime = [
+                    ...this.arr_date_realtime,
+                    {
+                      time_tank,
+                      time_tank_getTime: !isNaN(time_tank) ? time_tank.getTime() : 0,
+                      datebegin: time_tank_time_begin,
+                      datelast: time_tank_time_last,
+                      hourbegin,
+                      hourlast
+                    }
+                  ]
+
+                  // masukkan datebegin, datelast, hourbegin, hourlast ke arr_json_tangki_last
+                  this.arr_json_tangki_last[ele_name] = {
+                      ...this.arr_json_tangki_last[ele_name],
+                      datebegin: time_tank_time_begin,
+                      datelast: time_tank_time_last,
+                      hourbegin,
+                      hourlast
+                  }
 
                   // alert(hourbegin + '\n' + hourlast)
 
@@ -2486,7 +2489,30 @@ class DashboardTangki extends React.Component {
                     this.getDateMax_From_TangkiLast();
 
                     setTimeout(()=>{
-                      this.getAllData(this.tanggal_max_tangki_last, this.tanggal_max_tangki_last);
+                      console.error("GET DATE MAX FROM TANGKI LAST NEW ===")
+                      console.error(this.arr_json_tangki_last)
+
+                      let arr_maxDate_ForPerHour:any;
+                      let maxDate_ForPerHour:any;
+                      let get_maxDate_ForPerHour:any;
+                      let get_hourbegin_ForPerHour:any;
+                      let get_hourlast_ForPerHour:any;
+
+                      if (typeof this.arr_date_realtime != 'undefined' && this.arr_date_realtime != null){
+                        arr_maxDate_ForPerHour = this.arr_date_realtime.map(ele=>ele?.['time_tank_getTime']);
+                        maxDate_ForPerHour = Math.max.apply(null, arr_maxDate_ForPerHour);
+                        get_maxDate_ForPerHour = this.arr_date_realtime.filter(ele=>ele?.['time_tank_getTime'] == maxDate_ForPerHour)[0];
+                        get_hourbegin_ForPerHour = get_maxDate_ForPerHour?.['hourbegin'];
+                        get_hourlast_ForPerHour = get_maxDate_ForPerHour?.['hourlast'];
+                      }
+                      
+                      // console.error(get_maxDate_ForPerHour)
+                      // console.error(maxDate_ForPerHour)
+
+                      console.error("... end arr_json_tangki_last")
+
+                      this.getAllData(this.tanggal_max_tangki_last, this.tanggal_max_tangki_last,
+                                      get_hourbegin_ForPerHour, get_hourlast_ForPerHour);
                     },100)
               });
 
@@ -3383,6 +3409,7 @@ class DashboardTangki extends React.Component {
       // "dateBegin":formatDate(new Date(datebegin),'YYYY-MM-DD'),
       // "dateLast":formatDate(new Date(datelast),'YYYY-MM-DD')
 
+
       // LAGI FIXING PAK BAYU getDataHour banyak yg NaN
       await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
       // await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
@@ -3390,9 +3417,9 @@ class DashboardTangki extends React.Component {
           "date":formatDate(new Date(datebegin),'YYYY-MM-DD'),
           // // === BALIKKIN LAGI ===
           // "hourBegin": typeof hourbegin == 'undefined' || hourbegin == null ? '00:00' : hourbegin,
-          "hourBegin": typeof hourbegin == 'undefined' || hourbegin == null ? '06:00' : hourbegin,
+          "hourBegin": (typeof hourbegin == 'undefined' || hourbegin == null) ? '06:00' : hourbegin,
           // "hourLast": typeof hourlast == 'undefined' || hourlast == null ? '23:59' : hourlast,
-          "hourLast": typeof hourlast == 'undefined' || hourlast == null ? '08:30' : hourlast,
+          "hourLast": (typeof hourlast == 'undefined' || hourlast == null) ? '07:10' : hourlast,
           "minutes":true
         },
       (res:any)=>{
@@ -3457,6 +3484,7 @@ class DashboardTangki extends React.Component {
               },
               chartJarakSensorJam: {...this.setChartJarakSensorJam},
               chartTinggiJam: {...this.setChartTinggiJam},
+              chartTinggiModusJam: {...this.setChartTinggi_Modus_Jam},
               chartSuhuJam:{...this.setChartSuhuJam},
               chartSuhuModusJam:{...this.setChartSuhuModusJam},
               chartSuhuTinggiJam: {...this.setChartSuhuTinggiJam},
@@ -5605,7 +5633,7 @@ class DashboardTangki extends React.Component {
                 });
 
                 setTimeout(()=>{
-                  this.getAllData(this.state.dateSelected, this.state.dateSelected)
+                  this.getAllData(this.state.dateSelected, this.state.dateSelected,'00:00','23:59')
                 },200)
             }
             else
@@ -5696,7 +5724,23 @@ class DashboardTangki extends React.Component {
 
         setTimeout(()=>{
           console.log(this.state)
-          this.getAllData(this.tanggal_max_tangki_last, this.tanggal_max_tangki_last)
+
+          let arr_maxDate_ForPerHour:any;
+          let maxDate_ForPerHour:any;
+          let get_maxDate_ForPerHour:any;
+          let get_hourbegin_ForPerHour:any;
+          let get_hourlast_ForPerHour:any;
+
+          if (typeof this.arr_date_realtime != 'undefined' && this.arr_date_realtime != null){
+            arr_maxDate_ForPerHour = this.arr_date_realtime.map(ele=>ele?.['time_tank_getTime']);
+            maxDate_ForPerHour = Math.max.apply(null, arr_maxDate_ForPerHour);
+            get_maxDate_ForPerHour = this.arr_date_realtime.filter(ele=>ele?.['time_tank_getTime'] == maxDate_ForPerHour)[0];
+            get_hourbegin_ForPerHour = get_maxDate_ForPerHour?.['hourbegin'];
+            get_hourlast_ForPerHour = get_maxDate_ForPerHour?.['hourlast'];
+          }
+
+          this.getAllData(this.tanggal_max_tangki_last, this.tanggal_max_tangki_last
+                    , get_hourbegin_ForPerHour, get_hourlast_ForPerHour)
         },200)
       }
       
@@ -6226,7 +6270,7 @@ class DashboardTangki extends React.Component {
                                                     </Col>
                                                 </div>
 
-                                                <div className='width-suhu-tangki realtime-suhu-tangki-prop'>
+                                                <div className='width-suhu-tangki realtime-suhu-tangki-prop pl-3'>
                                                     <h5 className='dashtangki-title'>Suhu Tangki ( °C )</h5>
                                                     {/* <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal_jam})</span></div> */}
                                                     {this.state.loader.suhu_tangki && 
@@ -6399,6 +6443,7 @@ class DashboardTangki extends React.Component {
                                                               minutePlaceholder="mm"
                                                               hourPlaceholder="hh"
                                                               required={true}
+                                                              openClockOnFocus = {false}
                                                               onChange={(e)=>{this.onChangeTimePicker(e)}} 
                                                               value={this.state.timeSelected}
                                                               onBlur={(e)=>{this.onBlurTimePicker(e)}}/>
