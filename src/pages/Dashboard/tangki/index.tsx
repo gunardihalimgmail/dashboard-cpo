@@ -1324,7 +1324,7 @@ class DashboardTangki extends React.Component {
       dataLabels: {
         enabled: true,
         formatter:(val:any)=>{
-          return !isNaN(val) ? (val.toFixed(3) + " m") : ''
+          return !isNaN(val) && val != null ? ((Math.round(val*1000)/1000).toString() + " m") : ''
         }
         // style: {
         //   colors: ['#F44336', '#E91E63', '#9C27B0']
@@ -2018,7 +2018,7 @@ class DashboardTangki extends React.Component {
 
       // Create axes
       let categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
-      categoryAxis.dataFields.category = "country";
+      categoryAxis.dataFields.category = "tank_x";
       categoryAxis.renderer.labels.template.rotation = 270;
       categoryAxis.renderer.labels.template.hideOversized = false;
       categoryAxis.renderer.labels.template.horizontalCenter = "left";
@@ -2064,8 +2064,8 @@ class DashboardTangki extends React.Component {
 
       // Create series
       let series = chart.series.push(new am4charts.ConeSeries());
-      series.dataFields.valueY = "visits";
-      series.dataFields.categoryX = "country";
+      series.dataFields.valueY = "tank_value";
+      series.dataFields.categoryX = "tank_x";
       series.name = "Tank";
       series.tooltipText = "{categoryX}: [bold]{valueY}[/]";
       series.columns.template.fillOpacity = 1;    // opacity bar column
@@ -2116,6 +2116,42 @@ class DashboardTangki extends React.Component {
       this.chart_amColumn3d = chart;
     }
 
+    componentDidUpdate(prevProps: Readonly<{}>, prevState: Readonly<{}>, snapshot?: any): void {
+      setTimeout(()=>{
+          let am_logo = document.querySelectorAll('#chartdiv svg g[aria-labelledby]')
+          let g_idx_length:number = am_logo.length-1;
+
+          console.log("am_logo[g_idx_length-1]")
+          console.log(am_logo[g_idx_length])
+        
+          if (am_logo?.[g_idx_length] != null){
+            // document.getElementById('#chartdiv')!.style .display = "none"
+
+            am_logo.forEach((ele,idx)=>{
+                if (idx == g_idx_length){
+                  // SET ID DAHULU, agar bisa dihapus
+                    ele.setAttribute("id", "amchart-custom-" + idx.toString())
+                }
+            })
+
+            // am_logo[g_idx_length].style.display = "none";
+          }
+
+          let am_logos = document.querySelectorAll('#chartdiv svg g[aria-labelledby]')
+          am_logos.forEach((ele,idx)=>{
+              if (idx == g_idx_length){
+                  // console.error("ini")
+                  // console.error(ele.id);
+                  document.getElementById(ele.id)!.style.display = "none";
+              }
+          })
+
+          // am_logo.forEach((ele)=>{
+          //   console.log(ele)
+          // })
+      },10)
+    }
+
     async componentDidMount() {
         // this.setState({ 
         //   waktu:{
@@ -2124,25 +2160,25 @@ class DashboardTangki extends React.Component {
         //   }
         // })
 
-        this.generateAMChart_Column3D(
-          [
-            {
-              "country": "USA",
-              "visits": 4025
-            }, {
-              "country": "China",
-              "visits": 1882
-            }
-          ]
-        )
+        // this.generateAMChart_Column3D(
+        //   [
+        //     {
+        //       "country": "USA",
+        //       "visits": 4025
+        //     }, {
+        //       "country": "China",
+        //       "visits": 1882
+        //     }
+        //   ]
+        // )
         
 
         let length_mst_list_tangki:any = this.mst_list_tangki.length;
 
         // hit api yang getAllData
-        // await postApi("https://platform.iotsolution.id:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
+        await postApi("https://platform.iotsolution.id:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
 
-        await postApi("http://192.168.1.120:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
+        // await postApi("http://192.168.1.120:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
           
           if (res?.['responseCode'] == "200"){
               let res_data:any = res?.['data'];
@@ -3137,19 +3173,25 @@ class DashboardTangki extends React.Component {
         let obj_tinggi_isi_amchart:any = [];
 
         Object.keys(temp_updatedState_global?.['realtime']).forEach((ele_tank_name,idx_tank)=>{
+            let find_mst_tangki = this.mst_list_tangki.find(ele_tank=>ele_tank?.['name'] == ele_tank_name)
+            let title_tangki = find_mst_tangki ? find_mst_tangki?.['title'] : '';
+
             obj_tinggi_isi_amchart = [
               ...obj_tinggi_isi_amchart,
               {
-                country: ele_tank_name,
-                visits: temp_updatedState_global?.['realtime']?.[ele_tank_name]?.['tinggi']
+                tank_x: title_tangki,
+                tank_value: isNaN(temp_updatedState_global?.['realtime']?.[ele_tank_name]?.['tinggi']) ? 
+                          0
+                        :
+                        temp_updatedState_global?.['realtime']?.[ele_tank_name]?.['tinggi']
               }
             ]
         })
 
-        // console.log("obj_tinggi_isi_amchart")
-        // console.log(obj_tinggi_isi_amchart)
         
         setTimeout(()=>{
+          console.log("obj_tinggi_isi_amchart")
+          console.log(obj_tinggi_isi_amchart)
           this.generateAMChart_Column3D(obj_tinggi_isi_amchart)
           callback()
         })
@@ -3172,9 +3214,9 @@ class DashboardTangki extends React.Component {
 
         let data_temp:any = [];
 
-        // postApiSync("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,'1',
+        postApiSync("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,'1',
 
-        postApiSync("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,'2',
+        // postApiSync("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,'2',
           {
             "date":formatDate(new Date(datebegin),'YYYY-MM-DD'),
             // // === BALIKKIN LAGI ===
@@ -3330,8 +3372,8 @@ class DashboardTangki extends React.Component {
       // "dateLast":formatDate(new Date(datelast),'YYYY-MM-DD')
 
       // LAGI FIXING PAK BAYU getDataHour banyak yg NaN
-      await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
-      // await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
+      // await postApi("http://192.168.1.120:7004/api-v1/getDataHour?sort=ASC",null,true,'2',
+      await postApi("https://platform.iotsolution.id:7004/api-v1/getDataHour?sort=ASC",null,true,'1',
         {
           "date":formatDate(new Date(datebegin),'YYYY-MM-DD'),
           // // === BALIKKIN LAGI ===
@@ -6172,13 +6214,13 @@ class DashboardTangki extends React.Component {
                                                     </Col>
                                                 </div>
 
-                                                <div className='width-suhu-tangki'>
+                                                <div className='width-suhu-tangki realtime-suhu-tangki-prop'>
                                                     <h5 className='dashtangki-title'>Suhu Tangki ( °C )</h5>
                                                     {/* <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal_jam})</span></div> */}
                                                     {this.state.loader.suhu_tangki && 
                                                         (
-                                                          <div>
-                                                              <Col className='d-flex justify-content-center w-100'>
+                                                          <div className='realtime-suhu-tangki-loader'>
+                                                              <Col className='d-flex align-items-center justify-content-center w-100 h-100'>
                                                                 <ThreeCircles
                                                                       height="100"
                                                                       width="100"
