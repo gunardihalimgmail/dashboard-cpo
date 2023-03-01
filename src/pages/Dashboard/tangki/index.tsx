@@ -1938,7 +1938,7 @@ class DashboardTangki extends React.Component {
       am4core.useTheme(am4themes_animated);
       let chart = am4core.create("chartdiv", am4charts.XYChart3D);
 
-      chart.paddingBottom = 70;
+      chart.paddingBottom = 25;
       chart.angle = 70
 
       // chart.cursor.behavior = "none";
@@ -2043,6 +2043,8 @@ class DashboardTangki extends React.Component {
 
       let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
       valueAxis.renderer.grid.template.disabled = false;
+      // valueAxis.title.text = "Meter";
+      // valueAxis.title.fontWeight = "bold";
 
       // categoryAxis.renderer.labels.template.rotation = -90;
       // categoryAxis.renderer.grid.template.location = 0;
@@ -2063,11 +2065,11 @@ class DashboardTangki extends React.Component {
       // valueAxis.renderer.grid.template.disabled = false;
 
       // Create series
-      let series = chart.series.push(new am4charts.ConeSeries());
+      let series = chart.series.push(new am4charts.ColumnSeries3D());
       series.dataFields.valueY = "tank_value";
       series.dataFields.categoryX = "tank_x";
       series.name = "Tank";
-      series.tooltipText = "{categoryX}: [bold]{valueY}[/]";
+      series.tooltipText = "{categoryX}: [bold]{valueY} m [/]";
       series.columns.template.fillOpacity = 1;    // opacity bar column
 
       let columnTemplate = series.columns.template;
