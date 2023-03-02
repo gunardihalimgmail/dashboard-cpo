@@ -1,5 +1,7 @@
 import React, { createRef, useRef, useState } from 'react';
 import ReactToPrint from 'react-to-print'
+// import ReactExport from 'react-export-excel-xlsx-fix'
+import ReactExport from 'react-export-excel-xlsx-fix'
 
 import _ from 'lodash'
 
@@ -142,8 +144,14 @@ class PanggilToast extends React.Component {
   }
 }
 
-class DashboardTangki extends React.Component {
+const ExcelFile = ReactExport.ExcelFile;
+const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
+const ExcelColumn = ReactExport.ExcelFile.ExcelColumn;
 
+class DashboardTangki extends React.Component {
+    
+    data_Export:any = [];
+    
     componentRef:any;
   
     chart:any; // untuk Chart Tinggi isi (AM Chart)
@@ -2129,6 +2137,113 @@ class DashboardTangki extends React.Component {
     }
 
     async componentDidMount() {
+
+      // SAMPLE EXPORT TO EXCEL
+        // this.data_Export = [
+        //   {
+        //     name: "Johson",
+        //     amount: 500,
+        //     sex: 'M',
+        //     is_married: true
+        // },
+        // {
+        //     name: "Monika",
+        //     amount: 355000,
+        //     sex: 'F',
+        //     is_married: false
+        // },
+        // {
+        //     name: "John",
+        //     amount: 250000,
+        //     sex: 'M',
+        //     is_married: false
+        // },
+        // {
+        //     name: "Josef",
+        //     amount: "450500",
+        //     sex: 'M',
+        //     is_married: true
+        // }
+
+        //   // {
+        //   //   columns:[
+        //   //     {
+        //   //       value: "Headings",
+        //   //       widthPx: 100,
+        //   //       style: { font: { sz: "20", bold:true}}
+        //   //     },
+        //   //     {
+        //   //       value: "Text Style",
+        //   //       widthPx: 100,
+        //   //       style: { font: { sz: "24", bold:true}}
+        //   //     },
+        //   //     {
+        //   //       value: "Colors",
+        //   //       widthPx: 100,
+        //   //       style: { font: { sz: "40", bold:true}}
+        //   //     }
+        //   //   ],
+        //   //   data: [
+        //   //     [
+        //   //       { value: "H1", style: {font: {sz: "40", bold:true}}},
+        //   //       { value: 50, style: {font: {bold:true}}},
+        //   //       { value: "Red", style: {fill: 
+        //   //                                   {patternType:"solid", fgColor: { rgb: "FF0000"},
+        //   //                                   bgColor: { rgb: "FF0000"}}
+        //   //                               }}
+        //   //     ],
+        //   //     [
+        //   //       { value: "H2", style: {font: {sz: "18", bold:true}}},
+        //   //       { value: 10},
+        //   //       { value: "Blue", style: {fill: 
+        //   //                                   {patternType:"solid", fgColor: { rgb: "FF00FF"},
+        //   //                                   bgColor: { rgb: "FF00FF"}}
+        //   //                               }
+        //   //       }
+        //   //     ]
+        //   //   ]
+        //   // }
+        // //   // {
+        // //   //   // xSteps: 0,
+        // //   //   // ySteps: 3,
+        // //   //   columns:[
+        // //   //     {
+        // //   //       value: "Headings",
+        // //   //       width: {wch:200},
+        // //   //       style: { font: { sz: "20", bold:true}}
+        // //   //     },
+        // //   //     {
+        // //   //       value: "Text Style",
+        // //   //       widthPx: 180,
+        // //   //       style: { font: { sz: "24", bold:true}}
+        // //   //     },
+        // //   //     {
+        // //   //       value: "Colors",
+        // //   //       widthPx: 180,
+        // //   //       style: { font: { sz: "40", bold:true}}
+        // //   //     }
+        // //   //   ],
+        // //   //   data: [
+        // //   //     [
+        // //   //       { value: "H1", style: {font: {sz: "40", bold:true}}},
+        // //   //       { value: "Bold", style: {font: {bold:true}}},
+        // //   //       { value: "Red", style: {fill: 
+        // //   //                                   {patternType:"solid", fgColor: { rgb: "FFFF0000"},
+        // //   //                                   bgColor: { rgb: "FFFF0000"}}
+        // //   //                               }}
+        // //   //     ],
+        // //   //     [
+        // //   //       { value: "H2", style: {font: {sz: "18", bold:true}}},
+        // //   //       { value: "Underline", style: {font: {underline:true}}},
+        // //   //       { value: "Blue", style: {fill: 
+        // //   //                                   {patternType:"solid", fgColor: { rgb: "FFFFAA00"},
+        // //   //                                   bgColor: { rgb: "FFFFAA00"}}
+        // //   //                               }}
+        // //   //     ]
+        // //   //   ]
+        // //   // }
+        // ] 
+
         // this.setState({ 
         //   waktu:{
         //     tanggal:formatDate(new Date(),'DD MMMM YYYY'),
@@ -3500,6 +3615,8 @@ class DashboardTangki extends React.Component {
 
           let res_data:any = res?.['data'];
 
+          let obj_temp_tank_forExcel:any;
+
           if (typeof res_data != 'undefined' && res_data != null){
 
               // ambil data dengan id devices "BESTAGRO"
@@ -3860,7 +3977,7 @@ class DashboardTangki extends React.Component {
                   let arr_obj_keys_vol = Object.keys(obj_temp_tank);
 
                   arr_obj_keys_vol.forEach((tangki_name:any)=>{
-
+                    
                     // console.error("HALO TINGGI MINYAK TANGKIIIIIIIIIIII")
                     //   console.error(parseFloat(obj_temp_tank[tangki_name]['tinggi_minyak']).toFixed(3))
 
@@ -4046,9 +4163,79 @@ class DashboardTangki extends React.Component {
                   })
                   // ... end BALIKKIN
 
+                  // === FOR EXCEL EXPORT ===
+
+                  Object.keys(obj_temp_tank).forEach((ele_tank_name,idx_tank_name)=>{
+
+                      if (typeof obj_temp_tank_forExcel != 'undefined' &&
+                          obj_temp_tank_forExcel != null)
+                      {
+                          obj_temp_tank_forExcel = [
+                              ...obj_temp_tank_forExcel,
+                              {
+                                ...obj_temp_tank[ele_tank_name],
+                                tangki: ele_tank_name
+                              }
+                          ]
+
+                          // JIKA MAU OBJECT, {tangki_1: [{...}]}
+                          // obj_temp_tank_forExcel = {
+                          //     ...obj_temp_tank_forExcel,
+                          //     [ele_tank_name]: [
+                          //         ...obj_temp_tank_forExcel[ele_tank_name],
+                          //         {
+                          //           tangki: ele_tank_name,
+                          //           ...obj_temp_tank[ele_tank_name]
+                          //         }
+                          //     ]
+                          // }
+                      }
+                      else{
+
+                          obj_temp_tank_forExcel = [
+                              {
+                                ...obj_temp_tank[ele_tank_name],
+                                tangki: ele_tank_name
+                              }
+                          ]
+
+                          // JIKA MAU OBJECT, {tangki_1: [{...}]}
+                          // obj_temp_tank_forExcel = {
+                          //     ...obj_temp_tank_forExcel,
+                          //     [ele_tank_name]: [
+                          //         {
+                          //           ...obj_temp_tank[ele_tank_name],
+                          //           tangki: ele_tank_name
+                          //         }
+                          //     ]
+                          //     // [tangki_name]: {...obj_temp_tank[tangki_name]}
+                          // }
+                      }
+                    
+                  })
+                  
+                  // FOR EXCEL ARRAY
+                  this.data_Export = obj_temp_tank_forExcel.map((ele,idx)=>{
+                      return {
+                          tangki: ele?.['title'],
+                          tanggal: ele?.['tanggal'],
+                          jenis: ele?.['jenis'],
+                          tinggi: ele?.['tinggi_minyak'],
+                          suhu: parseFloat(ele?.['avg']),
+                          volume: ele?.['volume']
+                      }
+                  })
+
+                  // ... end === FOR EXCEL EXPORT ===
+                  console.log("FOR EXCEL EXPORT ====")
+                  console.log(obj_temp_tank_forExcel)
+                  console.log(this.data_Export)
+
+
+
+
                   // ... end <VOLUME TANGKI>
 
-                  
                   // taruh hasil rata-rata nya ke data_suhu_tangki_per_jam
                   // looping obj_temp_tank
 
@@ -4602,7 +4789,17 @@ class DashboardTangki extends React.Component {
                 setTimeout(()=>{
                   console.error("FINAL SET STATE")
                   console.error(this.state)
-                },1000)
+                  console.log("obj_temp_tank_forExcel")
+                  console.log(obj_temp_tank_forExcel)
+
+                  // console.log("data_jaraksensor_tangki_perjam_series")
+                  // console.log(this.data_jaraksensor_tangki_perjam_series)
+                  // console.log("data_tinggi_tangki_perjam_series")
+                  // console.log(this.data_tinggi_tangki_perjam_series)
+
+                  // console.log(_.MER)
+
+                },100)
 
               // ... END BALIKKIN
 
@@ -6466,9 +6663,34 @@ class DashboardTangki extends React.Component {
                                                             //   PrintElem.innerHTML = header;
                                                             //   return PrintElem;
                                                             // }}
-                                                            trigger={() => <button className="btn btn-sm btn-success mediaClassFilter">Print to PDF!</button>}
+                                                            trigger={() => <button className="btn btn-sm btn-success mediaClassFilter">PDF</button>}
                                                         />
+
+                                                        <div style={{marginLeft:'5px'}}>
+                                                              <ExcelFile filename={'Tangki_' + formatDate(new Date(),'YYYY-MM-DD HH:mm:ss').toString()} element={<button className="btn btn-sm btn-success">Excel</button>}>
+                                                                  {/* <ExcelSheet dataSet = {this.data_Export} name = "Organization" /> */}
+
+                                                                  <ExcelSheet data={this.data_Export} name="Result">
+                                                                      <ExcelColumn label="Tangki" value="tangki" />
+                                                                      <ExcelColumn label="Tanggal" value="tanggal" />
+                                                                      <ExcelColumn label="Jenis" value="jenis"/>
+                                                                      <ExcelColumn label="Tinggi" value="tinggi"/>
+                                                                      <ExcelColumn label="Suhu" value="suhu"/>
+                                                                      <ExcelColumn label="Volume" value="volume"/>
+
+                                                                      {/* <ExcelColumn label="Marital Status"
+                                                                                  value={(col) => col.is_married ? "Married" : "Single"}/> */}
+                                                                  </ExcelSheet>
+
+                                                                  {/* <ExcelSheet data={dataSet2} name="Leaves">
+                                                                      <ExcelColumn label="Name" value="name"/>
+                                                                      <ExcelColumn label="Total Leaves" value="total"/>
+                                                                      <ExcelColumn label="Remaining Leaves" value="remaining"/>
+                                                                  </ExcelSheet> */}
+                                                              </ExcelFile>
+                                                        </div>
                                                     </div>
+
 
                                                 </div>
                                             </Col>

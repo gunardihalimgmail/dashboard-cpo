@@ -23,6 +23,7 @@
     "apexcharts": "^3.36.3",
     "bootstrap": "^5.2.3",
     "d3": "^7.8.2",
+    "file-saver": "^2.0.5",
     "fusioncharts": "^3.12.2",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
@@ -30,8 +31,10 @@
     "react": "^18.2.0",
     "react-apexcharts": "^1.4.0",
     "react-bootstrap": "^2.7.0",
+    "react-data-export": "^0.6.0",
     "react-datepicker": "^4.10.0",
     "react-dom": "^18.2.0",
+    "react-export-excel-xlsx-fix": "^0.5.3",
     "react-fusioncharts": "^4.0.0",
     "react-loader-spinner": "^5.3.4",
     "react-notifications": "^1.7.4",
@@ -47,7 +50,8 @@
     "redux": "^4.2.0",
     "sass": "^1.57.1",
     "typescript": "^4.9.4",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "xlsx": "^0.18.5"
   },
   "scripts": {
     "start": "react-scripts start",
