@@ -4216,10 +4216,39 @@ class DashboardTangki extends React.Component {
                   
                   // FOR EXCEL ARRAY
                   this.data_Export = obj_temp_tank_forExcel.map((ele,idx)=>{
+
+                      let suhu_1_m:any = '', suhu_3_m = '', suhu_5_m = '', suhu_7_m = '', suhu_10_m = '';
+                      let avg_tinggi_suhu:any = ele?.['avg_tinggi_suhu'];
+                      
+                      let avg_tinggi_suhu_val:any = ele?.['avg_tinggi_suhu_val'];
+                      avg_tinggi_suhu_val = avg_tinggi_suhu_val.map((ele_suhu)=>{
+                        return parseFloat(ele_suhu)
+                      })
+
+                      if (Array.isArray(avg_tinggi_suhu)){
+                          if (avg_tinggi_suhu.length > 0){
+                              avg_tinggi_suhu.forEach((ele_tinggi_suhu,idx_tinggi_suhu)=>{
+                                  switch(ele_tinggi_suhu){
+                                    case 1 : suhu_1_m = avg_tinggi_suhu_val[idx_tinggi_suhu]; break;
+                                    case 3 : suhu_3_m = avg_tinggi_suhu_val[idx_tinggi_suhu]; break;
+                                    case 5 : suhu_5_m = avg_tinggi_suhu_val[idx_tinggi_suhu]; break;
+                                    case 7 : suhu_7_m = avg_tinggi_suhu_val[idx_tinggi_suhu]; break;
+                                    case 10 : suhu_10_m = avg_tinggi_suhu_val[idx_tinggi_suhu]; break;
+                                  }
+                              })
+                          }
+                      }
+
                       return {
                           tangki: ele?.['title'],
                           tanggal: ele?.['tanggal'],
                           jenis: ele?.['jenis'],
+                          data_jarak_sensor_m: ele?.['data_jarak_sensor_m'],
+                          suhu_1_m,
+                          suhu_3_m,
+                          suhu_5_m,
+                          suhu_7_m,
+                          suhu_10_m,
                           tinggi: ele?.['tinggi_minyak'],
                           suhu: parseFloat(ele?.['avg']),
                           volume: ele?.['volume']
@@ -6674,8 +6703,14 @@ class DashboardTangki extends React.Component {
                                                                       <ExcelColumn label="Tangki" value="tangki" />
                                                                       <ExcelColumn label="Tanggal" value="tanggal" />
                                                                       <ExcelColumn label="Jenis" value="jenis"/>
+                                                                      <ExcelColumn label="Jarak Sensor" value="data_jarak_sensor_m"/>
+                                                                      <ExcelColumn label="Suhu 1 M" value="suhu_1_m"/>
+                                                                      <ExcelColumn label="Suhu 3 M" value="suhu_3_m"/>
+                                                                      <ExcelColumn label="Suhu 5 M" value="suhu_5_m"/>
+                                                                      <ExcelColumn label="Suhu 7 M" value="suhu_7_m"/>
+                                                                      <ExcelColumn label="Suhu 10 M" value="suhu_10_m"/>
+                                                                      <ExcelColumn label="Suhu Average" value="suhu"/>
                                                                       <ExcelColumn label="Tinggi" value="tinggi"/>
-                                                                      <ExcelColumn label="Suhu" value="suhu"/>
                                                                       <ExcelColumn label="Volume" value="volume"/>
 
                                                                       {/* <ExcelColumn label="Marital Status"
