@@ -190,6 +190,14 @@ h4.dashtangki-cardbody-ontop{
     padding-left:20px;
 }
 
+.custom-btn-pdf{
+    flex:0
+}
+
+.custom-btn-excel-parent{
+    flex:0
+}
+
 @media(max-width:767px){
     .mediaClassFilter {
         width:100%
@@ -220,6 +228,27 @@ h4.dashtangki-cardbody-ontop{
         width: 100%;
         padding-left:0;
     }
+
+    .custom-btn-excel-parent {
+        width:100%;
+    }
+
+    .custom-btn-print {
+        width:100%;
+    }
+
+    .custom-btn-pdf{
+        flex:1;
+    }
+
+    .custom-btn-excel {
+        width:100%;
+    }
+
+    .custom-btn-excel-parent{
+        flex:1
+    }
+
 }
 
 // @media (min-width: 576px) { ... }

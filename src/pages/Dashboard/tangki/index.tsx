@@ -6682,48 +6682,51 @@ class DashboardTangki extends React.Component {
 
                                                     <div className=' w-100 d-flex justify-content-end align-items-center btn-filter-ml'>
                                                       
-                                                        <ReactToPrint
-                                                            content={() => this.componentRef}
-                                                            // concept create watermark
-                                                            //   const PrintElem = document.createElement('div');
-                                                            //   const header = 
-                                                            //     `<img src="${Img_Facebook}" alt="" class="watermark"/>` + 
-                                                            //     `<div class="page-footer">I'm The Footer</div>`;
-                                                            //   PrintElem.innerHTML = header;
-                                                            //   return PrintElem;
-                                                            // }}
-                                                            trigger={() => <button className="btn btn-sm btn-success mediaClassFilter">PDF</button>}
-                                                        />
+                                                      <div className='d-flex custom-btn-print'>
+                                                          <ReactToPrint
+                                                              content={() => this.componentRef}
+                                                              // concept create watermark
+                                                              //   const PrintElem = document.createElement('div');
+                                                              //   const header = 
+                                                              //     `<img src="${Img_Facebook}" alt="" class="watermark"/>` + 
+                                                              //     `<div class="page-footer">I'm The Footer</div>`;
+                                                              //   PrintElem.innerHTML = header;
+                                                              //   return PrintElem;
+                                                              // }}
+                                                              trigger={() => <button className="btn btn-sm btn-success mediaClassFilter custom-btn-pdf">PDF</button>}
+                                                          />
 
-                                                        <div style={{marginLeft:'5px'}}>
-                                                              <ExcelFile filename={'Tangki_' + formatDate(new Date(),'YYYY-MM-DD HH:mm:ss').toString()} element={<button className="btn btn-sm btn-success">Excel</button>}>
-                                                                  {/* <ExcelSheet dataSet = {this.data_Export} name = "Organization" /> */}
+                                                          <div style={{marginLeft:'5px'}} className='custom-btn-excel-parent'>
+                                                                <ExcelFile filename={'Tangki_' + formatDate(new Date(),'YYYY-MM-DD HH:mm:ss').toString()} element={<button className="btn btn-sm btn-success custom-btn-excel">Excel</button>}>
+                                                                    {/* <ExcelSheet dataSet = {this.data_Export} name = "Organization" /> */}
 
-                                                                  <ExcelSheet data={this.data_Export} name="Result">
-                                                                      <ExcelColumn label="Tangki" value="tangki" />
-                                                                      <ExcelColumn label="Tanggal" value="tanggal" />
-                                                                      <ExcelColumn label="Jenis" value="jenis"/>
-                                                                      <ExcelColumn label="Jarak Sensor" value="data_jarak_sensor_m"/>
-                                                                      <ExcelColumn label="Suhu 1 M" value="suhu_1_m"/>
-                                                                      <ExcelColumn label="Suhu 3 M" value="suhu_3_m"/>
-                                                                      <ExcelColumn label="Suhu 5 M" value="suhu_5_m"/>
-                                                                      <ExcelColumn label="Suhu 7 M" value="suhu_7_m"/>
-                                                                      <ExcelColumn label="Suhu 10 M" value="suhu_10_m"/>
-                                                                      <ExcelColumn label="Suhu Average" value="suhu"/>
-                                                                      <ExcelColumn label="Tinggi" value="tinggi"/>
-                                                                      <ExcelColumn label="Volume" value="volume"/>
+                                                                    <ExcelSheet data={this.data_Export} name="Result">
+                                                                        <ExcelColumn label="Tangki" value="tangki" />
+                                                                        <ExcelColumn label="Tanggal" value="tanggal" />
+                                                                        <ExcelColumn label="Jenis" value="jenis"/>
+                                                                        <ExcelColumn label="Jarak Sensor (m)" value="data_jarak_sensor_m"/>
+                                                                        <ExcelColumn label="Suhu 1 M (°C)" value="suhu_1_m"/>
+                                                                        <ExcelColumn label="Suhu 3 M (°C)" value="suhu_3_m"/>
+                                                                        <ExcelColumn label="Suhu 5 M (°C)" value="suhu_5_m"/>
+                                                                        <ExcelColumn label="Suhu 7 M (°C)" value="suhu_7_m"/>
+                                                                        <ExcelColumn label="Suhu 10 M (°C)" value="suhu_10_m"/>
+                                                                        <ExcelColumn label="Suhu Average (°C)" value="suhu"/>
+                                                                        <ExcelColumn label="Tinggi (m)" value="tinggi"/>
+                                                                        <ExcelColumn label="Volume (kg)" value="volume"/>
 
-                                                                      {/* <ExcelColumn label="Marital Status"
-                                                                                  value={(col) => col.is_married ? "Married" : "Single"}/> */}
-                                                                  </ExcelSheet>
+                                                                        {/* <ExcelColumn label="Marital Status"
+                                                                                    value={(col) => col.is_married ? "Married" : "Single"}/> */}
+                                                                    </ExcelSheet>
 
-                                                                  {/* <ExcelSheet data={dataSet2} name="Leaves">
-                                                                      <ExcelColumn label="Name" value="name"/>
-                                                                      <ExcelColumn label="Total Leaves" value="total"/>
-                                                                      <ExcelColumn label="Remaining Leaves" value="remaining"/>
-                                                                  </ExcelSheet> */}
-                                                              </ExcelFile>
-                                                        </div>
+                                                                    {/* <ExcelSheet data={dataSet2} name="Leaves">
+                                                                        <ExcelColumn label="Name" value="name"/>
+                                                                        <ExcelColumn label="Total Leaves" value="total"/>
+                                                                        <ExcelColumn label="Remaining Leaves" value="remaining"/>
+                                                                    </ExcelSheet> */}
+                                                                </ExcelFile>
+                                                          </div>
+                                                      </div>
+
                                                     </div>
 
 
