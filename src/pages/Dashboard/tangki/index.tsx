@@ -4136,7 +4136,7 @@ class DashboardTangki extends React.Component {
                                       beda_liter_mst,
                                       beda_liter_hitung,
                                       // volume: volume_tbl.toFixed(2),
-                                      volume: Math.round(parseFloat(volume_tbl) * 100) / 100,
+                                      volume: typeof(volume_tbl) != 'undefined' && volume_tbl != null ? Math.round(parseFloat(volume_tbl) * 100) / 100 : 0,
                                       jenis
                                   }
 
@@ -4251,7 +4251,7 @@ class DashboardTangki extends React.Component {
                           suhu_10_m,
                           tinggi: ele?.['tinggi_minyak'],
                           suhu: parseFloat(ele?.['avg']),
-                          volume: ele?.['volume']
+                          volume: ele?.['volume'] ?? 0
                       }
                   })
 
@@ -4439,7 +4439,11 @@ class DashboardTangki extends React.Component {
                       data_volume_temp.push(
                           {
                             x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm:ss'),
-                            y: parseFloat(obj_temp_tank?.[tangki_name]?.['volume']),
+                            y: typeof (obj_temp_tank?.[tangki_name]?.['volume']) != 'undefined' &&
+                                 (obj_temp_tank?.[tangki_name]?.['volume']) != null 
+                                ? 
+                                  parseFloat(obj_temp_tank?.[tangki_name]?.['volume'])
+                                : 0,
                             x_time: new Date(time_tank).getTime(),
                             jenis: obj_temp_tank?.[tangki_name]?.['jenis']
                           }
