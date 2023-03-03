@@ -220,11 +220,24 @@ class DashboardTangki extends React.Component {
       // konstanta tinggi segitiga di atas tinggi tangki
       // new => rata-rata sampai 24 Jan '23 - 10 feb 2023
 
+    // mst_avg_t_segitiga:any = {
+    //   'tangki_1':0.4030,   // 0.49629, 0.4030 (prev old -> new) tgl 21 feb '23
+    //   'tangki_2':0.6946,   // 0.71348, 0.70074, 0.69876, 0.69818, 0.69460, 0,6917, 0.6946 (prev) => TGL DIPAKAI *10 FEB - 21 FEB '23
+    //   'tangki_3':0.4890,   // 0.54700, 0.48733, 0.48870, 0.4890  (prev) => TGL DIPAKAI *10 FEB '23 - 16 FEB '23
+    //   'tangki_4':0.4734,   // 0.47460, 0.47229, 0.46792, 0.47070, 0.46650, 0.4708, 0.4734 (prev) => TGL DIPAKAI *10 feb '23 - 16 feb '23
+    // }
+
+    // Tinggi Profile
+    // tangki_1 : 12.9016
+    // tangki_2 : 13.1922
+    // tangki_3 : 13.3218
+    // tangki_4 : 13.2852
+    
     mst_avg_t_segitiga:any = {
-      'tangki_1':0.4030,   // 0.49629 (prev old -> new) tgl 21 feb '23
-      'tangki_2':0.6946,   // 0.71348, 0.70074, 0.69876, 0.69818, 0.69460, 0,6917, 0.6946 (prev) => TGL DIPAKAI *10 FEB - 21 FEB '23
-      'tangki_3':0.4890,   // 0.54700, 0.48733, 0.48870  (prev) => TGL DIPAKAI *10 FEB '23 - 16 FEB '23
-      'tangki_4':0.4734,   // 0.47460, 0.47229, 0.46792, 0.47070, 0.46650, 0.4708 (prev) => TGL DIPAKAI *10 feb '23 - 16 feb '23
+      'tangki_1':0.4186,   // 0.49629, 0.4030 (prev old -> new) tgl 21 feb '23
+      'tangki_2':0.7032,   // 0.71348, 0.70074, 0.69876, 0.69818, 0.69460, 0,6917, 0.6946 (prev) => TGL DIPAKAI *10 FEB - 21 FEB '23
+      'tangki_3':0.4918,   // 0.54700, 0.48733, 0.48870, 0.4890  (prev) => TGL DIPAKAI *10 FEB '23 - 16 FEB '23
+      'tangki_4':0.4582,   // 0.47460, 0.47229, 0.46792, 0.47070, 0.46650, 0.4708, 0.4734 (prev) => TGL DIPAKAI *10 feb '23 - 16 feb '23
     }
 
     // ... end
