@@ -198,7 +198,20 @@ h4.dashtangki-cardbody-ontop{
     flex:0
 }
 
+.checkPerJam {
+    font-style: italic;
+    font-size:14px;
+}
+
 @media(max-width:767px){
+
+    .checkPerJam {
+        display:flex;
+        justify-content: end;
+        font-style: italic;
+        font-size:12px;
+    }
+
     .mediaClassFilter {
         width:100%
     }

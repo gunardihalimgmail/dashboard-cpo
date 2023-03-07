@@ -6973,7 +6973,8 @@ class DashboardTangki extends React.Component {
 
                                             <Row className='mt-2'>
                                                 <hr></hr>
-                                                <div className='d-flex justify-content-between'>
+                                                <div className='d-flex justify-content-between flex-column flex-md-row '>
+
                                                     <div className='d-flex justify-content-start align-items-center gap-2'>
                                                         <div className='d-flex justify-content-start align-items-center'>
                                                             <img src = {MotionSensorRed} width="30" height="30" />
@@ -6983,7 +6984,8 @@ class DashboardTangki extends React.Component {
                                                             <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal})</span></div>
                                                         </div>
                                                     </div>
-                                                    <div>
+
+                                                    <div className='checkPerJam'>
                                                             {/* <Form.Check
                                                               inline
                                                               label="1"
@@ -7051,7 +7053,7 @@ class DashboardTangki extends React.Component {
 
                                             <Row className='mt-2'>
                                                 <hr></hr>
-                                                <div className='d-flex justify-content-between'>
+                                                <div className='d-flex justify-content-between flex-column flex-md-row'>
 
                                                     <div className='d-flex justify-content-start align-items-center gap-2'>
                                                       <div className='d-flex justify-content-start align-items-center'>
@@ -7063,7 +7065,7 @@ class DashboardTangki extends React.Component {
                                                       </div>
                                                     </div>
 
-                                                    <div>
+                                                    <div className='checkPerJam'>
                                                             {/* <Form.Check
                                                               inline
                                                               label="1"
@@ -7131,7 +7133,8 @@ class DashboardTangki extends React.Component {
 
                                             <Row className='mt-3'>
                                                 <hr></hr>
-                                                <div className='d-flex justify-content-between'>
+                                                <div className='d-flex justify-content-between flex-column flex-md-row'>
+
                                                     <div className='d-flex justify-content-start align-items-center gap-2'>
                                                         <div className='d-flex justify-content-start align-items-center'>
                                                             <img src = {TermSensor} width="30" height="30" />
@@ -7142,7 +7145,7 @@ class DashboardTangki extends React.Component {
                                                         </div>
                                                     </div>
 
-                                                    <div>
+                                                    <div className='checkPerJam'>
                                                         <Form.Check type={'checkbox'} inline>
                                                             <Form.Check.Input 
                                                                   type={'checkbox'} 
@@ -7200,7 +7203,7 @@ class DashboardTangki extends React.Component {
                                             {/* SUHU TANGKI ( KETINGGIAN )*/}
                                             <Row className='mt-3'>
                                                 <hr></hr>
-                                                <div className='d-flex justify-content-between'>
+                                                <div className='d-flex justify-content-between flex-column flex-md-row'>
                                                     <div>
                                                         <div className='d-flex justify-content-start align-items-center gap-2'>
                                                             <div className='d-flex justify-content-start align-items-center'>
@@ -7229,7 +7232,7 @@ class DashboardTangki extends React.Component {
                                                         </div>
 
                                                     </div>
-                                                    <div>
+                                                    <div className='checkPerJam mt-2'>
                                                         <Form.Check type={'checkbox'} inline>
                                                             <Form.Check.Input 
                                                                 type={'checkbox'} 
@@ -7286,7 +7289,8 @@ class DashboardTangki extends React.Component {
 
                                             <Row className='mt-3'>
                                                 <hr></hr>
-                                                <div className='d-flex justify-content-between'>
+                                                <div className='d-flex justify-content-between flex-column flex-md-row'>
+
                                                     <div className='d-flex justify-content-start align-items-center gap-2'>
                                                         <div className='d-flex justify-content-start align-items-center'>
                                                             <img src = {WeightTank} width="30" height="30" />
@@ -7297,7 +7301,7 @@ class DashboardTangki extends React.Component {
                                                         </div>
                                                     </div>
 
-                                                    <div>
+                                                    <div className='checkPerJam'>
                                                         <Form.Check type={'checkbox'} inline>
                                                             <Form.Check.Input type={'checkbox'} onChange={(val)=>{this.checkChartJam(val,'volume_jam')}}/>
                                                             <Form.Check.Label>{`Show Data Label`}</Form.Check.Label>
