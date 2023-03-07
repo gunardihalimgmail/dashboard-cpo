@@ -318,3 +318,30 @@ h4.dashtangki-cardbody-ontop{
   display: block;
   height: 100%;
 }
+
+.sensor-off-label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color:rgb(252, 45, 8);
+    // text-shadow: 0px 0px 10px white;
+    text-shadow: 2px 3px 7px white, 0 4px 1px rgb(255, 199, 199);
+    animation: onoff 2.5s infinite;
+    cursor:pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    height:50%;
+
+    h4 {
+        font-size:40px
+    }
+}
+@keyframes onoff {
+    0%, 100%{
+        opacity:0.3
+    }
+    50%{
+        opacity:1
+    }
+}

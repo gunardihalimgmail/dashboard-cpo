@@ -240,6 +240,13 @@ class DashboardTangki extends React.Component {
       'tangki_4':0.4582,   // 0.47460, 0.47229, 0.46792, 0.47070, 0.46650, 0.4708, 0.4734 (prev) => TGL DIPAKAI *10 feb '23 - 16 feb '23
     }
 
+    mst_t_kalibrasi:any = {
+      'tangki_1':1370,
+      'tangki_2':1370,
+      'tangki_3':1370,
+      'tangki_4':1370,
+    }
+
     // ... end
 
 
@@ -3212,10 +3219,20 @@ class DashboardTangki extends React.Component {
                             if (typeof obj_tinggi_tank_modus_filter_single?.[ele_nama_tangki] == 'undefined')
                             {
 
+                              let jarak_sensor_val:any = 0;
+                              let find_jarak_sensor_inobj = Object.keys(filter_single_modus?.[0]).find(ele=>ele.toLowerCase().indexOf("jarak sensor") != -1);
+                              if (find_jarak_sensor_inobj){
+                                  jarak_sensor_val = parseFloat(filter_single_modus?.[0]?.[find_jarak_sensor_inobj])
+                              }
+
                               // hanya menampung satu data tanggal terakhir per tangki
                                 obj_tinggi_tank_modus_filter_single = {
                                     ...obj_tinggi_tank_modus_filter_single,
-                                    [ele_nama_tangki]: filter_single_modus?.[0]
+                                    [ele_nama_tangki]: {
+                                      jarak_sensor: jarak_sensor_val,
+                                      sensor_off: jarak_sensor_val >= parseFloat(this.mst_t_kalibrasi[ele_nama_tangki]) ? true : false,
+                                      ...filter_single_modus?.[0]
+                                    }
                                 }
                             }
                         }
@@ -3256,6 +3273,8 @@ class DashboardTangki extends React.Component {
                 ...temp_updatedState_global['realtime'],
                 [ele_tank_name]: {
                     ...this.state.realtime[ele_tank_name],
+                    jarak_sensor: obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['jarak_sensor'],
+                    sensor_off: obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['sensor_off'],
                     tinggi: parseFloat(obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['tinggi_minyak']),
                     suhu: obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['avg'],
                     suhu_tank_num: obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['data_suhu'],
@@ -6272,14 +6291,15 @@ class DashboardTangki extends React.Component {
                                                     return (
                                                       <Col className='snap-col' key={ele.name} style={{marginBottom:'10px'}}>
                                                           
-                                                          <Card className={ele.bgColor}>
+                                                          <Card className={ele.bgColor} style = {{height:'100%'}}>
                                                               <Card.Body className='mb-3'>
                                                                   <img src = {SVG_Circle} className="dashtangki-image-circle" />
                                                                   <h4 className='text-white dashtangki-cardbody-ontop d-flex justify-content-between'>
                                                                       {
                                                                         // typeof this.state.realtime?.[ele.name]?.['jenis'] != 'undefined' 
                                                                         ele.title + 
-                                                                          (typeof this.state.realtime?.[ele.name]?.['jenis'] != 'undefined' &&
+                                                                          (!this.state.realtime?.[ele.name].sensor_off && 
+                                                                            typeof this.state.realtime?.[ele.name]?.['jenis'] != 'undefined' &&
                                                                             this.state.realtime?.[ele.name]?.['jenis'] != null 
                                                                           ? ' (' + this.state.realtime?.[ele.name]?.['jenis'] + ')'
                                                                           : '')
@@ -6288,7 +6308,8 @@ class DashboardTangki extends React.Component {
                                                                   </h4>
                                                                   <div className  ='dashtangki-subtitle-card mb-3'>
                                                                       {
-                                                                        typeof this.state.realtime?.[ele.name]?.['tanggal_jam'] != 'undefined' && 
+                                                                          !this.state.realtime?.[ele.name].sensor_off &&
+                                                                          typeof this.state.realtime?.[ele.name]?.['tanggal_jam'] != 'undefined' && 
                                                                             this.state.realtime?.[ele.name]?.['tanggal_jam'] != '' &&
                                                                             this.state.realtime?.[ele.name]?.['tanggal_jam'] != null 
                                                                             ?
@@ -6302,11 +6323,25 @@ class DashboardTangki extends React.Component {
                                                                       }
                                                                   </div>
 
-                                                                  <div style={{position:'relative', zIndex:2}}>
-                                                                    <h4 className='text-white'>Tinggi : {this.state.realtime?.[ele.name].tinggi} M</h4>
-                                                                    <h4 className='text-white'>Suhu : {this.state.realtime?.[ele.name].suhu} °C</h4>
-                                                                    <h4 className='text-white'>Volume : { this.state.realtime?.[ele.name].volume != "-" ? new Number(this.state.realtime?.[ele.name].volume).toLocaleString('en-us') : '-'} kg</h4>
-                                                                  </div>
+                                                                  {
+                                                                      this.state.realtime?.[ele.name].sensor_off && 
+                                                                      (
+                                                                          <div style={{position:'relative', zIndex:2}} className="sensor-off-label">
+                                                                              <h4>Sensor Off</h4>
+                                                                          </div>
+                                                                      )
+                                                                  }
+
+                                                                  {
+                                                                    !this.state.realtime?.[ele.name].sensor_off && 
+                                                                    (
+                                                                      <div style={{position:'relative', zIndex:2}}>
+                                                                        <h4 className='text-white'>Tinggi : {this.state.realtime?.[ele.name].tinggi} M</h4>
+                                                                        <h4 className='text-white'>Suhu : {this.state.realtime?.[ele.name].suhu} °C</h4>
+                                                                        <h4 className='text-white'>Volume : { this.state.realtime?.[ele.name].volume != "-" ? new Number(this.state.realtime?.[ele.name].volume).toLocaleString('en-us') : '-'} kg</h4>
+                                                                      </div>
+                                                                    )
+                                                                  }
 
                                                               </Card.Body>
                                                           </Card>
