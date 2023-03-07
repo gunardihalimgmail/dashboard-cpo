@@ -184,7 +184,7 @@ class DashboardTangki extends React.Component {
       suhu: true,
       suhu_modus: true,
       suhu_tinggi: true,
-      volume: false
+      volume: true
     }
     
     options_filter:any = [
@@ -277,6 +277,7 @@ class DashboardTangki extends React.Component {
     // { tangki_1: [{name:'1 M', data:[{x: '2022-01-01 06:00', y: 465 }]}]}
     obj_suhu_tinggi_tangki_perjam_series:any = {};
       
+    tooltip_apex_data_jarak_sensor_jenis:any = {};     // CPO / PKO
 
     // chart 1 (Tinggi isi Tangki)
     setChartTinggi = {
@@ -432,7 +433,6 @@ class DashboardTangki extends React.Component {
         },
     // ... end 
     }
-
 
     // contoh irregular Suhu Tangki (Jam)
     setChartSuhuJam_Irregular = {
@@ -1360,7 +1360,7 @@ class DashboardTangki extends React.Component {
         // }
       },
       markers: {
-        size: 0,
+        size: 3,
       },
       fill: {
         type: 'gradient',
@@ -1435,7 +1435,38 @@ class DashboardTangki extends React.Component {
           title:{
             formatter(seriesName, { series, seriesIndex, dataPointIndex, w }:any) {
 
+              // SINI BARU UPDATE
               // let jenis_tmp:any = w.globals.initialSeries[seriesIndex].data[dataPointIndex]?.['jenis'];
+              console.error(w.globals.initialSeries[seriesIndex].data[dataPointIndex])
+              let jenis = w.globals.initialSeries[seriesIndex].data[dataPointIndex]?.['jenis'] ?? '';
+
+              // w.globals menghasilkan nama tangki yang salah, pada saat irregular timeseries
+              // misal seharus'y seriesname tangki 3, malah jadi tangki 1 karena tangki 1 dan 3 punya gap waktu
+              let tangki_nama = w.globals.initialSeries[seriesIndex]?.['name'];
+              
+              let arr_initialSeries = w.globals.initialSeries;
+              console.log("arr initialseries")
+              console.log(arr_initialSeries)
+              // console.log("arr series")
+              // console.log(series)
+
+              console.error("W globals : " + tangki_nama)
+
+              // pakai yg "seriesName", menghasilkan nama series yang benar
+              // let tangki_nama_rev:any = seriesName;
+              console.error("Revisi : " + seriesName)
+
+              let tanggal = w.globals.initialSeries[seriesIndex]?.data[dataPointIndex]?.['x'];
+              console.error(tanggal)
+              console.log(w.globals)
+              console.log(w)
+              console.log("Series Index : " + seriesIndex)
+
+              // let final = jenis != '' ?
+              //         seriesName + ' (' + jenis + ')'
+              //         : seriesName + ' : '
+              // console.log("final")
+              // console.log(final)
               return seriesName
                     // + (typeof jenis_tmp != 'undefined' && jenis_tmp != null 
                     // ? ' (' + jenis_tmp + ')'
@@ -4055,6 +4086,8 @@ class DashboardTangki extends React.Component {
                           let tanggal_tangki:any = new Date(obj_temp_tank[tangki_name]['tanggal']);
 
                           let jenis:any = '';
+                       
+
                           let findCpoPko = this.arr_cpo_pko.find(res=>
                                     res.name == tangki_name &&
                                     (
@@ -4182,6 +4215,13 @@ class DashboardTangki extends React.Component {
                             // ... end (dikali dengan berat jenis nya apakah cpo atau pko)
 
                           }
+                          else{
+                            // jika tinggi tidak ketemu di volume, tetap update jenis cpo / pko
+                            obj_temp_tank[tangki_name] = {
+                              ...obj_temp_tank[tangki_name],
+                              jenis
+                            }
+                          }
                           // else{
                           //     console.error("NAN VOLUME TABLE")
                           //     console.log(tangki_name)
@@ -4288,9 +4328,9 @@ class DashboardTangki extends React.Component {
                   })
 
                   // ... end === FOR EXCEL EXPORT ===
-                  console.log("FOR EXCEL EXPORT ====")
-                  console.log(obj_temp_tank_forExcel)
-                  console.log(this.data_Export)
+                  // console.log("FOR EXCEL EXPORT ====")
+                  // console.log(obj_temp_tank_forExcel)
+                  // console.log(this.data_Export)
 
 
 
@@ -4311,8 +4351,12 @@ class DashboardTangki extends React.Component {
                       let tangki_exists:boolean = false;
                       let idx_arr_perjam_series:any = -1;
 
+                      let jenis_rev = obj_temp_tank?.[tangki_name]?.['jenis'] ? 
+                            (' (' + obj_temp_tank?.[tangki_name]?.['jenis'] + ')') : ''
+
+
                       // SUHU TANGKI PER JAM
-                      let findIdx:any = this.data_suhu_tangki_perjam_series.findIndex((res:any)=>res.name == obj_temp_tank[tangki_name]?.['title']);
+                      let findIdx:any = this.data_suhu_tangki_perjam_series.findIndex((res:any)=>res.name == (obj_temp_tank[tangki_name]?.['title'] + jenis_rev));
                       if (findIdx != -1){
                           tangki_exists = true;
                           data_temp = [...this.data_suhu_tangki_perjam_series[findIdx]?.['data']];
@@ -4340,10 +4384,12 @@ class DashboardTangki extends React.Component {
                       }
                       // ... end sorting 
 
+                      
                       // store data ke "data_suhu_tangki_perjam_series" untuk nanti di simpan ke setChartSuhuJam
                       if (!tangki_exists){
                         this.data_suhu_tangki_perjam_series.push(
-                            {name:title_tangki, data:[...data_temp]}
+                            {name:title_tangki + jenis_rev
+                              , data:[...data_temp]}
                         )
                       }else{
                           this.data_suhu_tangki_perjam_series[idx_arr_perjam_series] = {
@@ -4360,7 +4406,12 @@ class DashboardTangki extends React.Component {
                       let data_tinggi_temp:any = [];
 
                       let tangki_tinggi_exists:boolean = false
-                      let findTinggiIdx:any = this.data_tinggi_tangki_perjam_series.findIndex((res:any)=>res.name == obj_temp_tank[tangki_name]?.['title']);
+
+                      // let jenis_revisi = obj_temp_tank?.[tangki_name]?.['jenis'] ?? ''
+
+                      let findTinggiIdx:any = this.data_tinggi_tangki_perjam_series.findIndex((res:any)=>
+                                  res.name == (obj_temp_tank[tangki_name]?.['title'] + jenis_rev)
+                              );
                       if (findTinggiIdx != -1){
                           tangki_tinggi_exists = true;
                           data_tinggi_temp = [...this.data_tinggi_tangki_perjam_series[findIdx]?.['data']];
@@ -4392,9 +4443,11 @@ class DashboardTangki extends React.Component {
                       // console.log(data_tinggi_temp)
 
                        // store data ke "data_tinggi_tangki_perjam_series" untuk nanti di simpan ke setChartTinggiJam
+                      //  alert(title_tangki + jenis_rev)
                        if (!tangki_tinggi_exists){
                             this.data_tinggi_tangki_perjam_series.push(
-                                {name:title_tangki, data:[...data_tinggi_temp]}
+                                {name:title_tangki + jenis_rev, 
+                                  data:[...data_tinggi_temp]}
                             )
                         }else{
                             this.data_tinggi_tangki_perjam_series[idx_arr_perjam_series] = {
@@ -4411,7 +4464,9 @@ class DashboardTangki extends React.Component {
                       let data_jarak_sensor_temp:any = [];
 
                       let tangki_jarak_sensor_exists:boolean = false
-                      let findJarakSensorIdx:any = this.data_jaraksensor_tangki_perjam_series.findIndex((res:any)=>res.name == obj_temp_tank[tangki_name]?.['title']);
+                      
+
+                      let findJarakSensorIdx:any = this.data_jaraksensor_tangki_perjam_series.findIndex((res:any)=>res.name == (obj_temp_tank[tangki_name]?.['title'] + jenis_rev));
                       if (findJarakSensorIdx != -1){
                           tangki_jarak_sensor_exists = true;
                           data_jarak_sensor_temp = [...this.data_jaraksensor_tangki_perjam_series[findJarakSensorIdx]?.['data']];
@@ -4424,9 +4479,28 @@ class DashboardTangki extends React.Component {
                             x: formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm:ss'),
                             y: parseFloat(obj_temp_tank?.[tangki_name]?.['data_jarak_sensor_m']),
                             x_time: new Date(time_tank).getTime(),
-                            jenis: obj_temp_tank?.[tangki_name]?.['jenis']
+                            jenis: obj_temp_tank?.[tangki_name]?.['jenis'] ?? ''
                           }
                       );
+
+                      // if (typeof this.tooltip_apex_data_jarak_sensor_jenis?.[tangki_name] == 'undefined'){
+
+                      // SINI BARU UPDATE
+                          // let tooltip_format_time_tank = formatDate(new Date(time_tank),'YYYY-MM-DD HH:mm:ss');
+
+                          // this.tooltip_apex_data_jarak_sensor_jenis = {
+                          //     ...this.tooltip_apex_data_jarak_sensor_jenis,
+                          //     [tangki_name]: {
+                          //         ...this.tooltip_apex_data_jarak_sensor_jenis?.[tangki_name],
+                          //         [tooltip_format_time_tank]: obj_temp_tank?.[tangki_name]?.['jenis'] ?? ''
+                          //     }
+                          // }
+
+                          // console.log('TOOLTIP APEX DATA JARAK SENSOR')
+                          // console.log(this.tooltip_apex_data_jarak_sensor_jenis)
+                      // }
+
+
                        // SORTING data_tinggi_temp
                        if (data_jarak_sensor_temp.length > 0) {
 
@@ -4434,10 +4508,25 @@ class DashboardTangki extends React.Component {
                             return a['x_time'] - b['x_time'];
                         })
                       }
+                      // if (title_tangki == "Tangki 3"){
+                        // if (jenis_rev == ""){
+                        //   console.log("OBJ TEMP TANK TANGKI 3 JENIS REV")
+                        //   console.log(obj_temp_tank?.[tangki_name])
+                        //   console.info("Tangki 3 " + jenis_rev)
+                        //   console.info("Tangki 3 (TANGGAL TANGKI) " + new Date(obj_temp_tank[tangki_name]['tanggal']))
+                        // }
+                        // else
+                        // {
+                          // console.log("OBJ TEMP TANK TANGKI 3 JENIS REV (OK)")
+                          // console.log(obj_temp_tank?.[tangki_name])
+                          // console.info("Tangki 3 " + jenis_rev)
+                        // }
+                      // }
                       // store data ke "data_jaraksensor_tangki_perjam_series" untuk nanti di simpan ke setChartJarakSensorJam
                         if (!tangki_tinggi_exists){
                           this.data_jaraksensor_tangki_perjam_series.push(
-                              {name:title_tangki, data:[...data_jarak_sensor_temp]}
+                              {name:title_tangki + jenis_rev
+                                , data:[...data_jarak_sensor_temp]}
                           )
                       }else{
                           this.data_jaraksensor_tangki_perjam_series[idx_arr_perjam_series] = {
@@ -4459,7 +4548,7 @@ class DashboardTangki extends React.Component {
                       let data_volume_temp:any = [];
 
                       let tangki_volume_exists:boolean = false
-                      let findVolumeIdx:any = this.data_volume_tangki_perjam_series.findIndex((res:any)=>res.name == obj_temp_tank[tangki_name]?.['title']);
+                      let findVolumeIdx:any = this.data_volume_tangki_perjam_series.findIndex((res:any)=>res.name == (obj_temp_tank[tangki_name]?.['title'] + jenis_rev));
                       if (findVolumeIdx != -1){
                           tangki_volume_exists = true;
                           data_volume_temp = [...this.data_volume_tangki_perjam_series[findVolumeIdx]?.['data']];
@@ -4494,7 +4583,8 @@ class DashboardTangki extends React.Component {
                       // store data ke "data_volume_tangki_perjam_series" untuk nanti di simpan ke setChartVolumeJam
                       if (!tangki_volume_exists){
                           this.data_volume_tangki_perjam_series.push(
-                              {name:title_tangki, data:[...data_volume_temp]}
+                              {name:title_tangki + jenis_rev
+                                , data:[...data_volume_temp]}
                           )
                       }else{
                           this.data_volume_tangki_perjam_series[idx_arr_perjam_series] = {
@@ -6027,7 +6117,7 @@ class DashboardTangki extends React.Component {
   }
 
   onStartTimeClick(e:any){
-    alert(JSON.stringify(e))
+    // alert(JSON.stringify(e))
   }
 
   checkChartJam(val:any, type:'jarak_sensor'|'tinggi'|'suhu_jam'|'volume_jam'|'suhu_tinggi_jam'|
@@ -7303,7 +7393,10 @@ class DashboardTangki extends React.Component {
 
                                                     <div className='checkPerJam'>
                                                         <Form.Check type={'checkbox'} inline>
-                                                            <Form.Check.Input type={'checkbox'} onChange={(val)=>{this.checkChartJam(val,'volume_jam')}}/>
+                                                            <Form.Check.Input 
+                                                                defaultChecked={this.state.chartVolumeJam.options.dataLabels.enabled}
+                                                                type={'checkbox'} 
+                                                                onChange={(val)=>{this.checkChartJam(val,'volume_jam')}}/>
                                                             <Form.Check.Label>{`Show Data Label`}</Form.Check.Label>
                                                             {/* <Form.Control.Feedback type="valid">
                                                               You did it! 
