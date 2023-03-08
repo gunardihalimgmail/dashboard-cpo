@@ -39,7 +39,7 @@ import Badge from 'react-bootstrap/Badge';
 import Col from 'react-bootstrap/esm/Col';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/esm/Row';
-import { BlueWavyCurve, Img_Facebook, MotionSensor, MotionSensorRed, No_Found, SVG_Circle, Tank, TermSensor, Thermometer, WeightTank } from '../../../assets'
+import { BlueWavyCurve, Img_Facebook, MotionSensor, MotionSensorRed, No_Found, SVG_Circle, Tank, TermSensor, Thermometer, WarningIcon, WeightTank } from '../../../assets'
 import ReactApexChart from 'react-apexcharts';
 
 import ThermometerFC from '../thermometer';
@@ -245,6 +245,14 @@ class DashboardTangki extends React.Component {
       'tangki_2':1370,
       'tangki_3':1370,
       'tangki_4':1370,
+    }
+
+    // MASTER CPO / PKO BERDASARKAN KETINGGIAN 1 M
+    mst_1m_cpo_pko:any = {
+      'tangki_1': '',  // PKO
+      'tangki_2': '',  // PKO
+      'tangki_3': '',  // CPO
+      'tangki_4': ''   // CPO
     }
 
     // ... end
@@ -2187,6 +2195,178 @@ class DashboardTangki extends React.Component {
       this.hide_amlogo();
     }
 
+
+    get_suhu1M_CPO_PKO(arr_json_tangki_last){
+      // DAPATKAN STATUS CPO / PKO dari ketinggian suhu 1 M
+        // console.error("(GET SUHU 1M CPO PKO)")
+        // console.error(arr_json_tangki_last)
+
+        let arr_raw_all_suhu1m = {};
+        let obj_keys_last_onprogress = 0;
+
+        let arr_json_tangki_last_length = Object.keys(arr_json_tangki_last).length;
+
+        console.error ("GET SUHU 1M CPO PKO")
+
+        let obj_keys_last_onprogress_1m = 0;
+
+        let breakException = {};
+        let all_done = false
+
+        try{
+            Object.keys(arr_json_tangki_last).forEach((tank_name,idx)=>{
+              
+                // console.log(all_done)
+
+                // if (all_done)
+                // {
+                //   console.error("CEK LAGI ")
+                //   console.log(this.mst_1m_cpo_pko)
+                //     throw breakException
+                // }
+                
+                let datebegin = formatDate(new Date(arr_json_tangki_last?.[tank_name]?.['time']),'YYYY-MM-DD');
+                let hourbegin = '06:50'
+                let hourlast = '08:00'
+    
+                this.getDataHour_Await(datebegin, hourbegin, hourlast, (res_data)=>{
+                    // console.error("RES DATA (GET SUHU 1M CPO PKO)")
+                    // console.log(res_data)
+                    if (res_data?.['responseCode'] == "200"){
+
+                        // looping array
+
+                        res_data?.['data'].forEach((ele_obj,idx_obj)=>{
+                          
+                            console.error("all_done REVISI")
+                            console.error(all_done)
+                            if (all_done){
+                                console.error(this.mst_1m_cpo_pko)
+                                throw breakException
+                            }
+    
+                          // looping array data[0] hanya ada 1 data
+
+                            ele_obj?.['data'].forEach((ele_obj_key, idx_obj_key)=>{
+                                // let val = ele_obj_key?.['data'][0];
+
+                                    Object.keys(ele_obj_key).forEach((ele_key, idx_key)=>{
+        
+                                        let patt = new RegExp(/Temperature Tank [0-9]+.*[0-9]+.*M/,'gi')
+                                        let match = patt.exec(ele_key);
+                                        if (match != null){
+        
+                                            let patt_tank = new RegExp(/Tank [0-9]+/,'gi')
+                                            let match_tank = patt_tank.exec(match?.['input'])
+                                            if (match_tank != null){
+        
+                                                let tangki_name = '';
+        
+                                                let find_tank_in_list = this.mst_list_tangki.find(ele=>ele?.['api'].toLowerCase() == match_tank?.[0].toLowerCase())
+                                                if (find_tank_in_list){
+        
+                                                    tangki_name = find_tank_in_list?.['name'];
+                                                    // console.log("find_tank_in_list?.['name']")
+                                                    // console.log(find_tank_in_list?.['name'])
+                                                }
+        
+                                                // console.log("Hasil PATT EXEC TANK")
+                                                // console.log(match_tank[0])
+        
+                                                let patt_tinggi = new RegExp(/tinggi [0-9]+.*M/,'gi')
+                                                let match_patt_tinggi = patt_tinggi.exec(match?.['input'])
+                                                if (match_patt_tinggi != null){
+        
+                                                    let suhu_tinggi_num = parseFloat(match_patt_tinggi[0].replace(/(tinggi|M)/gi,''));
+        
+                                                    // HARUS AMBIL YANG KETINGGIAN 1 METER
+                                                    if (suhu_tinggi_num == 1){
+                                                        
+                                                        let suhu_1m_val = ele_obj_key?.[ele_key];
+        
+                                                        // CEK APAKAH (mst_1m_cpo_pko) UNTUK SEMUA TANGKI SUDAH TERISI CPO / PKO
+        
+                                                        let findTank_1mCpoPko = Object.keys(this.mst_1m_cpo_pko).find(ele=>ele == tangki_name);
+                                                        if (findTank_1mCpoPko){
+        
+                                                            if (this.mst_1m_cpo_pko?.[tangki_name] == '' ||
+                                                                this.mst_1m_cpo_pko?.[tangki_name] == null){
+
+                                                                this.mst_1m_cpo_pko = {
+                                                                    ...this.mst_1m_cpo_pko,
+                                                                    [tangki_name]: suhu_1m_val <= 35 ? 'PKO' : 'CPO'
+                                                                }
+        
+                                                                // CEK APAKAH (mst_1m_cpo_pko) UNTUK SEMUA TANGKI SUDAH TERISI CPO / PKO
+                                                                
+                                                                let all_done_tmp = true;
+                                                                // Object.keys(this.mst_1m_cpo_pko).forEach((ele_tank_name)=>{
+                                                                //     if (this.mst_1m_cpo_pko[ele_tank_name] == ''){
+                                                                //         all_done_tmp = false
+                                                                //     }
+                                                                // })
+                                                                let findEmpty = Object.values(this.mst_1m_cpo_pko).find(ele=>ele == '')
+                                                                if (!findEmpty){
+                                                                      all_done = true
+                                                                      console.error(Object.values(this.mst_1m_cpo_pko))
+                                                                }
+                                                                // if (all_done_tmp){
+                                                                //     all_done = all_done_tmp
+                                                                //     console.log(all_done)
+                                                                // }
+                                                                // ... cek all done
+                                                            }
+                                                        }
+      
+        
+                                                        // console.log("mst_1m_cpo_pko")
+                                                        // console.log(this.mst_1m_cpo_pko)
+                                                        // console.log("ele_obj_key[ele_key] : " + ele_obj_key[ele_key])
+                                                    }
+                                                }
+                                            }
+        
+                                        }
+        
+                                    })
+                                
+    
+                            })
+                        })
+                      
+    
+                    }
+    
+                    obj_keys_last_onprogress_1m++;
+                })
+            })
+        }catch(e){
+            // throw(e)
+            alert(e)
+        }
+
+        // TUNGGU HINGGA SELESAI
+        let intLast = setInterval(()=>{
+            if (arr_json_tangki_last_length == obj_keys_last_onprogress_1m){
+                clearInterval(intLast)
+            }
+        })
+
+        // this.getDataHour_Await(new Date(), '06:50', '08:00', (res_data)=>{
+
+        //     if (res_data?.['responseCode'] == "200"){
+        //       console.log("res data NEW")
+        //       console.log(res_data)
+        //       arr_raw_all_suhu1m = [
+        //           ...arr_raw_all_suhu1m,
+        //           ...res_data?.['data']
+        //       ]
+        //     }
+        //     obj_keys_last_onprogress++;
+        //     // console.error(obj_keys_last_onprogress)
+        // });
+    }
+
     async componentDidMount() {
 
       // SAMPLE EXPORT TO EXCEL
@@ -2320,6 +2500,8 @@ class DashboardTangki extends React.Component {
         // hit api yang getAllData
         // await postApi("https://platform.iotsolution.id:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
 
+
+
         await postApi("http://192.168.1.120:7004/api-v1/getLastData",null,true,'2',null,(res:any)=>{
           
           if (res?.['responseCode'] == "200"){
@@ -2373,6 +2555,8 @@ class DashboardTangki extends React.Component {
                   console.log(this.arr_json_alldata)
                   console.log(this.arr_json_tangki_last);
               }
+
+
               
 
               // ===== MODUS DATA REAL TIME =====
@@ -2493,7 +2677,6 @@ class DashboardTangki extends React.Component {
         // LOOPING NAMA TANGKI (KEY PERTAMA)
         let obj_keys_last:any = Object.keys(arr_json_tangki_last);
 
-        
 
         // panjang tangki obj_keys_last
         let obj_keys_last_length:any = obj_keys_last.length;
@@ -2653,6 +2836,11 @@ class DashboardTangki extends React.Component {
                     })
 
                     this.getDateMax_From_TangkiLast();
+                    
+                    // GET SUHU 1M PENENTUAN BERAT JENIS (CPO / PKO)
+                    this.get_suhu1M_CPO_PKO(this.arr_json_tangki_last);
+                    // ... end SUHU 1M PENENTUAN BERAT JENIS
+
 
                     setTimeout(()=>{
                       console.error("GET DATE MAX FROM TANGKI LAST NEW ===")
@@ -4205,7 +4393,9 @@ class DashboardTangki extends React.Component {
                                       jenis
                                   }
 
-                                  // console.error(obj_temp_tank[tangki_name])
+                                  if (tangki_name == "tangki_3"){
+                                    console.error(obj_temp_tank[tangki_name])
+                                  }
                                   
                                   // alert(JSON.stringify(arr_berat_jenis))
                                   // volume_tbl => volume dari tabel
@@ -6417,7 +6607,12 @@ class DashboardTangki extends React.Component {
                                                                       this.state.realtime?.[ele.name].sensor_off && 
                                                                       (
                                                                           <div style={{position:'relative', zIndex:2}} className="sensor-off-label">
-                                                                              <h4>Sensor Off</h4>
+                                                                              <img src = {WarningIcon} width={35} height = {35}
+                                                                                  />
+                                                                              <h4 style = {{zIndex:3}}>Sensor Off</h4>
+                                                                              <img src = {WarningIcon} width={35} height = {35}
+                                                                                style = {{transform:'rotateY(180deg)'}}
+                                                                                  />
                                                                           </div>
                                                                       )
                                                                   }
