@@ -255,6 +255,13 @@ class DashboardTangki extends React.Component {
       'tangki_4': ''   // CPO
     }
 
+    mst_1m_cpo_pko_filter:any = {
+      'tangki_1': '',  // PKO
+      'tangki_2': '',  // PKO
+      'tangki_3': '',  // CPO
+      'tangki_4': ''   // CPO
+    }
+
     // ... end
 
 
@@ -1445,30 +1452,30 @@ class DashboardTangki extends React.Component {
 
               // SINI BARU UPDATE
               // let jenis_tmp:any = w.globals.initialSeries[seriesIndex].data[dataPointIndex]?.['jenis'];
-              console.error(w.globals.initialSeries[seriesIndex].data[dataPointIndex])
-              let jenis = w.globals.initialSeries[seriesIndex].data[dataPointIndex]?.['jenis'] ?? '';
+              // console.error(w.globals.initialSeries[seriesIndex].data[dataPointIndex])
+              // let jenis = w.globals.initialSeries[seriesIndex].data[dataPointIndex]?.['jenis'] ?? '';
 
               // w.globals menghasilkan nama tangki yang salah, pada saat irregular timeseries
               // misal seharus'y seriesname tangki 3, malah jadi tangki 1 karena tangki 1 dan 3 punya gap waktu
-              let tangki_nama = w.globals.initialSeries[seriesIndex]?.['name'];
+              // let tangki_nama = w.globals.initialSeries[seriesIndex]?.['name'];
               
-              let arr_initialSeries = w.globals.initialSeries;
-              console.log("arr initialseries")
-              console.log(arr_initialSeries)
+              // let arr_initialSeries = w.globals.initialSeries;
+              // console.log("arr initialseries")
+              // console.log(arr_initialSeries)
               // console.log("arr series")
               // console.log(series)
 
-              console.error("W globals : " + tangki_nama)
+              // console.error("W globals : " + tangki_nama)
 
               // pakai yg "seriesName", menghasilkan nama series yang benar
               // let tangki_nama_rev:any = seriesName;
-              console.error("Revisi : " + seriesName)
+              // console.error("Revisi : " + seriesName)
 
-              let tanggal = w.globals.initialSeries[seriesIndex]?.data[dataPointIndex]?.['x'];
-              console.error(tanggal)
-              console.log(w.globals)
-              console.log(w)
-              console.log("Series Index : " + seriesIndex)
+              // let tanggal = w.globals.initialSeries[seriesIndex]?.data[dataPointIndex]?.['x'];
+              // console.error(tanggal)
+              // console.log(w.globals)
+              // console.log(w)
+              // console.log("Series Index : " + seriesIndex)
 
               // let final = jenis != '' ?
               //         seriesName + ' (' + jenis + ')'
@@ -2196,7 +2203,7 @@ class DashboardTangki extends React.Component {
     }
 
 
-    get_suhu1M_CPO_PKO(arr_json_tangki_last){
+    get_suhu1M_CPO_PKO(arr_json_tangki_last, callback){
       // DAPATKAN STATUS CPO / PKO dari ketinggian suhu 1 M
         // console.error("(GET SUHU 1M CPO PKO)")
         // console.error(arr_json_tangki_last)
@@ -2214,19 +2221,11 @@ class DashboardTangki extends React.Component {
         let all_done = false
 
         try{
-            Object.keys(arr_json_tangki_last).forEach((tank_name,idx)=>{
-              
-                // console.log(all_done)
 
-                // if (all_done)
-                // {
-                //   console.error("CEK LAGI ")
-                //   console.log(this.mst_1m_cpo_pko)
-                //     throw breakException
-                // }
-                
+            Object.keys(arr_json_tangki_last).forEach((tank_name,idx)=>{
+                            
                 let datebegin = formatDate(new Date(arr_json_tangki_last?.[tank_name]?.['time']),'YYYY-MM-DD');
-                let hourbegin = '06:50'
+                let hourbegin = '06:50' 
                 let hourlast = '08:00'
     
                 this.getDataHour_Await(datebegin, hourbegin, hourlast, (res_data)=>{
@@ -2238,12 +2237,12 @@ class DashboardTangki extends React.Component {
 
                         res_data?.['data'].forEach((ele_obj,idx_obj)=>{
                           
-                            console.error("all_done REVISI")
-                            console.error(all_done)
-                            if (all_done){
-                                console.error(this.mst_1m_cpo_pko)
-                                throw breakException
-                            }
+                            // console.error("all_done REVISI")
+                            // console.error(all_done)
+                            // if (all_done){
+                            //     console.error(this.mst_1m_cpo_pko)
+                            //     throw breakException
+                            // }
     
                           // looping array data[0] hanya ada 1 data
 
@@ -2293,7 +2292,7 @@ class DashboardTangki extends React.Component {
                                                                 this.mst_1m_cpo_pko?.[tangki_name] == null){
 
                                                                 this.mst_1m_cpo_pko = {
-                                                                    ...this.mst_1m_cpo_pko,
+                                                                    ...this.mst_1m_cpo_pko, 
                                                                     [tangki_name]: suhu_1m_val <= 35 ? 'PKO' : 'CPO'
                                                                 }
         
@@ -2342,13 +2341,17 @@ class DashboardTangki extends React.Component {
             })
         }catch(e){
             // throw(e)
-            alert(e)
+            if (e != breakException){
+              throw e
+            }
         }
 
         // TUNGGU HINGGA SELESAI
         let intLast = setInterval(()=>{
             if (arr_json_tangki_last_length == obj_keys_last_onprogress_1m){
+                console.error("ARR JSON TANGKI LAST LENGTH : ");
                 clearInterval(intLast)
+                callback(this.mst_1m_cpo_pko);
             }
         })
 
@@ -2556,9 +2559,6 @@ class DashboardTangki extends React.Component {
                   console.log(this.arr_json_tangki_last);
               }
 
-
-              
-
               // ===== MODUS DATA REAL TIME =====
 
               // AMBIL DATA YANG PALING SERING MUNCUL UNTUK MASING-MASING TANGKI
@@ -2634,8 +2634,8 @@ class DashboardTangki extends React.Component {
           let am_logo = document.querySelectorAll('#chartdiv svg g[aria-labelledby]')
           let g_idx_length:number = am_logo.length-1;
 
-          console.log("am_logo[g_idx_length-1]")
-          console.log(am_logo[g_idx_length])
+          // console.log("am_logo[g_idx_length-1]")
+          // console.log(am_logo[g_idx_length])
         
           if (am_logo?.[g_idx_length] != null){
             // document.getElementById('#chartdiv')!.style .display = "none"
@@ -2822,54 +2822,75 @@ class DashboardTangki extends React.Component {
 
               let arr_raw_reduce:any = this.grouping_Data_Raw(arr_raw_all);
 
-              this.funcSeparateTank(arr_raw_reduce, ()=>{
+              // kosongkan data master 1m cpo / pko
+              let kosongkan_data_mst_1m_cpopko = {}
 
-                    let getFirstTangkiList = this.mst_list_tangki.length > 0 ? {...this.mst_list_tangki[0]} : {}
-                    this.getFirstTangki_Default = {...getFirstTangkiList}
+              Object.keys(this.mst_1m_cpo_pko).forEach((ele_tank_name,idx)=>{
+                  kosongkan_data_mst_1m_cpopko = {
+                      ...kosongkan_data_mst_1m_cpopko,
+                      [ele_tank_name]: ''
+                  }
+              })
+              this.mst_1m_cpo_pko = {...kosongkan_data_mst_1m_cpopko}
+
+              console.error("KOSONGKAN DATA")
+              console.error(kosongkan_data_mst_1m_cpopko)
+
+              // GET SUHU 1M PENENTUAN BERAT JENIS (CPO / PKO)
+              this.get_suhu1M_CPO_PKO(this.arr_json_tangki_last, (resp_mst_1m_cpo_pko)=>{
+                
+                  this.funcSeparateTank(arr_raw_reduce, ()=>{
+
+                        let getFirstTangkiList = this.mst_list_tangki.length > 0 ? {...this.mst_list_tangki[0]} : {}
+                        this.getFirstTangki_Default = {...getFirstTangkiList}
+            
+                        this.setState({
+                          ...this.state,
+                          chartSuhuTinggiJam: {
+                                ...this.state.chartSuhuTinggiJam,
+                                suhuTinggiSelected: {...getFirstTangkiList}
+                          }
+                        })
+
+                        this.getDateMax_From_TangkiLast();
+                        
+
+                            console.error("MST 1M CPO PKO")
+                            console.error(this.mst_1m_cpo_pko)
+
+                            setTimeout(()=>{
+                              console.error("GET DATE MAX FROM TANGKI LAST NEW ===")
+                              console.error(this.arr_json_tangki_last)
         
-                    this.setState({
-                      ...this.state,
-                      chartSuhuTinggiJam: {
-                            ...this.state.chartSuhuTinggiJam,
-                            suhuTinggiSelected: {...getFirstTangkiList}
-                      }
-                    })
+                              let arr_maxDate_ForPerHour:any;
+                              let maxDate_ForPerHour:any;
+                              let get_maxDate_ForPerHour:any;
+                              let get_hourbegin_ForPerHour:any;
+                              let get_hourlast_ForPerHour:any;
+        
+                              if (typeof this.arr_date_realtime != 'undefined' && this.arr_date_realtime != null){
+                                arr_maxDate_ForPerHour = this.arr_date_realtime.map(ele=>ele?.['time_tank_getTime']);
+                                maxDate_ForPerHour = Math.max.apply(null, arr_maxDate_ForPerHour);
+                                get_maxDate_ForPerHour = this.arr_date_realtime.filter(ele=>ele?.['time_tank_getTime'] == maxDate_ForPerHour)[0];
+                                get_hourbegin_ForPerHour = get_maxDate_ForPerHour?.['hourbegin'];
+                                get_hourlast_ForPerHour = get_maxDate_ForPerHour?.['hourlast'];
+                              }
+                              
+                              // console.error(get_maxDate_ForPerHour)
+                              // console.error(maxDate_ForPerHour)
+        
+                              console.error("... end arr_json_tangki_last")
+        
+                              // GETALLDATA + MST_1M_CPO_PKO (SUHU 1 M)
 
-                    this.getDateMax_From_TangkiLast();
-                    
-                    // GET SUHU 1M PENENTUAN BERAT JENIS (CPO / PKO)
-                    this.get_suhu1M_CPO_PKO(this.arr_json_tangki_last);
-                    // ... end SUHU 1M PENENTUAN BERAT JENIS
-
-
-                    setTimeout(()=>{
-                      console.error("GET DATE MAX FROM TANGKI LAST NEW ===")
-                      console.error(this.arr_json_tangki_last)
-
-                      let arr_maxDate_ForPerHour:any;
-                      let maxDate_ForPerHour:any;
-                      let get_maxDate_ForPerHour:any;
-                      let get_hourbegin_ForPerHour:any;
-                      let get_hourlast_ForPerHour:any;
-
-                      if (typeof this.arr_date_realtime != 'undefined' && this.arr_date_realtime != null){
-                        arr_maxDate_ForPerHour = this.arr_date_realtime.map(ele=>ele?.['time_tank_getTime']);
-                        maxDate_ForPerHour = Math.max.apply(null, arr_maxDate_ForPerHour);
-                        get_maxDate_ForPerHour = this.arr_date_realtime.filter(ele=>ele?.['time_tank_getTime'] == maxDate_ForPerHour)[0];
-                        get_hourbegin_ForPerHour = get_maxDate_ForPerHour?.['hourbegin'];
-                        get_hourlast_ForPerHour = get_maxDate_ForPerHour?.['hourlast'];
-                      }
-                      
-                      // console.error(get_maxDate_ForPerHour)
-                      // console.error(maxDate_ForPerHour)
-
-                      console.error("... end arr_json_tangki_last")
-
-                      this.getAllData(this.tanggal_max_tangki_last, this.tanggal_max_tangki_last,
-                                      get_hourbegin_ForPerHour, get_hourlast_ForPerHour);
-                    },100)
+                              this.getAllData(this.tanggal_max_tangki_last, this.tanggal_max_tangki_last,
+                                              get_hourbegin_ForPerHour, get_hourlast_ForPerHour,
+                                              this.mst_1m_cpo_pko);
+                            },100)
+                        // });
+                        // ... end SUHU 1M PENENTUAN BERAT JENIS
+                  });
               });
-
 
               clearInterval(intOnProgress)
             }
@@ -3217,8 +3238,21 @@ class DashboardTangki extends React.Component {
                             // && 
                             // (res.datelast == null || res.datelast == '' || new Date(res.datelast) >= tanggal_tangki)
                     )
-                    if (findCpoPko){
-                        jenis = findCpoPko?.['jenis'];
+
+                    // SUHU 1 M JENIS
+                    // acuan utama jika suhu 1m kosong, maka akan mengambil object tanggal berlaku utk dapat "jenis"
+                    // jika sudah ada jenis dalam object "mst_1m_cpo_pko", maka acuannya ke object tersebut.
+                    // *** DIUTAMAKAN suhu ketinggian 1m ***
+                    // *function "get_suhu1M_CPO_PKO" utk mst_1m_cpo_pko
+                    if (this.mst_1m_cpo_pko?.[ele_nama_tangki] == "")
+                    {
+                        if (findCpoPko){
+                            jenis = findCpoPko?.['jenis'];
+                        }
+                    }
+                    else{
+                        // DI UTAMAKAN SUHU KETINGGIAN 1 M
+                        jenis = this.mst_1m_cpo_pko?.[ele_nama_tangki]
                     }
 
                     if (findItem){
@@ -3230,9 +3264,7 @@ class DashboardTangki extends React.Component {
                       volume_tbl = parseFloat(findItem.volume);
                       beda_liter_mst = parseFloat(findItem.beda_liter);
 
-
                       beda_liter_hitung = Math.round((beda_liter_mst * tinggi_tmp_dec) * 1000) / 1000; // cth : (dari 1010,7) 0.7 * 4613 => 3229,1 
-                      
 
                       volume_prev = volume_tbl;
 
@@ -3766,7 +3798,7 @@ class DashboardTangki extends React.Component {
       }
     }
 
-    async getAllData(datebegin:any, datelast:any, hourbegin?:any, hourlast?:any){
+    async getAllData(datebegin:any, datelast:any, hourbegin?:any, hourlast?:any, var_mst_1m_cpo_pko?:any){
 
         // GET ALL DATA PER JAM (SUHU, TINGGI)
       // await postApi("https://platform.iotsolution.id:7004/api-v1/getAllData",null,true,'1',(res:any)=>{
@@ -4270,12 +4302,10 @@ class DashboardTangki extends React.Component {
                           // console.error("FIND ITEM MATH ROUND")
                           // console.error(findItem)
 
-
                           let tanggal_tangki:any = new Date(obj_temp_tank[tangki_name]['tanggal']);
 
                           let jenis:any = '';
-                       
-
+                          
                           let findCpoPko = this.arr_cpo_pko.find(res=>
                                     res.name == tangki_name &&
                                     (
@@ -4292,11 +4322,50 @@ class DashboardTangki extends React.Component {
                                     // (res.datelast == null || res.datelast == '' || new Date(res.datelast) >= tanggal_tangki)
                           )
 
-                          if (findCpoPko){
-                              jenis = findCpoPko?.['jenis'];
-                              // console.log("kalkulasi_volume_tangki findCpoPko");
-                              // console.log(findCpoPko)
+                          
+                          // CARI CPO / PKO DARI arr_cpo_pko
+                          // acuan utama jika suhu 1m kosong, maka akan mengambil object tanggal berlaku utk dapat "jenis"
+                          // jika sudah ada jenis dalam object "mst_1m_cpo_pko", maka acuannya ke object tersebut.
+                          // *** DIUTAMAKAN suhu ketinggian 1m ***
+                          // *function "get_suhu1M_CPO_PKO" utk mst_1m_cpo_pko
+
+                          if (typeof var_mst_1m_cpo_pko != 'undefined' &&
+                                var_mst_1m_cpo_pko != null)
+                          {
+                              if (var_mst_1m_cpo_pko?.[tangki_name] == '')
+                              {
+                                  if (findCpoPko){
+                                      jenis = findCpoPko?.['jenis']
+                                  }
+                              }
+                              else{
+                                  // DI UTAMAKAN SUHU KETINGGIAN 1 M
+                                  jenis = var_mst_1m_cpo_pko?.[tangki_name];
+                              }
                           }
+                          else{
+                            if (findCpoPko){
+                                jenis = findCpoPko?.['jenis']
+                            }
+                          }
+                          
+                          // if (this.mst_1m_cpo_pko?.[tangki_name] == "")
+                          // {
+                              // jika pakai tanggal berlaku
+                              // if (findCpoPko){
+                              //     jenis = findCpoPko?.['jenis'];
+
+                                  // console.log("kalkulasi_volume_tangki findCpoPko");
+                                  // console.log(findCpoPko)
+                              // }
+                              // ... <end> pakai tanggal berlaku
+                          // }
+                          // else{
+                              // jenis = this.mst_1m_cpo_pko?.[tangki_name];
+                              // jenis = "halo"
+                              // alert(jenis)
+                          // }
+                          
 
                           if (findItem){
                   
@@ -4393,9 +4462,9 @@ class DashboardTangki extends React.Component {
                                       jenis
                                   }
 
-                                  if (tangki_name == "tangki_3"){
-                                    console.error(obj_temp_tank[tangki_name])
-                                  }
+                                  // if (tangki_name == "tangki_3"){
+                                  //   console.error(obj_temp_tank[tangki_name])
+                                  // }
                                   
                                   // alert(JSON.stringify(arr_berat_jenis))
                                   // volume_tbl => volume dari tabel
@@ -6116,6 +6185,107 @@ class DashboardTangki extends React.Component {
       })
   }
 
+  get_Suhu1M_From_Filter(tanggal, callback){
+
+      // kosongkan data master 1m cpo / pko
+      let kosongkan_data_mst_1m_cpopko = {}
+
+      let arr_json_tangki_last_length = Object.keys(this.mst_1m_cpo_pko_filter).length;
+
+      Object.keys(this.mst_1m_cpo_pko_filter).forEach((ele_tank_name,idx)=>{
+          kosongkan_data_mst_1m_cpopko = {
+              ...kosongkan_data_mst_1m_cpopko,
+              [ele_tank_name]: ''
+          }
+      })
+      this.mst_1m_cpo_pko_filter = {...kosongkan_data_mst_1m_cpopko}
+      // ... <end> kosongkan
+
+      let status_done = false;
+
+
+      this.getDataHour_Await(tanggal, '06:50', '08:00', (res_data)=>{
+          if (res_data?.['responseCode'] == "200"){
+
+              res_data?.['data'].forEach((ele_obj,idx_obj)=>{
+
+                  ele_obj?.['data'].forEach((ele_obj_key, idx_obj_key)=>{
+
+                      Object.keys(ele_obj_key).forEach((ele_key, idx_key)=>{
+                          let patt = new RegExp(/Temperature Tank [0-9]+.*[0-9]+.*M/,'gi')
+                          let match = patt.exec(ele_key);
+                          if (match != null){
+        
+                            let patt_tank = new RegExp(/Tank [0-9]+/,'gi')
+                            let match_tank = patt_tank.exec(match?.['input'])
+                            if (match_tank != null)
+                            {
+                                  let tangki_name = '';
+
+                                  let find_tank_in_list = this.mst_list_tangki.find(ele=>ele?.['api'].toLowerCase() == match_tank?.[0].toLowerCase())
+                                  if (find_tank_in_list){
+
+                                      tangki_name = find_tank_in_list?.['name'];
+                                      // console.log("find_tank_in_list?.['name']")
+                                      // console.log(find_tank_in_list?.['name'])
+                                  }
+
+                                  // console.log("Hasil PATT EXEC TANK")
+                                  // console.log(match_tank[0])
+
+                                  let patt_tinggi = new RegExp(/tinggi [0-9]+.*M/,'gi')
+                                  let match_patt_tinggi = patt_tinggi.exec(match?.['input'])
+                                  if (match_patt_tinggi != null){
+
+                                      let suhu_tinggi_num = parseFloat(match_patt_tinggi[0].replace(/(tinggi|M)/gi,''));
+
+                                      // HARUS AMBIL YANG KETINGGIAN 1 METER
+                                      if (suhu_tinggi_num == 1){
+                                          
+                                          let suhu_1m_val = ele_obj_key?.[ele_key];
+
+                                          // CEK APAKAH (mst_1m_cpo_pko) UNTUK SEMUA TANGKI SUDAH TERISI CPO / PKO
+
+                                          let findTank_1mCpoPko = Object.keys(this.mst_1m_cpo_pko_filter).find(ele=>ele == tangki_name);
+                                          if (findTank_1mCpoPko){
+
+                                              if (this.mst_1m_cpo_pko_filter?.[tangki_name] == '' ||
+                                                  this.mst_1m_cpo_pko_filter?.[tangki_name] == null){
+
+                                                  this.mst_1m_cpo_pko_filter = {
+                                                      ...this.mst_1m_cpo_pko_filter, 
+                                                      [tangki_name]: suhu_1m_val <= 35 ? 'PKO' : 'CPO'
+                                                  }
+
+                                                  let findEmpty = Object.values(this.mst_1m_cpo_pko_filter).find(ele=>ele == '')
+                                                  if (!findEmpty){
+                                                        status_done = true
+                                                        console.error(Object.values(this.mst_1m_cpo_pko_filter))
+                                                  }
+
+                                              }
+                                          }
+                                      }
+                                  }
+                            }
+
+                          }
+
+                      })
+                  })
+              })
+          }
+      })
+
+      // TUNGGU HINGGA SELESAI
+      let intLast = setInterval(()=>{
+          if (status_done){
+              clearInterval(intLast)
+              callback(this.mst_1m_cpo_pko_filter);
+          }
+      })
+  }
+
   clickFilter(){
       let dateSelected:any = this.state.dateSelected;
       let timeSelected:any = this.state.timeSelected;
@@ -6147,6 +6317,7 @@ class DashboardTangki extends React.Component {
 
           if (dateSelected != null || timeSelected != null)
           {
+
             if (this.state.show.datepicker && !this.state.show.timepicker){
 
                 this.data_jaraksensor_tangki_perjam_series = []
@@ -6175,7 +6346,12 @@ class DashboardTangki extends React.Component {
                 });
 
                 setTimeout(()=>{
-                  this.getAllData(this.state.dateSelected, this.state.dateSelected,'00:00','23:59')
+
+                    this.get_Suhu1M_From_Filter(formatDate(this.state.dateSelected,'YYYY-MM-DD'), (obj_mst_1m_cpo_pko_filter)=>{
+                        // alert(JSON.stringify(obj_mst_1m_cpo_pko_filter))
+                        this.getAllData(this.state.dateSelected, this.state.dateSelected,'00:00','23:59', obj_mst_1m_cpo_pko_filter)
+                    })
+
                 },200)
             }
             else
@@ -6211,7 +6387,12 @@ class DashboardTangki extends React.Component {
                     });
 
                     setTimeout(()=>{
-                      this.getAllData(dateSelected, dateSelected, timeSelected[0], timeSelected[1]);
+
+                      this.get_Suhu1M_From_Filter(formatDate(this.state.dateSelected,'YYYY-MM-DD'), (obj_mst_1m_cpo_pko_filter)=>{
+
+                          this.getAllData(dateSelected, dateSelected, timeSelected[0], timeSelected[1], obj_mst_1m_cpo_pko_filter);
+                      })
+
                     },200)
                 }
               }
@@ -6281,8 +6462,12 @@ class DashboardTangki extends React.Component {
             get_hourlast_ForPerHour = get_maxDate_ForPerHour?.['hourlast'];
           }
 
-          this.getAllData(this.tanggal_max_tangki_last, this.tanggal_max_tangki_last
-                    , get_hourbegin_ForPerHour, get_hourlast_ForPerHour)
+          this.get_Suhu1M_From_Filter(formatDate(this.state.dateSelected,'YYYY-MM-DD'), (obj_mst_1m_cpo_pko_filter)=>{
+              this.getAllData(this.tanggal_max_tangki_last, this.tanggal_max_tangki_last
+                            , get_hourbegin_ForPerHour, get_hourlast_ForPerHour,
+                            obj_mst_1m_cpo_pko_filter
+                        )
+          })
         },200)
       }
       
@@ -6291,7 +6476,7 @@ class DashboardTangki extends React.Component {
 
   onChangeTimePicker(e:any){
       // alert(JSON.stringify(e))
-      console.log(e)
+      // console.log(e)
       try{
         this.setState({
           timeSelected:[e[0], e[1]]
@@ -6303,7 +6488,7 @@ class DashboardTangki extends React.Component {
       }
   }
   onBlurTimePicker(e:any){
-    console.log(e)
+    // console.log(e)
   }
 
   onStartTimeClick(e:any){
