@@ -358,3 +358,62 @@ h4.dashtangki-cardbody-ontop{
         opacity:1
     }
 }
+
+.tesfontawesome-css:before {
+    position: absolute;
+    font-family: 'Font Awesome 5 Free';
+    content: '\f496';
+    font-weight: 900;
+    color: red;
+}
+
+.l-bg-cherry {
+    background: linear-gradient(to right, #a86008, #ffba56) !important;
+    color: white;
+}   
+
+.l-bg-blue {
+    // background: linear-gradient(to right, #0a504a, #38ef7d) !important;
+    background: linear-gradient(to right, #373b44, #4286f4) !important;
+    color: white;
+}
+
+.l-bg-green {
+    // background: linear-gradient(to right, #0a504a, #38ef7d) !important;
+    background: linear-gradient(135deg, #23bdb8 0%, #43e794 100%) !important;
+    color: white;
+}
+
+.l-bg-cyan {
+    background: linear-gradient(135deg, #289cf5, #84c0ec) !important;
+    color: white;
+}
+
+
+.card-total-1 {
+    height:150px !important;
+    margin-bottom:10px;
+}
+.card-total-2 {
+    height:150px !important;
+    margin-bottom: 10px;
+}
+
+.card {
+    .card-statistic-3 .card-icon {
+        position: absolute;
+        color: #000;
+        top: 20px;
+        right: 10px;
+        opacity: 0.3;
+
+        .class-fa-shop {
+            font-size:110px;
+        }
+    }
+
+}
+
+.progress {
+    height:10px !important;
+}

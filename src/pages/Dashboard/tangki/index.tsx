@@ -66,6 +66,8 @@ import berat_jenis_cpo_json from '../../../data/volume_tangki/berat_jenis_cpo.js
 import berat_jenis_pko_json from '../../../data/volume_tangki/berat_jenis_pko.json'
 import { toast, ToastContainer } from 'react-toastify';
 import { FALSE } from 'sass';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLayerGroup, faOilWell  } from '@fortawesome/free-solid-svg-icons';
 // import tesaja from '../../../data/tes.json'
 
 // ReactFC.fcRoot(FusionCharts, PowerCharts, FusionTheme)
@@ -150,6 +152,11 @@ const ExcelColumn = ReactExport.ExcelFile.ExcelColumn;
 
 class DashboardTangki extends React.Component {
     
+
+
+    total_cpo:any = '70%'
+    total_pko:any = '100%'
+
     data_Export:any = [];
     
     componentRef:any;
@@ -200,6 +207,14 @@ class DashboardTangki extends React.Component {
     // ... <end>
 
     props:any;
+
+    // master tinggi maksimal setiap tangki
+    mst_t_max = {
+      'tangki_1': 5406469,
+      'tangki_2': 5883034,
+      'tangki_3': 6375939,
+      'tangki_4': 6386468
+    }
 
     // satuan meter
     mst_t_lubang_ukur:any = {
@@ -6673,7 +6688,19 @@ class DashboardTangki extends React.Component {
 
       return (
             <div>
-               
+
+                {/* <div className='tesfontawesome-css'>
+                   <FontAwesomeIcon icon = {faShoppingCart} size = "3x" />
+                </div> */}
+
+                {/* <div className='progress'>
+                    <div className='progress-bar bg-success progress-bar-striped' 
+                          style = {{width:'75%'}}
+                          role="progressbar" data-width="50%" 
+                    > 
+                      </div>
+                </div> */}
+
 
                 {/* <PanggilToast ref={(response)=>(this.componentRef = response)} /> */}
 
@@ -6949,73 +6976,84 @@ class DashboardTangki extends React.Component {
 
                                         </Row> */}
 
-                                        <Row className='mt-5'>
+                                        <Row className='mt-4'>
                                             <div className='d-flex flex-column flex-md-row '>
 
                                                 <div className='width-tinggi-isi'>
-                                                    <h5 className='dashtangki-title'>Tinggi Isi Tangki ( m )</h5>
-                                                    {/* <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal_jam})</span></div> */}
-                                                    <Col>
-                                                        
-                                                        <div id="chart" className='d-flex justify-content-center align-items-center'>
 
-                                                            {/* <ReactFC
-                                                                type="column3d"
-                                                                width="100%"
-                                                                height="30%"
-                                                                dataFormat="JSON"
-                                                                dataSource={dataSource}
-                                                            /> */}
+                                                    <div className='card card-total-1 l-bg-blue'>
+                                                          <div className='card-statistic-3 p-4'>
+
+                                                              <div className='card-icon card-icon-large'>
+                                                                  <FontAwesomeIcon icon = {faOilWell} className='class-fa-shop' />
+                                                              </div>  
+
+                                                              <div className='mb-4'>
+
+                                                                  <div className='row mb-2'>
+                                                                      <h5>Total CPO</h5>
+                                                                  </div>
+
+                                                                  <div className='row'>
+                                                                      <div className='col-8'>
+                                                                          <h2 className='d-flex align-items-center mb-2'>
+                                                                              3,243
+                                                                          </h2>
+                                                                      </div>
+                                                                      <div className='col-4 d-flex justify-content-end align-items-end'>
+                                                                          <h5 style = {{fontStyle:'italic', opacity:1}}>
+                                                                              70%
+                                                                          </h5>
+                                                                      </div>
+                                                                  </div>
+
+                                                                  <div>
+                                                                      <div className='progress'>
+                                                                          <div className='progress-bar l-bg-green' role='progressbar'
+                                                                                aria-valuemin={0} aria-valuemax={100}
+                                                                                style = {{width:`${this.total_cpo}`}}>
+                                                                          </div>
+                                                                      </div>
+                                                                  </div>
+                                                              </div>
 
 
-                                                            {/* <Audio
-                                                              height="150"
-                                                              width="150"
-                                                              color="red"
-                                                              ariaLabel="audio-loading"
-                                                              wrapperStyle={{}}
-                                                              wrapperClass="wrapper-class"
-                                                              visible={this.state.loader.tinggi_isi}
-                                                            /> */}
-                                                            <ThreeCircles
-                                                                height="100"
-                                                                width="100"
-                                                                color="#4fa94d"
-                                                                wrapperStyle={{}}
-                                                                wrapperClass="classTinggiIsi"
-                                                                visible={this.state.loader.tinggi_isi}
-                                                                ariaLabel="three-circles-rotating"
-                                                                outerCircleColor="#008ffb"
-                                                                innerCircleColor="#00e396"
-                                                                middleCircleColor="#feb019"
-                                                              />
+                                                          </div>
+                                                    </div>
 
-                                                            {/* <Dna
-                                                              height = "200"
-                                                              width = "200"
-                                                              ariaLabel = 'dna-loading'
-                                                              wrapperStyle={{}}
-                                                              wrapperClass="wrapper-class"
-                                                              visible={this.state.loader.tinggi_isi}
-                                                            /> */}
+                                                    <div className='card card-total-2 l-bg-cherry'>
+                                                          <div className='card-statistic-3 p-4'>
+                                                              <div className='card-icon card-icon-large'>
+                                                                  <FontAwesomeIcon icon = {faLayerGroup} className='class-fa-shop' />
+                                                              </div>  
 
-                                                            {
-                                                              (<div id = "chartdiv" style={{width:"100%", height:"300px",
-                                                                opacity:!this.state.loader.tinggi_isi ? 1 : 0}}></div>)
-                                                            }
-                                                            {/* { 
-                                                              !this.state.loader.tinggi_isi &&
-                                                                (<div className='w-100 '>
-                                                                  <ReactApexChart 
-                                                                          options={this.state.chartTinggi.options} 
-                                                                          series={this.state.chartTinggi.series} 
-                                                                          type="bar" height={350}
-                                                                  />
-                                                                </div>)
-                                                            } */}
+                                                              <div className='mb-4'>
+                                                                  <h5>Total PKO</h5>
+                                                              </div>
 
-                                                        </div>
-                                                    </Col>
+                                                              <div className='row'>
+                                                                  <div className='col-8'>
+                                                                      <h2 className='d-fle x align-items-center mb-2'>
+                                                                          3,243
+                                                                      </h2>
+                                                                  </div>
+                                                                  <div className='col-4 d-flex justify-content-end align-items-end'>
+                                                                      <h5 style = {{fontStyle:'italic', opacity:1}}>
+                                                                          100%
+                                                                      </h5>
+                                                                  </div>
+                                                              </div>
+
+                                                              <div>
+                                                                  <div className='progress'>
+                                                                      <div className='progress-bar l-bg-cyan' role='progressbar'
+                                                                            aria-valuemin={0} aria-valuemax={100}
+                                                                            style = {{width:`${this.total_pko}`}}>
+                                                                      </div>
+                                                                  </div>
+                                                              </div>
+                                                          </div>
+                                                    </div>
                                                 </div>
 
                                                 <div className='width-suhu-tangki realtime-suhu-tangki-prop pl-3'>
@@ -7065,6 +7103,74 @@ class DashboardTangki extends React.Component {
                                                         } 
                                                     </div>
                                                 </div>
+                                                
+                                            </div>
+                                        </Row>
+
+                                        <Row>
+                                            <div className='width-tinggi-isi'>
+                                                <h5 className='dashtangki-title'>Tinggi Isi Tangki ( m )</h5>
+                                                {/* <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal_jam})</span></div> */}
+                                                <Col>
+                                                    
+                                                    <div id="chart" className='d-flex justify-content-center align-items-center'>
+
+                                                        {/* <ReactFC
+                                                            type="column3d"
+                                                            width="100%"
+                                                            height="30%"
+                                                            dataFormat="JSON"
+                                                            dataSource={dataSource}
+                                                        /> */}
+
+                                                        {/* <Audio
+                                                          height="150"
+                                                          width="150"
+                                                          color="red"
+                                                          ariaLabel="audio-loading"
+                                                          wrapperStyle={{}}
+                                                          wrapperClass="wrapper-class"
+                                                          visible={this.state.loader.tinggi_isi}
+                                                        /> */}
+                                                        <ThreeCircles
+                                                            height="100"
+                                                            width="100"
+                                                            color="#4fa94d"
+                                                            wrapperStyle={{}}
+                                                            wrapperClass="classTinggiIsi"
+                                                            visible={this.state.loader.tinggi_isi}
+                                                            ariaLabel="three-circles-rotating"
+                                                            outerCircleColor="#008ffb"
+                                                            innerCircleColor="#00e396"
+                                                            middleCircleColor="#feb019"
+                                                          />
+
+                                                        {/* <Dna
+                                                          height = "200"
+                                                          width = "200"
+                                                          ariaLabel = 'dna-loading'
+                                                          wrapperStyle={{}}
+                                                          wrapperClass="wrapper-class"
+                                                          visible={this.state.loader.tinggi_isi}
+                                                        /> */}
+
+                                                        {
+                                                          (<div id = "chartdiv" style={{width:"100%", height:"300px",
+                                                            opacity:!this.state.loader.tinggi_isi ? 1 : 0}}></div>)
+                                                        }
+                                                        {/* { 
+                                                          !this.state.loader.tinggi_isi &&
+                                                            (<div className='w-100 '>
+                                                              <ReactApexChart 
+                                                                      options={this.state.chartTinggi.options} 
+                                                                      series={this.state.chartTinggi.series} 
+                                                                      type="bar" height={350}
+                                                              />
+                                                            </div>)
+                                                        } */}
+
+                                                    </div>
+                                                </Col>
                                             </div>
                                         </Row>
 
