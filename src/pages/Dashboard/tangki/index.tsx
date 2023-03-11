@@ -2947,6 +2947,20 @@ class DashboardTangki extends React.Component {
     funcSeparateTank(arr_raw_alls:any, callback){
         let obj_tank:any = {};
 
+        // menghitung total cpo / pko
+        let obj_tank_total = {
+            "PKO":0,
+            "CPO":0
+        }
+        let obj_tank_max_total = {
+            "PKO":0,
+            "CPO":0
+        }
+        let obj_tank_total_percent = {
+            "PKO":0,
+            "CPO":0
+        }
+
         // function untuk memisahkan tangki ke masing-masing key
         // obj = {tangki_1: {'volume isi tank 1':'...', 'Jarak Sensor dengan permukaan Tank 1' : '774.91', 'id_device':"BESTAGRO_002_NEW"}}
         //       ,{tangki_2: {'volume isi tank 2':'...', 'Jarak Sensor dengan permukaan Tank 2' : '203.77', 'id_device':"BESTAGRO_002_NEW"}}
@@ -3530,8 +3544,48 @@ class DashboardTangki extends React.Component {
 
         let arr_tangki_temp:any = [];
 
+        
         // LOOPING obj_tinggi_tank_modus_filter_single
         Object.keys(obj_tinggi_tank_modus_filter_single).forEach((ele_tank_name,idx_tank_name)=>{
+
+            let volume_final = Math.round(parseFloat(obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['volume']) * 100) / 100;
+            let val_max_tangki = this.mst_t_max?.[ele_tank_name] ?? 0;
+
+            // UPDATE TOTAL VOLUME CPO / PKO
+            let jenis_update = obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['jenis'];
+    
+            // CARI APA ADA DATA JENIS YG SAMA, CPO ATAU PKO
+            let findTotalJenis = Object.keys(obj_tank_total).find((ele_jenis,idx_jenis)=>ele_jenis.toUpperCase() == jenis_update.toUpperCase());
+            if (findTotalJenis){
+                obj_tank_total[findTotalJenis] = obj_tank_total[findTotalJenis] + volume_final;
+                obj_tank_max_total[findTotalJenis] = obj_tank_max_total[findTotalJenis] + val_max_tangki;
+            }  
+            else{
+                // JIAK TIDAK ADA DATA, MAKA DI TAMBAHKAN BARU
+                obj_tank_total = {
+                    ...obj_tank_total,
+                    [jenis_update]: volume_final
+                }
+
+                obj_tank_max_total = {
+                    ...obj_tank_max_total,
+                    [jenis_update]: val_max_tangki
+                }
+                
+            }
+            // ... <end> UPDATE TOTAL VOLUME
+
+
+
+            Object.keys(obj_tank_total).forEach((ele_jenis2,idx_jenis2)=>{
+                let hitung_percent = (obj_tank_total?.[ele_jenis2] / obj_tank_max_total?.[ele_jenis2]) * 100;
+                obj_tank_total_percent = {
+                    ...obj_tank_total_percent,
+                    [ele_jenis2]: Math.round(hitung_percent * 100) / 100
+                }
+            })
+
+
 
             // taruh di temp dahulu, baru di store ke setState (karena setState tidak bisa update di looping multi data)
             temp_updatedState_global['realtime'] = {
@@ -3554,7 +3608,8 @@ class DashboardTangki extends React.Component {
                     volume_faktor_koreksi: obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['volume_faktor_koreksi'],
                     tanggal: formatDate(new Date(obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['time']), 'DD MMMM YYYY'),
                     tanggal_jam: formatDate(new Date(obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['time']), 'DD MMMM YYYY HH:mm:ss'),
-                    jenis: obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['jenis']
+                    jenis: obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['jenis'],
+                    max_tangki: val_max_tangki
                 }
             }
 
@@ -3568,6 +3623,8 @@ class DashboardTangki extends React.Component {
             }
             arr_tangki_tinggi.push(parseFloat(obj_tinggi_tank_modus_filter_single?.[ele_tank_name]?.['tinggi_minyak']));
         })
+
+
         // ... end LOOPING obj_tinggi_tank_modus_filter_single
 
         arr_tangki_name.forEach((ele, idx)=>{
@@ -3618,8 +3675,16 @@ class DashboardTangki extends React.Component {
                   name: "Tinggi Isi Tangki"}
               ]
           },
+          total: {...obj_tank_total},
+          total_max_tangki: {...obj_tank_max_total},
+          total_percent: {...obj_tank_total_percent},
           ...temp_updatedState_global
         })
+
+        setTimeout(()=>{
+          console.error("HASIL TOTAL VOLUME")
+          console.error(this.state)
+        },100)
 
         let obj_tinggi_isi_amchart:any = [];
 
@@ -3629,7 +3694,7 @@ class DashboardTangki extends React.Component {
 
             obj_tinggi_isi_amchart = [
               ...obj_tinggi_isi_amchart,
-              {
+              { 
                 tank_x: title_tangki,
                 tank_value: isNaN(temp_updatedState_global?.['realtime']?.[ele_tank_name]?.['tinggi']) ? 
                           0
@@ -6979,7 +7044,7 @@ class DashboardTangki extends React.Component {
                                         <Row className='mt-4'>
                                             <div className='d-flex flex-column flex-md-row '>
 
-                                                <div className='width-tinggi-isi'>
+                                                <div className='width-tinggi-isi class-col-totalcpopko'>
 
                                                     <div className='card card-total-1 l-bg-blue'>
                                                           <div className='card-statistic-3 p-4'>
@@ -6990,19 +7055,19 @@ class DashboardTangki extends React.Component {
 
                                                               <div className='mb-4'>
 
-                                                                  <div className='row mb-2'>
+                                                                  <div className='row mb-3'>
                                                                       <h5>Total CPO</h5>
                                                                   </div>
 
                                                                   <div className='row'>
                                                                       <div className='col-8'>
-                                                                          <h2 className='d-flex align-items-center mb-2'>
-                                                                              3,243
-                                                                          </h2>
+                                                                          <h4 className='d-flex align-items-center mb-2'>
+                                                                              {this.state.total?.['CPO'] ? new Number(this.state.total?.['CPO']).toLocaleString('en-US') : '-'} kg
+                                                                          </h4>
                                                                       </div>
                                                                       <div className='col-4 d-flex justify-content-end align-items-end'>
-                                                                          <h5 style = {{fontStyle:'italic', opacity:1}}>
-                                                                              70%
+                                                                          <h5 style = {{fontStyle:'italic', opacity:1, zIndex: 1}}>
+                                                                              {this.state?.['total_percent']?.['CPO']} %
                                                                           </h5>
                                                                       </div>
                                                                   </div>
@@ -7011,7 +7076,7 @@ class DashboardTangki extends React.Component {
                                                                       <div className='progress'>
                                                                           <div className='progress-bar l-bg-green' role='progressbar'
                                                                                 aria-valuemin={0} aria-valuemax={100}
-                                                                                style = {{width:`${this.total_cpo}`}}>
+                                                                                style = {{width:`${this.state?.['total_percent']?.['CPO']}%`}}>
                                                                           </div>
                                                                       </div>
                                                                   </div>
@@ -7033,13 +7098,13 @@ class DashboardTangki extends React.Component {
 
                                                               <div className='row'>
                                                                   <div className='col-8'>
-                                                                      <h2 className='d-fle x align-items-center mb-2'>
-                                                                          3,243
-                                                                      </h2>
+                                                                      <h4 className='d-flex align-items-center mb-2'>
+                                                                          {this.state.total?.['PKO'] ? new Number(this.state.total?.['PKO']).toLocaleString('en-US') : '-'} kg
+                                                                      </h4>
                                                                   </div>
                                                                   <div className='col-4 d-flex justify-content-end align-items-end'>
-                                                                      <h5 style = {{fontStyle:'italic', opacity:1}}>
-                                                                          100%
+                                                                      <h5 style = {{fontStyle:'italic', opacity:1, zIndex: 1}}>
+                                                                            {this.state?.['total_percent']?.['PKO']} %
                                                                       </h5>
                                                                   </div>
                                                               </div>
@@ -7048,7 +7113,7 @@ class DashboardTangki extends React.Component {
                                                                   <div className='progress'>
                                                                       <div className='progress-bar l-bg-cyan' role='progressbar'
                                                                             aria-valuemin={0} aria-valuemax={100}
-                                                                            style = {{width:`${this.total_pko}`}}>
+                                                                            style = {{width:`${this.state?.['total_percent']?.['PKO']}%`}}>
                                                                       </div>
                                                                   </div>
                                                               </div>
@@ -7107,84 +7172,132 @@ class DashboardTangki extends React.Component {
                                             </div>
                                         </Row>
 
-                                        <Row>
-                                            <div className='width-tinggi-isi'>
-                                                <h5 className='dashtangki-title'>Tinggi Isi Tangki ( m )</h5>
-                                                {/* <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal_jam})</span></div> */}
-                                                <Col>
-                                                    
-                                                    <div id="chart" className='d-flex justify-content-center align-items-center'>
+                                        <Row className='mt-4'>
+                                            <div className='d-flex flex-column flex-md-row'>
+                                                <div className='width-tinggi-isi'>
+                                                    <h5 className='dashtangki-title'>Tinggi Isi Tangki ( m )</h5>
+                                                    {/* <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal_jam})</span></div> */}
+                                                    <Col>
+                                                        
+                                                        <div id="chart" className='d-flex justify-content-center align-items-center'>
 
-                                                        {/* <ReactFC
-                                                            type="column3d"
+                                                            {/* <ReactFC
+                                                                type="column3d"
+                                                                width="100%"
+                                                                height="30%"
+                                                                dataFormat="JSON"
+                                                                dataSource={dataSource}
+                                                            /> */}
+
+                                                            {/* <Audio
+                                                              height="150"
+                                                              width="150"
+                                                              color="red"
+                                                              ariaLabel="audio-loading"
+                                                              wrapperStyle={{}}
+                                                              wrapperClass="wrapper-class"
+                                                              visible={this.state.loader.tinggi_isi}
+                                                            /> */}
+                                                            <ThreeCircles
+                                                                height="100"
+                                                                width="100"
+                                                                color="#4fa94d"
+                                                                wrapperStyle={{}}
+                                                                wrapperClass="classTinggiIsi"
+                                                                visible={this.state.loader.tinggi_isi}
+                                                                ariaLabel="three-circles-rotating"
+                                                                outerCircleColor="#008ffb"
+                                                                innerCircleColor="#00e396"
+                                                                middleCircleColor="#feb019"
+                                                              />
+
+                                                            {/* <Dna
+                                                              height = "200"
+                                                              width = "200"
+                                                              ariaLabel = 'dna-loading'
+                                                              wrapperStyle={{}}
+                                                              wrapperClass="wrapper-class"
+                                                              visible={this.state.loader.tinggi_isi}
+                                                            /> */}
+
+                                                            {
+                                                              (<div id = "chartdiv" style={{width:"100%", height:"300px",
+                                                                opacity:!this.state.loader.tinggi_isi ? 1 : 0}}></div>)
+                                                            }
+                                                            {/* { 
+                                                              !this.state.loader.tinggi_isi &&
+                                                                (<div className='w-100 '>
+                                                                  <ReactApexChart 
+                                                                          options={this.state.chartTinggi.options} 
+                                                                          series={this.state.chartTinggi.series} 
+                                                                          type="bar" height={350}
+                                                                  />
+                                                                </div>)
+                                                            } */}
+
+                                                        </div>
+                                                    </Col>
+                                                </div>
+
+                                                <div className='width-volume-isi'>
+                                                    <h5 className='dashtangki-title'>Volume Tangki ( kg )</h5>
+                                                    {/* <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal_jam})</span></div> */}
+
+                                                    <Col className='d-flex flex-nowrap customclass-snap'>
+                                                        {/* <ReactFC {...this.chartConfigs_Suhu}/>
+                                                        <ReactFC {...this.chartConfigs_Suhu}/>
+                                                        <ReactFC {...this.chartConfigs_Suhu}/>
+                                                        <ReactFC {...this.chartConfigs_Suhu}/> */}
+                                                        {
+                                                          this.mst_list_tangki.map((ele,idx)=>{
+                                                            return (
+                                                              <div className='snap-col' key = {ele.name}>
+                                                                  <CylinderFC
+                                                                        caption = {ele.title + 
+                                                                                (typeof this.state.realtime?.[ele.name]?.['jenis'] != 'undefined' &&
+                                                                                this.state.realtime?.[ele.name]?.['jenis'] != null 
+                                                                                ? ' (' + this.state.realtime?.[ele.name]?.['jenis'] + ')'
+                                                                                : '')
+                                                                              } 
+                                                                        subcaption2={this.state.realtime?.[ele.name]?.['tanggal_jam']}
+                                                                        subcaption={this.state.realtime?.[ele.name]?.['tanggal']} 
+                                                                        value={this.state.realtime?.[ele.name]?.['volume']} plottooltext_hover="Volume"/>
+                                                              </div>
+                                                            )
+                                                          })
+                                                        }
+                                                          
+                                                        {/* <div className='snap-col'>
+                                                            <CylinderFC caption = "Tangki 2" value={4774841.53} plottooltext_hover="Volume"/>
+                                                        </div>
+                                                        <div className='snap-col'>
+                                                            <CylinderFC caption = "Tangki 3" value={0} plottooltext_hover="Volume"/>
+                                                        </div>
+                                                        <div className='snap-col'>
+                                                            <CylinderFC caption = "Tangki 4" value={3028794.28} plottooltext_hover="Volume"/>
+                                                        </div> */}
+
+                                                        {/* <ReactFusioncharts
+                                                            type="thermometer"
                                                             width="100%"
-                                                            height="30%"
+                                                            height="100%"
                                                             dataFormat="JSON"
                                                             dataSource={dataSource}
-                                                        /> */}
-
-                                                        {/* <Audio
-                                                          height="150"
-                                                          width="150"
-                                                          color="red"
-                                                          ariaLabel="audio-loading"
-                                                          wrapperStyle={{}}
-                                                          wrapperClass="wrapper-class"
-                                                          visible={this.state.loader.tinggi_isi}
-                                                        /> */}
-                                                        <ThreeCircles
-                                                            height="100"
-                                                            width="100"
-                                                            color="#4fa94d"
-                                                            wrapperStyle={{}}
-                                                            wrapperClass="classTinggiIsi"
-                                                            visible={this.state.loader.tinggi_isi}
-                                                            ariaLabel="three-circles-rotating"
-                                                            outerCircleColor="#008ffb"
-                                                            innerCircleColor="#00e396"
-                                                            middleCircleColor="#feb019"
-                                                          />
-
-                                                        {/* <Dna
-                                                          height = "200"
-                                                          width = "200"
-                                                          ariaLabel = 'dna-loading'
-                                                          wrapperStyle={{}}
-                                                          wrapperClass="wrapper-class"
-                                                          visible={this.state.loader.tinggi_isi}
-                                                        /> */}
-
-                                                        {
-                                                          (<div id = "chartdiv" style={{width:"100%", height:"300px",
-                                                            opacity:!this.state.loader.tinggi_isi ? 1 : 0}}></div>)
-                                                        }
-                                                        {/* { 
-                                                          !this.state.loader.tinggi_isi &&
-                                                            (<div className='w-100 '>
-                                                              <ReactApexChart 
-                                                                      options={this.state.chartTinggi.options} 
-                                                                      series={this.state.chartTinggi.series} 
-                                                                      type="bar" height={350}
-                                                              />
-                                                            </div>)
-                                                        } */}
-
-                                                    </div>
-                                                </Col>
+                                                          /> */}
+                                                    </Col>
+                                                </div>
                                             </div>
                                         </Row>
 
-                                        <Row className='mt-3'>
+                                        {/* <Row className='mt-3'>
                                           
                                             <Col className='d-flex justify-content-start flex-nowrap customclass-snap'>
-                                                {/* <ReactFC {...this.chartConfigs_Suhu}/>
                                                 <ReactFC {...this.chartConfigs_Suhu}/>
                                                 <ReactFC {...this.chartConfigs_Suhu}/>
-                                                <ReactFC {...this.chartConfigs_Suhu}/> */}
+                                                <ReactFC {...this.chartConfigs_Suhu}/>
+                                                <ReactFC {...this.chartConfigs_Suhu}/>
                                                
-                                                
-
-                                                {/* <div className='snap-col'>
+                                                <div className='snap-col'>
                                                     <ThermometerFC caption = "Tangki 2" value={50}/>
                                                 </div>
                                                 <div className='snap-col'>
@@ -7192,66 +7305,21 @@ class DashboardTangki extends React.Component {
                                                 </div>
                                                 <div className='snap-col'>
                                                     <ThermometerFC caption = "Tangki 4" value={25}/>
-                                                </div> */}
+                                                </div>
 
-                                                {/* <ReactFusioncharts
+                                                <ReactFusioncharts
                                                     type="thermometer"
                                                     width="100%"
                                                     height="100%"
                                                     dataFormat="JSON"
                                                     dataSource={dataSource}
-                                                  /> */}
+                                                  />
                                             </Col>
-                                      </Row>
+                                        </Row> */}
 
-                                        <Row className='mt-4'>
-                                            <h5 className='dashtangki-title'>Volume Tangki ( kg )</h5>
-                                            {/* <div className='mt--4'><span className='dashtangki-subtitle'>({this.state.waktu.tanggal_jam})</span></div> */}
-
-                                            <Col className='d-flex flex-nowrap customclass-snap'>
-                                                {/* <ReactFC {...this.chartConfigs_Suhu}/>
-                                                <ReactFC {...this.chartConfigs_Suhu}/>
-                                                <ReactFC {...this.chartConfigs_Suhu}/>
-                                                <ReactFC {...this.chartConfigs_Suhu}/> */}
-                                                {
-                                                  this.mst_list_tangki.map((ele,idx)=>{
-                                                    return (
-                                                      <div className='snap-col' key = {ele.name}>
-                                                        <CylinderFC 
-                                                                caption = {ele.title + 
-                                                                        (typeof this.state.realtime?.[ele.name]?.['jenis'] != 'undefined' &&
-                                                                        this.state.realtime?.[ele.name]?.['jenis'] != null 
-                                                                        ? ' (' + this.state.realtime?.[ele.name]?.['jenis'] + ')'
-                                                                        : '')
-                                                                      } 
-                                                                subcaption2={this.state.realtime?.[ele.name]?.['tanggal_jam']}
-                                                                subcaption={this.state.realtime?.[ele.name]?.['tanggal']} 
-                                                                value={this.state.realtime?.[ele.name]?.['volume']} plottooltext_hover="Volume"/>
-                                                      </div>
-                                                    )
-                                                  })
-                                                } 
-                                                  
-                                                {/* <div className='snap-col'>
-                                                    <CylinderFC caption = "Tangki 2" value={4774841.53} plottooltext_hover="Volume"/>
-                                                </div>
-                                                <div className='snap-col'>
-                                                    <CylinderFC caption = "Tangki 3" value={0} plottooltext_hover="Volume"/>
-                                                </div>
-                                                <div className='snap-col'>
-                                                    <CylinderFC caption = "Tangki 4" value={3028794.28} plottooltext_hover="Volume"/>
-                                                </div> */}
-
-                                                {/* <ReactFusioncharts
-                                                    type="thermometer"
-                                                    width="100%"
-                                                    height="100%"
-                                                    dataFormat="JSON"
-                                                    dataSource={dataSource}
-                                                  /> */}
-                                            </Col>
-                                        </Row>
-
+                                        {/* <Row className='mt-4'>
+                                            VOLUME (KG) previous
+                                        </Row> */}
 
                                         <Row className='mt-5'>
                                             {/* <hr></hr> */}
