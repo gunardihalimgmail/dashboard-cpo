@@ -8,7 +8,7 @@ import logo from '../assets/images/logo.svg';
 import { Route_custom } from '../config';
 import { actionCreators, State } from '../state';
 import './App.css';
-import Login from './login';
+import Login from './login/index_style2';
 import useUpdateLogger from './customHook/useUpdateLogger';
 import useLocalStorage from './customHook/useLocalStorage';
 import usePrevPage from './customHook/usePrevPage';

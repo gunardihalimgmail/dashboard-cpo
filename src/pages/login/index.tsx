@@ -1,24 +1,16 @@
-import { LukePorter } from '../../assets'
-import { Button, Gap, Input, Link } from '../../components'
+import React from 'react'
 import './login.scss'
 
 const Login = () => {
-    return (
-        <div className="main-page">
-            <div className="left">
-                <img src={LukePorter} className="bg-image" alt="bgImage"/>
-            </div>
-            <div className="right">
-                <p className='title'>Login</p>
-                <Input label="Email" placeholder = "Email"/>
-                <Gap height={7} />
-                <Input label="Password" placeholder = "Password" type="password"/>
-                <Gap height={20}/>
-                <Button title="Register"/>
-                <Link className="link" title="Kembali ke login" />
-            </div>
+  return (
+    <div className='login-container'>
+        <div className='login-sub-container d-flex justify-content-center align-items-center'>
+            <form className='form-login'>
+                <h1>HALO</h1>
+            </form>
         </div>
-    )   
+    </div>
+  )
 }
 
 export default Login

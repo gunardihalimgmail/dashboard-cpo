@@ -1,7 +1,8 @@
 import react from 'react'
 import { BrowserRouter } from "react-router-dom"
 import { Navigate, Route, Routes } from 'react-router'
-import Login from '../../pages/login'
+// import Login from '../../pages/login/index_style2'
+import Login from '../../pages/login/index'
 import Register from '../../pages/register'
 import Home from '../../pages/Home'
 import CreateBlog from '../../pages/CreateBlog'

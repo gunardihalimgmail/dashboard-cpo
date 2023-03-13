@@ -5,7 +5,7 @@ import CreateBlogChild from '../CreateBlogChild'
 import DetailBlog from '../DetailBlog'
 import Footer from '../Footer'
 import Header from '../Header'
-import Login from '../login'
+import Login from '../login/index_style2'
 import './HomeApp.scss'
 
 const Home = () => {
